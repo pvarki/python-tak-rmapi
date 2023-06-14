@@ -42,6 +42,9 @@ junit_family="xunit2"
 addopts="--cov=takrmapi --cov-fail-under=65 --cov-branch"
 asyncio_mode="strict"
 
+[tool.pylint.MASTER]
+extension-pkg-allow-list = "pydantic"
+
 [tool.pylint.format]
 max-line-length = 120
 
