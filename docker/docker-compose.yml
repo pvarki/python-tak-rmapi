@@ -1,0 +1,16 @@
+version: '2.1'
+services:
+  tak-rmapi:
+    image: pvarki/tak-rmapi
+    container_name: tak-rmapi
+    network_mode: "host"
+    privileged: true
+    #ports:
+    #  - "8000:8000"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+
+  busybox:
+    image: busybox
+    container_name: Tunkki2
+    command: sleep 999999

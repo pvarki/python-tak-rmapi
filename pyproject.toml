@@ -2,7 +2,7 @@
 name = "takrmapi"
 version = "0.1.0"
 description = "RASENMAEHER integration API for TAK server"
-authors = ["Eero af Heurlin <rambo@iki.fi>"]
+authors = ["Ari Karhunen <ari.karhunen@iki.fi>"]
 # FIXME: Doublecheck these values
 #homepage = "https://gitlab.com/advian-oss/python-tak-rmapi/"
 #repository = "https://gitlab.com/advian-oss/python-tak-rmapi/"
