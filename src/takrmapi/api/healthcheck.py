@@ -26,7 +26,7 @@ async def get_healthcheck_delivery_status(
     ready_to_serve: bool = False
 
     # TODO do some actual logic to check if we have something to serve...
-    dir_files = os.listdir("/opt/tak/data/certs")
+    dir_files = os.listdir("/opt/tak/data/certs/files")
     if len(dir_files) > 0:
         ready_to_serve = True
 
