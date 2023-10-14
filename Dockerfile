@@ -96,6 +96,7 @@ FROM python:3.11-slim-bookworm as production
 COPY --from=production_build /tmp/wheelhouse /tmp/wheelhouse
 COPY --from=production_build /docker-entrypoint.sh /docker-entrypoint.sh
 COPY --from=pvarki/kw_product_init:latest /kw_product_init /kw_product_init
+COPY docker/container-init.sh /container-init.sh
 
 WORKDIR /app
 # Install system level deps for running the package (not devel versions for building wheels)
@@ -147,6 +148,7 @@ ENTRYPOINT ["/usr/bin/tini", "--", "docker/entrypoint-test.sh"]
 # Re run install to get the service itself installed
 RUN --mount=type=ssh source /.venv/bin/activate \
     && poetry install --no-interaction --no-ansi \
+    && ln -s /app/docker/container-init.sh /container-init.sh \
     && docker/pre_commit_init.sh \
     && true
 
@@ -156,11 +158,16 @@ RUN --mount=type=ssh source /.venv/bin/activate \
 ###########
 FROM devel_build as devel_shell
 # Copy everything to the image
+COPY --from=pvarki/kw_product_init:latest /kw_product_init /kw_product_init
 COPY . /app
 WORKDIR /app
 RUN apt-get update && apt-get install -y zsh \
     && sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" \
     && echo "source /root/.profile" >>/root/.zshrc \
     && pip3 install git-up \
+    # Map the special names to docker host internal ip because 127.0.0.1 is *container* localhost on login
+    && echo "sed 's/.*localmaeher.*//g' /etc/hosts >/etc/hosts.new && cat /etc/hosts.new >/etc/hosts" >>/root/.profile \
+    && echo "echo \"\$(getent hosts host.docker.internal | awk '{ print $1 }') localmaeher.pvarki.fi mtls.localmaeher.pvarki.fi\" >>/etc/hosts" >>/root/.profile \
+    && ln -s /app/docker/container-init.sh /container-init.sh \
     && true
 ENTRYPOINT ["/bin/zsh", "-l"]

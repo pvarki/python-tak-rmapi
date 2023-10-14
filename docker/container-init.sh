@@ -9,6 +9,9 @@ then
   echo "First run already cone"
 else
   # Do the normal init
-  /kw_product_init init /pvarki/kraftwerk-init.json
-  date -u +"%Y%m%dT%H%M" >/data/persistent/firstrun.done
+  if [ -f /pvarki/kraftwerk-init.json ]
+  then
+    /kw_product_init init /pvarki/kraftwerk-init.json
+    date -u +"%Y%m%dT%H%M" >/data/persistent/firstrun.done
+  fi
 fi
