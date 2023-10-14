@@ -118,9 +118,10 @@ RUN --mount=type=ssh apt-get update && apt-get install -y \
     # Map the special names to docker host internal ip because 127.0.0.1 is *container* localhost on login
     && echo "sed 's/.*localmaeher.*//g' /etc/hosts >/etc/hosts.new && cat /etc/hosts.new >/etc/hosts" >>/root/.profile \
     && echo "echo \"\$(getent hosts host.docker.internal | awk '{ print $1 }') localmaeher.pvarki.fi mtls.localmaeher.pvarki.fi\" >>/etc/hosts" >>/root/.profile \
+    # Make some directories
+    && mkdir -p /opt/tak/data/certs \
+    && mkdir -p /app/devel_certs/cfssl \
     && true
-RUN mkdir -p /opt/tak/data/certs
-RUN mkdir -p /app/devel_certs/cfssl
 COPY ./tests/data/cfssl /app/devel_certs/cfssl
 ENTRYPOINT ["/usr/bin/tini", "--", "/docker-entrypoint.sh"]
 
@@ -159,13 +160,6 @@ COPY . /app
 WORKDIR /app
 RUN apk add --no-cache zsh \
     && sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" \
-    && echo "if [ \"\$NO_WHEELHOUSE\" = \"1\" ]" >>/root/.profile \
-    && echo "then" >>/root/.profile \
-    && echo "  echo \"Wheelhouse disabled\"" >>/root/.profile \
-    && echo "else">>/root/.profile \
-    && echo "  export PIP_TRUSTED_HOST=172.17.0.1" >>/root/.profile \
-    && echo "  export PIP_FIND_LINKS=http://172.17.0.1:3141" >>/root/.profile \
-    && echo "fi" >>/root/.profile \
     && echo "source /root/.profile" >>/root/.zshrc \
     && pip3 install git-up \
     && true
