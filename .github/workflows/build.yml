@@ -42,4 +42,4 @@ jobs:
     - uses: pvarki/ci@main
       with:
         dockerfile-target: devel_shell
-        image-tag: rasenmaeher_api:devel_shell
+        image-tag: takrmapi:devel_shell
