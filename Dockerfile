@@ -1,3 +1,5 @@
+ARG TEMURIN_VERSION="17"
+
 # syntax=docker/dockerfile:1.1.7-experimental
 #############################################
 # Tox testsuite for multiple python version #
@@ -19,7 +21,8 @@ RUN export RESOLVED_VERSIONS=`pyenv_resolve $PYTHON_VERSIONS` \
 ######################
 # Base builder image #
 ######################
-FROM python:3.11-bookworm as builder_base
+FROM eclipse-temurin:${TEMURIN_VERSION}-jammy as builder_base
+#FROM python:3.11-bookworm as builder_base
 
 ENV \
   # locale
@@ -47,12 +50,14 @@ RUN apt-get update && apt-get install -y \
         tini \
         openssh-client \
         cargo \
-    && apt-get autoremove -y \
+        python3.11
+RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.11
+RUN apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/* \
     # githublab ssh
     && mkdir -p -m 0700 ~/.ssh && ssh-keyscan gitlab.com github.com | sort > ~/.ssh/known_hosts \
     # Installing `poetry` package manager:
-    && curl -sSL https://install.python-poetry.org | python3 - \
+    && curl -sSL https://install.python-poetry.org | python3.11 - \
     && echo 'export PATH="/root/.local/bin:$PATH"' >>/root/.profile \
     && export PATH="/root/.local/bin:$PATH" \
     && true
@@ -92,7 +97,9 @@ RUN --mount=type=ssh source /.venv/bin/activate \
 #########################
 # Main production build #
 #########################
-FROM python:3.11-slim-bookworm as production
+# FROM pvarki/takserver:4.10-RELEASE-12 as compose-base
+FROM eclipse-temurin:${TEMURIN_VERSION}-jammy as production
+# FROM python:3.11-slim-bookworm as production
 COPY --from=production_build /tmp/wheelhouse /tmp/wheelhouse
 COPY --from=production_build /docker-entrypoint.sh /docker-entrypoint.sh
 COPY --from=pvarki/kw_product_init:latest /kw_product_init /kw_product_init
@@ -109,7 +116,9 @@ RUN --mount=type=ssh apt-get update && apt-get install -y \
         openssh-client \
         curl \
         jq \
-    && apt-get autoremove -y \
+        python3.11
+RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.11
+RUN apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/* \
     && chmod a+x /docker-entrypoint.sh \
     && WHEELFILE=`echo /tmp/wheelhouse/takrmap*.whl` \
@@ -122,9 +131,21 @@ RUN --mount=type=ssh apt-get update && apt-get install -y \
     # Make some directories
     && mkdir -p /opt/tak/data/certs \
     && mkdir -p /app/devel_certs/cfssl \
+    && curl https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh -o /usr/bin/wait-for-it.sh \
+    && chmod a+x /usr/bin/wait-for-it.sh \
     && true
 COPY ./tests/data/cfssl /app/devel_certs/cfssl
 ENTRYPOINT ["/usr/bin/tini", "--", "/docker-entrypoint.sh"]
+
+
+#####################
+# Compose container #
+#####################
+FROM pvarki/takserver:4.10-RELEASE-12 as tak_server
+FROM production as integ_production
+COPY --from=tak_server /opt/tak /opt/tak
+COPY --from=tak_server /opt/scripts /opt/scripts
+COPY --from=tak_server /opt/templates /opt/templates
 
 
 #####################################
@@ -169,5 +190,7 @@ RUN apt-get update && apt-get install -y zsh \
     && echo "sed 's/.*localmaeher.*//g' /etc/hosts >/etc/hosts.new && cat /etc/hosts.new >/etc/hosts" >>/root/.profile \
     && echo "echo \"\$(getent hosts host.docker.internal | awk '{ print $1 }') localmaeher.pvarki.fi mtls.localmaeher.pvarki.fi\" >>/etc/hosts" >>/root/.profile \
     && ln -s /app/docker/container-init.sh /container-init.sh \
+    && curl https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh -o /usr/bin/wait-for-it.sh \
+    && chmod a+x /usr/bin/wait-for-it.sh \
     && true
 ENTRYPOINT ["/bin/zsh", "-l"]
