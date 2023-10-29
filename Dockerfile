@@ -194,3 +194,13 @@ RUN apt-get update && apt-get install -y zsh \
     && chmod a+x /usr/bin/wait-for-it.sh \
     && true
 ENTRYPOINT ["/bin/zsh", "-l"]
+
+
+############################
+# Compose container target #
+############################
+FROM pvarki/takserver:4.10-RELEASE-12 as tak_server
+FROM devel_shell as integ_devel_shell
+COPY --from=tak_server /opt/tak /opt/tak
+COPY --from=tak_server /opt/scripts /opt/scripts
+COPY --from=tak_server /opt/templates /opt/templates
