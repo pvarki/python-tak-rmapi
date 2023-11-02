@@ -8,6 +8,7 @@ from libpvarki.schemas.product import UserCRUDRequest
 from libpvarki.schemas.generic import OperationResultResponse
 
 from takrmapi import tak_helpers
+from takrmapi.tak_schema import UserMissionZipRequest
 
 LOGGER = logging.getLogger(__name__)
 
@@ -19,15 +20,9 @@ test_router = APIRouter()
 @router.post("/created")
 async def user_created(user: UserCRUDRequest) -> OperationResultResponse:
     """New device cert was created"""
-    _ = user  # TODO: should we validate the cert at this point ??
-
+    tak_usercrud = tak_helpers.UserCRUD(user)
     LOGGER.info("Adding new user '{}' to TAK".format(user.callsign))
-
-    await tak_helpers.add_new_user(callsign=user.callsign, x509cert=user.x509cert)
-
-    # uuid: str = Field(description="RASENMAEHER UUID for this user")
-    # callsign: str = Field(description="Callsign of the user")
-    # x509cert: str = Field(description="Certificate encoded with CFSSL conventions (newlines escaped)")
+    await tak_usercrud.add_new_user()
 
     result = OperationResultResponse(success=True)
     return result
@@ -38,8 +33,8 @@ async def user_created(user: UserCRUDRequest) -> OperationResultResponse:
 @router.post("/revoked")
 async def user_revoked(user: UserCRUDRequest) -> OperationResultResponse:
     """Device cert was revoked"""
-    _ = user
-    await tak_helpers.revoke_user(callsign=user.callsign)
+    tak_usercrud = tak_helpers.UserCRUD(user)
+    await tak_usercrud.revoke_user()
     result = OperationResultResponse(success=True)
     return result
 
@@ -47,8 +42,8 @@ async def user_revoked(user: UserCRUDRequest) -> OperationResultResponse:
 @router.post("/promoted")
 async def user_promoted(user: UserCRUDRequest) -> OperationResultResponse:
     """Device cert was promoted to admin privileges"""
-    _ = user
-    await tak_helpers.promote_user(callsign=user.callsign)
+    tak_usercrud = tak_helpers.UserCRUD(user)
+    await tak_usercrud.promote_user()
     result = OperationResultResponse(success=True)
     return result
 
@@ -56,8 +51,8 @@ async def user_promoted(user: UserCRUDRequest) -> OperationResultResponse:
 @router.post("/demoted")
 async def user_demoted(user: UserCRUDRequest) -> OperationResultResponse:
     """Device cert was demoted to standard privileges"""
-    _ = user
-    await tak_helpers.demote_user(callsign=user.callsign)
+    tak_usercrud = tak_helpers.UserCRUD(user)
+    await tak_usercrud.demote_user()
     result = OperationResultResponse(success=True)
     return result
 
@@ -65,17 +60,17 @@ async def user_demoted(user: UserCRUDRequest) -> OperationResultResponse:
 @router.put("/updated")
 async def user_updated(user: UserCRUDRequest) -> OperationResultResponse:
     """Device callsign updated"""
-    _ = user
-    await tak_helpers.update_user(callsign=user.callsign, x509cert=user.x509cert)
+    tak_usercrud = tak_helpers.UserCRUD(user)
+    await tak_usercrud.update_user()
     result = OperationResultResponse(success=True)
     return result
 
 
 @router.get("/missionzip")
-async def get_missionpkg(user: UserCRUDRequest) -> List[Dict[str, str]]:
+async def get_missionpkg(user_mission: UserMissionZipRequest) -> List[Dict[str, str]]:
     """Return zip package containing client config and certificates"""
-    _ = user
-    zip_files = await tak_helpers.create_missionpkg(callsign=user.callsign, missionpkg="example")
+    tak_missionpkg = tak_helpers.MissionZip(user_mission)
+    zip_files = await tak_missionpkg.create_missionpkg()
     returnable: List[Dict[str, str]] = []
     for file in zip_files:
         with open(file, "rb") as filehandle:
@@ -85,7 +80,7 @@ async def get_missionpkg(user: UserCRUDRequest) -> List[Dict[str, str]]:
             {
                 "title": filename,
                 "data": f"data:application/zip;base64,{base64.b64encode(contents).decode('ascii')}",
-                "filename": f"{user.callsign}_{filename}",
+                "filename": f"{user_mission.callsign}_{filename}",
             }
         )
     return returnable
@@ -94,9 +89,9 @@ async def get_missionpkg(user: UserCRUDRequest) -> List[Dict[str, str]]:
 # REMOVE ME, JUST FOR TESTING
 @router.get("/test-list-m")
 async def test_user_listm() -> OperationResultResponse:
-    """Device callsign updated"""
-    await tak_helpers.tak_api_user_list()
-
+    """Get user listing from TAK rest api"""
+    t_rest_helper = tak_helpers.RestHelpers()
+    await t_rest_helper.tak_api_user_list()
     result = OperationResultResponse(success=True)
     return result
 
@@ -104,7 +99,8 @@ async def test_user_listm() -> OperationResultResponse:
 # REMOVE ME, JUST FOR TESTING
 @test_router.get("/test-list")
 async def user_list() -> OperationResultResponse:
-    """Device callsign updated"""
-    await tak_helpers.tak_api_user_list()
+    """Get user listing from TAK rest api, no jwt/mtls check"""
+    t_rest_helper = tak_helpers.RestHelpers()
+    await t_rest_helper.tak_api_user_list()
     result = OperationResultResponse(success=True)
     return result
