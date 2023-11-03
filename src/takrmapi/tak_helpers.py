@@ -7,16 +7,15 @@ from pathlib import Path
 from typing import Any, Mapping, Union, cast
 import aiohttp
 import cryptography.x509
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.asymmetric import rsa
-from cryptography.hazmat.primitives.serialization import load_pem_private_key, pkcs12, NoEncryption, PrivateFormat
+from cryptography.hazmat.primitives.serialization import pkcs12, NoEncryption
 from OpenSSL import crypto  # FIXME: Move to python-cryptography for cert parsing
 from jinja2 import Template
 
 from libpvarki.schemas.product import UserCRUDRequest
 from libpvarki.mtlshelp.session import get_session as libsession
 from takrmapi import config
-from takrmapi.tak_schema import UserMissionZipRequest
+
+# from takrmapi.tak_schema import UserMissionZipRequest
 
 
 LOGGER = logging.getLogger(__name__)
@@ -77,19 +76,17 @@ class UserCRUD:
 class MissionZip:
     """Mission package class"""
 
-    def __init__(self, user_mission: UserMissionZipRequest):
-        self.user_mission: UserMissionZipRequest = user_mission
-        self.user: UserCRUDRequest = UserCRUDRequest(
-            uuid=self.user_mission.uuid, callsign=self.user_mission.callsign, x509cert=self.user_mission.x509cert
-        )
+    def __init__(self, user: UserCRUDRequest):
+        self.user: UserCRUDRequest = user
         self.helpers = Helpers(self.user)
+        self.missionpkg = config.TAK_MISSIONPKG_DEFAULT_MISSION  # Option for different missionpkgs in future?
 
     async def create_missionpkg(self) -> list[str]:
         """Create tak mission package packages to different app versions"""
         returnable: list[str] = []
         # FIXME: Use Paths until absolutely have to convert to strings
-        tmp_folder = f"{config.TAK_MISSIONPKG_TMP}/{self.user_mission.callsign}_{self.user_mission.missionpkg}"
-        walk_dir = f"{config.TAK_MISSIONPKG_TEMPLATES_FOLDER}/{self.user_mission.missionpkg}"
+        tmp_folder = f"{config.TAK_MISSIONPKG_TMP}/{self.user.callsign}_{self.missionpkg}"
+        walk_dir = f"{config.TAK_MISSIONPKG_TEMPLATES_FOLDER}/{self.missionpkg}"
         await self.helpers.remove_tmp_dir(tmp_folder)
         os.makedirs(tmp_folder)
         if os.path.exists(f"{walk_dir}/atak"):
@@ -105,9 +102,7 @@ class MissionZip:
         """Loop through files in missionpkg templates folder"""
         # TODO maybe in memory fs for tmp files...
 
-        tmp_folder = (
-            f"{config.TAK_MISSIONPKG_TMP}/{self.user_mission.callsign}_{self.user_mission.missionpkg}/{app_version}"
-        )
+        tmp_folder = f"{config.TAK_MISSIONPKG_TMP}/{self.user.callsign}_{self.missionpkg}/{app_version}"
         os.makedirs(tmp_folder)
         for root, dirs, files in os.walk(walk_dir):
             for name in dirs:
@@ -143,8 +138,8 @@ class MissionZip:
             tak_server_uid_name="UID_NAME_TODO",
             tak_server_name="TAK_SRV_NAME_TODO",
             tak_server_address="SOME_TAK_ADDRESS",
-            client_cert_name=self.user_mission.callsign,
-            client_cert_password=self.user_mission.callsign,
+            client_cert_name=self.user.callsign,
+            client_cert_password=self.user.callsign,
         )
 
     async def zip_folder_content(self, zipfile: str, tmp_folder: str) -> None:
@@ -170,42 +165,19 @@ class MissionZip:
             LOGGER.info("Creating takserver-public.p12 file")
             dest_file = f"{tmp_folder}/content/takserver-public.p12"
             await self.write_pfx_just_cert(cert_file="/le_certs/rasenmaeher/fullchain.pem", dest_file=dest_file)
-        if f"{self.user_mission.callsign}.p12" in row:
-            LOGGER.info("Creating {}.p12 file".format(self.user_mission.callsign))
-            dest_file = f"{tmp_folder}/content/{ self.user_mission.callsign }.p12"
-            await self.write_pfx(
-                cert_file=f"{config.TAK_CERTS_FOLDER}/{self.user_mission.callsign}.pem",
-                dest_file=dest_file,
-            )
+        if f"{self.user.callsign}.p12" in row:
+            LOGGER.info("DISABLED - Creating {}.p12 file".format(self.user.callsign))
+            # dest_file = f"{tmp_folder}/content/{ self.user.callsign }.p12"
+            # await self.write_pfx(
+            #    cert_file=f"{config.TAK_CERTS_FOLDER}/{self.user.callsign}.pem",
+            #    dest_file=dest_file,
+            # )
 
     async def write_pfx_just_cert(self, cert_file: str, dest_file: str) -> None:
         """Write the server certificate pfx"""
         cert = cryptography.x509.load_pem_x509_certificate(Path(cert_file).read_bytes())
         p12bytes = pkcs12.serialize_key_and_certificates(
-            self.user_mission.callsign.encode("utf-8"), None, cert, None, NoEncryption()
-        )
-        Path(dest_file).write_bytes(p12bytes)
-
-    async def write_pfx(self, cert_file: str, dest_file: str) -> None:
-        """Write the user certificate pfx"""
-        cert = cryptography.x509.load_pem_x509_certificate(Path(cert_file).read_bytes())
-        key = cast(
-            rsa.RSAPrivateKey,
-            load_pem_private_key(bytes(self.user_mission.private_key.replace("\\n", "\n"), "UTF-8"), None),
-        )
-
-        # Apple devices (and some windowses too I guess) have an issue with the modern
-        # secure ways to encrypt pkcs12 files so we do it oldskool.
-        encryption = (
-            PrivateFormat.PKCS12.encryption_builder()
-            .kdf_rounds(50000)
-            .key_cert_algorithm(pkcs12.PBES.PBESv1SHA1And3KeyTripleDESCBC)  # nosec
-            .hmac_hash(hashes.SHA1())  # nosec
-            .build(self.user_mission.callsign.encode("utf-8"))  # callsing.encode() = "password"
-        )
-
-        p12bytes = pkcs12.serialize_key_and_certificates(
-            self.user_mission.callsign.encode("utf-8"), key, cert, None, encryption
+            self.user.callsign.encode("utf-8"), None, cert, None, NoEncryption()
         )
         Path(dest_file).write_bytes(p12bytes)
 

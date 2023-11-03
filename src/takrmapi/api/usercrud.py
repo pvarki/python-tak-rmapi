@@ -1,14 +1,11 @@
 """"User actions"""
 import logging
-import base64
-from typing import List, Dict
 from fastapi import APIRouter, Depends
 from libpvarki.middleware import MTLSHeader
 from libpvarki.schemas.product import UserCRUDRequest
 from libpvarki.schemas.generic import OperationResultResponse
 
 from takrmapi import tak_helpers
-from takrmapi.tak_schema import UserMissionZipRequest
 
 LOGGER = logging.getLogger(__name__)
 
@@ -64,26 +61,6 @@ async def user_updated(user: UserCRUDRequest) -> OperationResultResponse:
     await tak_usercrud.update_user()
     result = OperationResultResponse(success=True)
     return result
-
-
-@router.get("/missionzip")
-async def get_missionpkg(user_mission: UserMissionZipRequest) -> List[Dict[str, str]]:
-    """Return zip package containing client config and certificates"""
-    tak_missionpkg = tak_helpers.MissionZip(user_mission)
-    zip_files = await tak_missionpkg.create_missionpkg()
-    returnable: List[Dict[str, str]] = []
-    for file in zip_files:
-        with open(file, "rb") as filehandle:
-            contents = filehandle.read()
-        filename = file.split("/")[-1]
-        returnable.append(
-            {
-                "title": filename,
-                "data": f"data:application/zip;base64,{base64.b64encode(contents).decode('ascii')}",
-                "filename": f"{user_mission.callsign}_{filename}",
-            }
-        )
-    return returnable
 
 
 # REMOVE ME, JUST FOR TESTING
