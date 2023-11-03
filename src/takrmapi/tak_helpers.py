@@ -41,7 +41,9 @@ class UserCRUD:
         """Remove user from TAK"""
         if await self.helpers.user_cert_validate():
             await self.helpers.delete_user_with_cert()
-        # TODO REMOVE CERTIFICATE FROM config.TAK_CERTS_FOLDER
+            if (config.TAK_CERTS_FOLDER / f"{self.user.callsign}.pem").is_file():
+                os.remove(config.TAK_CERTS_FOLDER / f"{self.user.callsign}.pem")
+            return True
         return False
 
     async def promote_user(self) -> bool:
@@ -70,6 +72,7 @@ class UserCRUD:
         if await self.helpers.user_cert_validate():
             # TODO check/find out if the user is admin and add as admin
             await self.helpers.add_user_to_tak_with_cert()
+            return True
         return False
 
 
