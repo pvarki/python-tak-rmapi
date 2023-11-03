@@ -282,6 +282,7 @@ class Helpers:
         # THIS SHOULD BE CHANGED TO BE DONE THROUGH REST IF POSSIBLE
         #
         environ = os.environ.copy()
+        environ["TAKCL_CORECONFIG_PATH"] = str(config.TAKCL_CORECONFIG_PATH)
         environ["ADMIN_CERT_NAME"] = self.user.callsign
         proc = await asyncio.create_subprocess_exec(
             "/opt/scripts/enable_admin.sh", stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE, env=environ
@@ -295,7 +296,8 @@ class Helpers:
         # THIS SHOULD BE CHANGED TO BE DONE THROUGH REST IF POSSIBLE
         #
         environ = os.environ.copy()
-        environ["ADMIN_CERT_NAME"] = self.user.callsign
+        environ["TAKCL_CORECONFIG_PATH"] = str(config.TAKCL_CORECONFIG_PATH)
+        environ["USER_CERT_NAME"] = self.user.callsign
         proc = await asyncio.create_subprocess_exec(
             "/opt/scripts/delete_user.sh", stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE, env=environ
         )
