@@ -87,6 +87,7 @@ class MissionZip:
     async def create_missionpkg(self) -> list[str]:
         """Create tak mission package packages to different app versions"""
         returnable: list[str] = []
+        # FIXME: Use Paths until absolutely have to convert to strings
         tmp_folder = f"{config.TAK_MISSIONPKG_TMP}/{self.user_mission.callsign}_{self.user_mission.missionpkg}"
         walk_dir = f"{config.TAK_MISSIONPKG_TEMPLATES_FOLDER}/{self.user_mission.missionpkg}"
         await self.helpers.remove_tmp_dir(tmp_folder)
