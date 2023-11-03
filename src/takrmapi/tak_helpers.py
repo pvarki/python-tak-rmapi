@@ -166,7 +166,7 @@ class MissionZip:
             dest_file = f"{tmp_folder}/content/takserver-public.p12"
             if not os.path.exists(f"{tmp_folder}/content"):
                 os.makedirs(f"{tmp_folder}/content")
-            await self.write_pfx_just_cert(cert_file="/le_certs/rasenmaeher/fullchain.pem", dest_file=dest_file)
+            await self.write_pfx_just_cert(cert_file="/ca_public/ca_chain.pem", dest_file=dest_file)
         if f"{self.user.callsign}.p12" in row:
             LOGGER.info("DISABLED - Creating {}.p12 file".format(self.user.callsign))
             # dest_file = f"{tmp_folder}/content/{ self.user.callsign }.p12"
