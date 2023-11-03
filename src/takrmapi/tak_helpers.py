@@ -79,7 +79,7 @@ class MissionZip:
     def __init__(self, user: UserCRUDRequest):
         self.user: UserCRUDRequest = user
         self.helpers = Helpers(self.user)
-        self.missionpkg = config.TAK_MISSIONPKG_DEFAULT_MISSION  # Option for different missionpkgs in future?
+        self.missionpkg = config.TAK_MISSIONPKG_DEFAULT_MISSION
 
     async def create_missionpkg(self) -> list[str]:
         """Create tak mission package packages to different app versions"""
@@ -164,6 +164,8 @@ class MissionZip:
         if "takserver-public.p12" in row:
             LOGGER.info("Creating takserver-public.p12 file")
             dest_file = f"{tmp_folder}/content/takserver-public.p12"
+            if not os.path.exists(f"{tmp_folder}/content"):
+                os.makedirs(f"{tmp_folder}/content")
             await self.write_pfx_just_cert(cert_file="/le_certs/rasenmaeher/fullchain.pem", dest_file=dest_file)
         if f"{self.user.callsign}.p12" in row:
             LOGGER.info("DISABLED - Creating {}.p12 file".format(self.user.callsign))

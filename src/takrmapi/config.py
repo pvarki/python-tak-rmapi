@@ -13,7 +13,8 @@ RMAPI_PERSISTENT_FOLDER: Path = cfg("RMAPI_PERSISTENT_FOLDER", cast=Path, defaul
 TAK_MISSIONPKG_TEMPLATES_FOLDER: Path = cfg(
     "TAK_MISSIONPKG_TEMPLATES_FOLDER", cast=Path, default=Path(__file__).parent / "templates" / "tak_missionpkg"
 )
-TAK_MISSIONPKG_DEFAULT_MISSION: str = cfg("TAK_MISSIONPKG_DEFAULT_MISSION", cast=str, default="example")
+# There are some rumors for need of different mission packages, default lives under tak_missionpkg/default
+TAK_MISSIONPKG_DEFAULT_MISSION: str = cfg("TAK_MISSIONPKG_DEFAULT_MISSION", cast=str, default="default")
 TAK_MISSIONPKG_TMP: str = cfg(
     "TAK_MISSIONPKG_TMP", cast=str, default="/tmp"  # nosec B108 - TODO maybe in memory stuff to replace /tmp
 )
