@@ -10,9 +10,9 @@
       <entry key="displayServerConnectionWidget" class="class java.lang.Boolean">true</entry>
       <entry key="caLocation" class="class java.lang.String">cert/takserver-public.p12</entry>
       <entry key="caPassword" class="class java.lang.String">public</entry>
-      <!-- client certificate should be delivered by other means? -->
+      <!-- client certificate should be handled via system keychain
       <entry key="certificateLocation" class="class java.lang.String">cert/{{ client_cert_name }}.p12</entry>
-      <!-- client_cert_password == callsign == client_cert_name -->
       <entry key="clientPassword" class="class java.lang.String">{{ client_cert_password }}</entry>
+       -->
    </preference>
 </preferences>
