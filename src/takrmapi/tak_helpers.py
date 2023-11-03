@@ -10,7 +10,7 @@ import cryptography.x509
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives.serialization import load_pem_private_key, pkcs12, NoEncryption, PrivateFormat
-from OpenSSL import crypto
+from OpenSSL import crypto  # FIXME: Move to python-cryptography for cert parsing
 from jinja2 import Template
 
 from libpvarki.schemas.product import UserCRUDRequest

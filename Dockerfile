@@ -50,14 +50,14 @@ RUN apt-get update && apt-get install -y \
         tini \
         openssh-client \
         cargo \
-        python3.11
-RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.11
-RUN apt-get autoremove -y \
+        python3.10 \
+        python3-pip \
+    && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/* \
     # githublab ssh
     && mkdir -p -m 0700 ~/.ssh && ssh-keyscan gitlab.com github.com | sort > ~/.ssh/known_hosts \
     # Installing `poetry` package manager:
-    && curl -sSL https://install.python-poetry.org | python3.11 - \
+    && curl -sSL https://install.python-poetry.org | python3 - \
     && echo 'export PATH="/root/.local/bin:$PATH"' >>/root/.profile \
     && export PATH="/root/.local/bin:$PATH" \
     && true
@@ -116,9 +116,9 @@ RUN --mount=type=ssh apt-get update && apt-get install -y \
         openssh-client \
         curl \
         jq \
-        python3.11
-RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.11
-RUN apt-get autoremove -y \
+        python3.10 \
+        python3-pip \
+    && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/* \
     && chmod a+x /docker-entrypoint.sh \
     && WHEELFILE=`echo /tmp/wheelhouse/takrmap*.whl` \
