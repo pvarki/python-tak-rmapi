@@ -5,8 +5,7 @@ CR=${TR}/certs
 set -e
 # Resolve our magic names to docker internal ip
 sed 's/.*localmaeher.*//g' /etc/hosts >/etc/hosts.new && cat /etc/hosts.new >/etc/hosts
-echo "$(getent hosts rmnginx | awk '{ print $1 }') localmaeher.pvarki.fi mtls.localmaeher.pvarki.fi" >>/etc/hosts
-echo "$(getent hosts takmsg | awk '{ print $1 }') tak.localmaeher.pvarki.fi" >>/etc/hosts
+echo "$(getent hosts host.docker.internal | awk '{ print $1 }') localmaeher.pvarki.fi mtls.localmaeher.pvarki.fi" >>/etc/hosts
 cat /etc/hosts
 
 # Symlink the log directory under data dir
