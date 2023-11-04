@@ -1,21 +1,22 @@
 """Helper functions to manage tak"""
+from typing import Any, Mapping, Union, cast
 import os
 import asyncio
 import shutil
 import logging
 from pathlib import Path
-from typing import Any, Mapping, Union, cast
 import aiohttp
+
+
 import cryptography.x509
 from cryptography.hazmat.primitives.serialization import pkcs12, NoEncryption
 from OpenSSL import crypto  # FIXME: Move to python-cryptography for cert parsing
 from jinja2 import Template
-
 from libpvarki.schemas.product import UserCRUDRequest
 from libpvarki.mtlshelp.session import get_session as libsession
-from takrmapi import config
 
-# from takrmapi.tak_schema import UserMissionZipRequest
+
+from takrmapi import config
 
 
 LOGGER = logging.getLogger(__name__)
@@ -138,9 +139,9 @@ class MissionZip:
     async def render_tak_manifest_template(self, template: Template) -> str:
         """Render tak manifest template"""
         return template.render(
-            tak_server_uid_name="UID_NAME_TODO",
-            tak_server_name="TAK_SRV_NAME_TODO",
-            tak_server_address="SOME_TAK_ADDRESS",
+            tak_server_uid_name=config.TAK_SERVER_FQDN,
+            tak_server_name=config.TAK_SERVER_NAME,
+            tak_server_address=config.TAK_SERVER_FQDN,
             client_cert_name=self.user.callsign,
             client_cert_password=self.user.callsign,
         )
@@ -164,9 +165,9 @@ class MissionZip:
         """Handle manifest .p12 rows"""
         dest_file: str = ""
         # Create .p12 from letsencrypt cert (/le_certs/rasenmaeher/fullchain.pem)
-        if "takserver-public.p12" in row:
-            LOGGER.info("Creating takserver-public.p12 file")
-            dest_file = f"{tmp_folder}/content/takserver-public.p12"
+        if "rasenmaeher_ca-public.p12" in row:
+            LOGGER.info("Creating rasenmaeher_ca-public.p12 file")
+            dest_file = f"{tmp_folder}/content/rasenmaeher_ca-public.p12"
             if not os.path.exists(f"{tmp_folder}/content"):
                 os.makedirs(f"{tmp_folder}/content")
             await self.write_pfx_just_cert(cert_file="/ca_public/ca_chain.pem", dest_file=dest_file)

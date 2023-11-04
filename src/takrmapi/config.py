@@ -1,7 +1,27 @@
 """Configurations with .env support"""
+from typing import Dict, Any, cast
 from pathlib import Path
+import json
+import functools
 
 from starlette.config import Config
+
+
+@functools.cache
+def load_manifest(filepth: Path = Path("/pvarki/kraftwerk-init.json")) -> Dict[str, Any]:
+    """Load the manifest"""
+    return cast(Dict[str, Any], json.loads(filepth.read_text(encoding="utf-8")))
+
+
+def read_tak_fqdn() -> str:
+    """Read the fqdn from manifest"""
+    return str(load_manifest()["product"]["dns"])
+
+
+def read_deployment_name() -> str:
+    """Read the fqdn from manifest"""
+    return str(load_manifest()["deployment"])
+
 
 cfg = Config(".env")
 
@@ -23,3 +43,7 @@ TAK_MESSAGING_API_HOST: str = cfg("TAK_MESSAGING_API_HOST", cast=str, default="h
 TAK_MESSAGING_API_PORT: int = cfg("TAK_MESSAGING_API_PORT", cast=int, default=8443)
 
 TAKCL_CORECONFIG_PATH: Path = cfg("TAKCL_CORECONFIG_PATH", cast=Path, default=Path("/opt/tak/data/CoreConfig.xml"))
+
+# Used for mission pkgs
+TAK_SERVER_FQDN: str = cfg("TAK_SERVER_FQDN", cast=str, default=read_tak_fqdn())
+TAK_SERVER_NAME: str = cfg("TAK_SERVER_NAME", cast=str, default=read_deployment_name())
