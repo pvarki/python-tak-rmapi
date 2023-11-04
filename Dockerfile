@@ -136,11 +136,9 @@ RUN --mount=type=ssh apt-get update && apt-get install -y \
     && echo "echo \"\$(getent hosts host.docker.internal | awk '{ print $1 }') localmaeher.pvarki.fi mtls.localmaeher.pvarki.fi\" >>/etc/hosts" >>/root/.profile \
     # Make some directories
     && mkdir -p /opt/tak/data/certs \
-    && mkdir -p /app/devel_certs/cfssl \
     && curl https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh -o /usr/bin/wait-for-it.sh \
     && chmod a+x /usr/bin/wait-for-it.sh \
     && true
-COPY ./tests/data/cfssl /app/devel_certs/cfssl
 ENTRYPOINT ["/usr/bin/tini", "--", "/docker-entrypoint.sh"]
 
 
