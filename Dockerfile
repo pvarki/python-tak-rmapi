@@ -97,12 +97,17 @@ RUN --mount=type=ssh source /.venv/bin/activate \
 #########################
 # Main production build #
 #########################
+FROM pvarki/takserver:4.10-RELEASE-12 as tak_server
+
 # FROM pvarki/takserver:4.10-RELEASE-12 as compose-base
 FROM eclipse-temurin:${TEMURIN_VERSION}-jammy as production
 # FROM python:3.11-slim-bookworm as production
 COPY --from=production_build /tmp/wheelhouse /tmp/wheelhouse
 COPY --from=production_build /docker-entrypoint.sh /docker-entrypoint.sh
 COPY --from=pvarki/kw_product_init:latest /kw_product_init /kw_product_init
+COPY --from=tak_server /opt/tak /opt/tak
+COPY --from=tak_server /opt/scripts /opt/scripts
+COPY --from=tak_server /opt/templates /opt/templates
 COPY docker/container-init.sh /container-init.sh
 
 WORKDIR /app
@@ -136,16 +141,6 @@ RUN --mount=type=ssh apt-get update && apt-get install -y \
     && true
 COPY ./tests/data/cfssl /app/devel_certs/cfssl
 ENTRYPOINT ["/usr/bin/tini", "--", "/docker-entrypoint.sh"]
-
-
-#####################
-# Compose container #
-#####################
-FROM pvarki/takserver:4.10-RELEASE-12 as tak_server
-FROM production as integ_production
-COPY --from=tak_server /opt/tak /opt/tak
-COPY --from=tak_server /opt/scripts /opt/scripts
-COPY --from=tak_server /opt/templates /opt/templates
 
 
 #####################################
