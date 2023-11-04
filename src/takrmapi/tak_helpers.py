@@ -185,6 +185,9 @@ class MissionZip:
 
     async def write_pfx_just_cert(self, cert_file: Union[str, Path], dest_file: Union[str, Path]) -> None:
         """Write the server certificate pfx"""
+        # FIXME: This puts only the first cert in the chain to the PKCS12 store
+        #        We should add root and intermediate separately
+        #        and perhaps add the LE public cert too just in case
         cert_file = Path(cert_file)
         dest_file = Path(dest_file)
         cert = cryptography.x509.load_pem_x509_certificate(cert_file.read_bytes())
