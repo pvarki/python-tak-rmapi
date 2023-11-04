@@ -105,6 +105,7 @@ FROM eclipse-temurin:${TEMURIN_VERSION}-jammy as production
 COPY --from=production_build /tmp/wheelhouse /tmp/wheelhouse
 COPY --from=production_build /docker-entrypoint.sh /docker-entrypoint.sh
 COPY --from=pvarki/kw_product_init:latest /kw_product_init /kw_product_init
+# FIXME: Figure out exactly which jars we need and copy only those
 COPY --from=tak_server /opt/tak /opt/tak
 COPY --from=tak_server /opt/scripts /opt/scripts
 COPY --from=tak_server /opt/templates /opt/templates
