@@ -9,7 +9,11 @@ import aiohttp
 
 
 import cryptography.x509
-from cryptography.hazmat.primitives.serialization import pkcs12, NoEncryption
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.serialization import (
+    pkcs12,
+    PrivateFormat,
+)
 from OpenSSL import crypto  # FIXME: Move to python-cryptography for cert parsing
 from jinja2 import Template
 from libpvarki.schemas.product import UserCRUDRequest
@@ -179,13 +183,25 @@ class MissionZip:
             #    dest_file=dest_file,
             # )
 
-    async def write_pfx_just_cert(self, cert_file: str, dest_file: str) -> None:
+    async def write_pfx_just_cert(self, cert_file: Union[str, Path], dest_file: Union[str, Path]) -> None:
         """Write the server certificate pfx"""
-        cert = cryptography.x509.load_pem_x509_certificate(Path(cert_file).read_bytes())
-        p12bytes = pkcs12.serialize_key_and_certificates(
-            self.user.callsign.encode("utf-8"), None, cert, None, NoEncryption()
+        cert_file = Path(cert_file)
+        dest_file = Path(dest_file)
+        cert = cryptography.x509.load_pem_x509_certificate(cert_file.read_bytes())
+        key = None
+
+        # Apple devices (and some windowses too I guess) have an issue with the modern
+        # secure ways to encrypt pkcs12 files so we do it oldskool.
+        encryption = (
+            PrivateFormat.PKCS12.encryption_builder()
+            .kdf_rounds(50000)
+            .key_cert_algorithm(pkcs12.PBES.PBESv1SHA1And3KeyTripleDESCBC)  # nosec
+            .hmac_hash(hashes.SHA1())  # nosec
+            .build(b"public")
         )
-        Path(dest_file).write_bytes(p12bytes)
+
+        p12bytes = pkcs12.serialize_key_and_certificates(cert_file.stem.encode("utf-8"), key, cert, None, encryption)
+        dest_file.write_bytes(p12bytes)
 
 
 class Helpers:
