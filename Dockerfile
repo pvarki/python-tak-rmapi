@@ -130,12 +130,9 @@ RUN --mount=type=ssh apt-get update && apt-get install -y \
     && WHEELFILE=`echo /tmp/wheelhouse/takrmap*.whl` \
     && pip3 install --find-links=/tmp/wheelhouse/ "$WHEELFILE"[all] \
     && rm -rf /tmp/wheelhouse/ \
-    # Do whatever else you need to
-    # Map the special names to docker host internal ip because 127.0.0.1 is *container* localhost on login
-    && echo "sed 's/.*localmaeher.*//g' /etc/hosts >/etc/hosts.new && cat /etc/hosts.new >/etc/hosts" >>/root/.profile \
-    && echo "echo \"\$(getent hosts host.docker.internal | awk '{ print $1 }') localmaeher.pvarki.fi mtls.localmaeher.pvarki.fi\" >>/etc/hosts" >>/root/.profile \
     # Make some directories
     && mkdir -p /opt/tak/data/certs \
+    # Get tool for waiting for ports
     && curl https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh -o /usr/bin/wait-for-it.sh \
     && chmod a+x /usr/bin/wait-for-it.sh \
     && true
