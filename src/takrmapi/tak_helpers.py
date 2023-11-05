@@ -171,16 +171,12 @@ class MissionZip:
             await self.write_pfx_just_cert(cert_file="/ca_public/ca_chain.pem", dest_file=dest_file)
         if f"{self.user.callsign}.p12" in row:
             LOGGER.info("DISABLED - Creating {}.p12 file".format(self.user.callsign))
-            # dest_file = f"{tmp_folder}/content/{ self.user.callsign }.p12"
-            # await self.write_pfx(
-            #    cert_file=f"{config.TAK_CERTS_FOLDER}/{self.user.callsign}.pem",
-            #    dest_file=dest_file,
-            # )
 
     async def write_pfx_just_cert(self, cert_file: Union[str, Path], dest_file: Union[str, Path]) -> None:
         """Write the server certificate pfx"""
         cert_file = Path(cert_file)
         dest_file = Path(dest_file)
+        # FIXME: do the blocking IO in executor
         p12bytes = convert_pem_to_pkcs12(cert_file, None, "public", None, cert_file.stem)
         dest_file.write_bytes(p12bytes)
 
