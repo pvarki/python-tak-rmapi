@@ -8,17 +8,11 @@ from pathlib import Path
 import aiohttp
 
 
-import cryptography.x509
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.serialization import (
-    pkcs12,
-    PrivateFormat,
-)
 from OpenSSL import crypto  # FIXME: Move to python-cryptography for cert parsing
 from jinja2 import Template
 from libpvarki.schemas.product import UserCRUDRequest
 from libpvarki.mtlshelp.session import get_session as libsession
-
+from libpvarki.mtlshelp.pkcs12 import convert_pem_to_pkcs12
 
 from takrmapi import config
 
@@ -185,25 +179,9 @@ class MissionZip:
 
     async def write_pfx_just_cert(self, cert_file: Union[str, Path], dest_file: Union[str, Path]) -> None:
         """Write the server certificate pfx"""
-        # FIXME: This puts only the first cert in the chain to the PKCS12 store
-        #        We should add root and intermediate separately
-        #        and perhaps add the LE public cert too just in case
         cert_file = Path(cert_file)
         dest_file = Path(dest_file)
-        cert = cryptography.x509.load_pem_x509_certificate(cert_file.read_bytes())
-        key = None
-
-        # Apple devices (and some windowses too I guess) have an issue with the modern
-        # secure ways to encrypt pkcs12 files so we do it oldskool.
-        encryption = (
-            PrivateFormat.PKCS12.encryption_builder()
-            .kdf_rounds(50000)
-            .key_cert_algorithm(pkcs12.PBES.PBESv1SHA1And3KeyTripleDESCBC)  # nosec
-            .hmac_hash(hashes.SHA1())  # nosec
-            .build(b"public")
-        )
-
-        p12bytes = pkcs12.serialize_key_and_certificates(cert_file.stem.encode("utf-8"), key, cert, None, encryption)
+        p12bytes = convert_pem_to_pkcs12(cert_file, None, "public", None, cert_file.stem)
         dest_file.write_bytes(p12bytes)
 
 
