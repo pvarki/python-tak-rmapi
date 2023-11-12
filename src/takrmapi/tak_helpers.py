@@ -222,24 +222,21 @@ class MissionZip:
 
     async def manifest_p12_row(self, row: str, tmp_folder: str) -> None:
         """Handle manifest .p12 rows"""
-        dest_file: str = ""
-        # Create .p12 from letsencrypt cert (/le_certs/rasenmaeher/fullchain.pem)
-        if "rasenmaeher_ca-public.p12" in row:
-            LOGGER.info("Creating rasenmaeher_ca-public.p12 file")
-            dest_file = f"{tmp_folder}/content/rasenmaeher_ca-public.p12"
-            if not os.path.exists(f"{tmp_folder}/content"):
-                os.makedirs(f"{tmp_folder}/content")
-            await self.write_pfx_just_cert(cert_file="/ca_public/ca_chain.pem", dest_file=dest_file)
-        if f"{self.user.callsign}.p12" in row:
-            LOGGER.info("DISABLED - Creating {}.p12 file".format(self.user.callsign))
-
-    async def write_pfx_just_cert(self, cert_file: Union[str, Path], dest_file: Union[str, Path]) -> None:
-        """Write the server certificate pfx"""
-        cert_file = Path(cert_file)
-        dest_file = Path(dest_file)
         # FIXME: do the blocking IO in executor
-        p12bytes = convert_pem_to_pkcs12(cert_file, None, "public", None, cert_file.stem)
-        dest_file.write_bytes(p12bytes)
+        if "rasenmaeher_ca-public.p12" in row:
+            tgtfile = Path(tmp_folder) / "content" / "rasenmaeher_ca-public.p12"
+            LOGGER.info("Creating {}".format(tgtfile))
+            p12bytes = convert_pem_to_pkcs12(tgtfile, None, "public", None, tgtfile.stem)
+            tgtfile.parent.mkdir(parents=True, exist_ok=True)
+            tgtfile.write_bytes(p12bytes)
+        if f"{self.user.callsign}.p12" in row:
+            tgtfile = Path(tmp_folder) / "content" / f"{self.user.callsign}.p12"
+            LOGGER.info("Creating {}".format(tgtfile))
+            p12bytes = convert_pem_to_pkcs12(
+                self.user.certpem, self.user.certkey, self.user.callsign, None, self.user.callsign
+            )
+            tgtfile.parent.mkdir(parents=True, exist_ok=True)
+            tgtfile.write_bytes(p12bytes)
 
 
 class Helpers:
