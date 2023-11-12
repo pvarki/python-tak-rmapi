@@ -31,6 +31,7 @@ async def user_created(user: UserCRUDRequest) -> OperationResultResponse:
 async def user_revoked(user: UserCRUDRequest) -> OperationResultResponse:
     """Device cert was revoked"""
     tak_usercrud = tak_helpers.UserCRUD(user)
+    LOGGER.info("Removing user '{}' from TAK".format(user.callsign))
     await tak_usercrud.revoke_user()
     result = OperationResultResponse(success=True)
     return result
@@ -40,6 +41,7 @@ async def user_revoked(user: UserCRUDRequest) -> OperationResultResponse:
 async def user_promoted(user: UserCRUDRequest) -> OperationResultResponse:
     """Device cert was promoted to admin privileges"""
     tak_usercrud = tak_helpers.UserCRUD(user)
+    LOGGER.info("Promoting user '{}' to admin".format(user.callsign))
     await tak_usercrud.promote_user()
     result = OperationResultResponse(success=True)
     return result
@@ -49,6 +51,7 @@ async def user_promoted(user: UserCRUDRequest) -> OperationResultResponse:
 async def user_demoted(user: UserCRUDRequest) -> OperationResultResponse:
     """Device cert was demoted to standard privileges"""
     tak_usercrud = tak_helpers.UserCRUD(user)
+    LOGGER.info("Demoting user '{}' to normal user".format(user.callsign))
     await tak_usercrud.demote_user()
     result = OperationResultResponse(success=True)
     return result

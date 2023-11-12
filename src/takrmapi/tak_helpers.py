@@ -96,15 +96,17 @@ class UserCRUD:
     async def revoke_user(self) -> bool:
         """Remove user from TAK"""
         if await self.helpers.user_cert_validate():
-            await self.helpers.delete_user_with_cert()
-            if (config.TAK_CERTS_FOLDER / f"{self.user.callsign}.pem").is_file():
-                os.remove(config.TAK_CERTS_FOLDER / f"{self.user.callsign}.pem")
             async with (await self.helpers.tak_mtls_client()) as session:
-                resp = await session.post(f"{self.rm_base}api/v1/product/revoke/mtls", json={"cert": self.certpem})
+                url = f"{self.rm_base}api/v1/product/revoke/mtls"
+                LOGGER.debug("POSTing cert to {}".format(url))
+                resp = await session.post(url, json={"cert": self.certpem})
                 LOGGER.debug("Got response: {}".format(resp))
                 resp.raise_for_status()
                 payload = await resp.json()
                 LOGGER.debug("Got payload: {}".format(payload))
+            await self.helpers.delete_user_with_cert()
+            if (config.TAK_CERTS_FOLDER / f"{self.user.callsign}.pem").is_file():
+                os.remove(config.TAK_CERTS_FOLDER / f"{self.user.callsign}.pem")
             return True
         return False
 
@@ -226,12 +228,15 @@ class MissionZip:
         """Handle manifest .p12 rows"""
         # FIXME: do the blocking IO in executor
         if "rasenmaeher_ca-public.p12" in row:
+            srcfile = Path("/ca_public/ca_chain.pem")
             tgtfile = Path(tmp_folder) / "content" / "rasenmaeher_ca-public.p12"
             LOGGER.info("Creating {}".format(tgtfile))
-            p12bytes = convert_pem_to_pkcs12(tgtfile, None, "public", None, tgtfile.stem)
+            p12bytes = convert_pem_to_pkcs12(srcfile, None, "public", None, srcfile.stem)
             tgtfile.parent.mkdir(parents=True, exist_ok=True)
+            LOGGER.debug("{} exists: {}".format(tgtfile.parent, tgtfile.parent.exists()))
             tgtfile.write_bytes(p12bytes)
-        if f"{self.user.callsign}.p12" in row:
+            LOGGER.debug("{} exists: {}".format(tgtfile, tgtfile.exists()))
+        elif f"{self.user.callsign}.p12" in row:
             tgtfile = Path(tmp_folder) / "content" / f"{self.user.callsign}.p12"
             LOGGER.info("Creating {}".format(tgtfile))
             p12bytes = convert_pem_to_pkcs12(
@@ -239,6 +244,9 @@ class MissionZip:
             )
             tgtfile.parent.mkdir(parents=True, exist_ok=True)
             tgtfile.write_bytes(p12bytes)
+            LOGGER.debug("{} exists: {}".format(tgtfile, tgtfile.exists()))
+        else:
+            raise RuntimeError("IDK what to do")
 
 
 class Helpers:
