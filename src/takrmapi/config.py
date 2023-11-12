@@ -3,13 +3,30 @@ from typing import Dict, Any, cast
 from pathlib import Path
 import json
 import functools
+import logging
 
 from starlette.config import Config
+
+LOGGER = logging.getLogger(__name__)
 
 
 @functools.cache
 def load_manifest(filepth: Path = Path("/pvarki/kraftwerk-init.json")) -> Dict[str, Any]:
     """Load the manifest"""
+    if not filepth.exists():
+        # return a dummy manifest
+        LOGGER.warning("Returning dummy manifest")
+        rm_uri = "https://localmaeher.pvarki.fi"
+        mtls_uri = rm_uri.replace("https://", "https://mtls.")
+        return {
+            "deployment": "localmaeher",
+            "rasenmaeher": {
+                "init": {"base_uri": rm_uri, "csr_jwt": "LOL, no"},
+                "mtls": {"base_uri": mtls_uri},
+                "certcn": "rasenmaeher",
+            },
+            "product": {"dns": "tak.localmaeher.pvarki.fi"},
+        }
     return cast(Dict[str, Any], json.loads(filepth.read_text(encoding="utf-8")))
 
 

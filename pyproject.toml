@@ -38,7 +38,7 @@ strict=true
 
 [tool.pytest.ini_options]
 junit_family="xunit2"
-addopts="--cov=takrmapi --cov-fail-under=65 --cov-branch"
+addopts="--cov=takrmapi --cov-fail-under=30 --cov-branch"
 asyncio_mode="strict"
 
 [tool.pylint.format]

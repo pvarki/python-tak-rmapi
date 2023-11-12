@@ -1,11 +1,17 @@
 """Test the HTML fragment"""
 from typing import Dict
 import logging
+
+
+import pytest
 from fastapi.testclient import TestClient
 
 from .conftest import APP
 
 LOGGER = logging.getLogger(__name__)
+pytestmark = pytest.mark.skip(
+    reason="tests need complete refactoring and most of them can't work without working RASENMAHER instance anymore",
+)
 
 
 def test_unauth(norppa11: Dict[str, str]) -> None:
