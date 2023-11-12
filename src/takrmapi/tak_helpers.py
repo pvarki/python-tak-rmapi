@@ -62,7 +62,7 @@ class UserCRUD:
     def rm_base(self) -> str:
         """Return RASENMAEHER base url"""
         manifest = config.load_manifest()
-        return str(manifest["rasenmaeher"]["mtls"])
+        return cast(str, manifest["rasenmaeher"]["mtls"]["base_uri"])
 
     async def create_user_dir_and_files(self) -> None:
         """create the userdata path and make a new tak specific cert/keypair"""
@@ -77,7 +77,9 @@ class UserCRUD:
         csrpem = await async_create_client_csr(ckp, csrpath, {"CN": self.certcn})
 
         async with (await self.helpers.tak_mtls_client()) as session:
-            resp = await session.post(f"{self.rm_base}api/v1/product/sign_csr/mtls", json={"csr": csrpem})
+            url = f"{self.rm_base}api/v1/product/sign_csr/mtls"
+            LOGGER.debug("POSTing to {}".format(url))
+            resp = await session.post(url, json={"csr": csrpem})
             resp.raise_for_status()
             payload = await resp.json()
             certpath.write_text(payload["certificate"], encoding="utf-8")
