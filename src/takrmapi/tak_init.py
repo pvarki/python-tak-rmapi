@@ -14,7 +14,10 @@ LOGGER = logging.getLogger(__name__)
 
 async def setup_tak_mgmt_conn() -> None:
     """Setup required credentials to manage TAK"""
-    user: UserCRUDRequest = UserCRUDRequest(uuid="not_needed", callsign="mtlsclient", x509cert="not_needed")
+    # FIXME: Refactor to separate helpers not requiring a dummy user
+    user: tak_helpers.UserCRUD = tak_helpers.UserCRUD(
+        UserCRUDRequest(uuid="not_needed", callsign="mtlsclient", x509cert="not_needed")
+    )
     t_helpers = tak_helpers.Helpers(user)
     t_rest_helper = tak_helpers.RestHelpers(user)
 

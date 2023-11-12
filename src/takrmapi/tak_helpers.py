@@ -13,6 +13,7 @@ from jinja2 import Template
 from libpvarki.schemas.product import UserCRUDRequest
 from libpvarki.mtlshelp.session import get_session as libsession
 from libpvarki.mtlshelp.pkcs12 import convert_pem_to_pkcs12
+from libpvarki.mtlshelp.csr import async_create_keypair, async_create_client_csr
 
 from takrmapi import config
 
@@ -20,16 +21,70 @@ from takrmapi import config
 LOGGER = logging.getLogger(__name__)
 DEFAULT_TIMEOUT = 3.0
 
+# FIXME: Convert the helpers to dataclasses
+
 
 class UserCRUD:
     """Helper class for tak_helpers"""
 
     def __init__(self, user: UserCRUDRequest):
         self.user: UserCRUDRequest = user
-        self.helpers = Helpers(self.user)
+        self.userdata: Path = config.RMAPI_PERSISTENT_FOLDER / "users" / user.uuid
+        self.helpers = Helpers(self)
+
+    @property
+    def callsign(self) -> str:
+        """return the callsign"""
+        return self.user.callsign
+
+    @property
+    def certcn(self) -> str:
+        """return CN for the special cert"""
+        return f"{self.user.callsign}_tak"
+
+    @property
+    def certpem(self) -> str:
+        """Cert contents as PEM"""
+        certpath = self.userdata / f"{self.certcn}.pem"
+        if certpath.exists():
+            return certpath.read_text(encoding="utf-8")
+        return self.user.x509cert.replace("\\n", "\n")
+
+    @property
+    def certkey(self) -> str:
+        """Cert private key contents as PEM"""
+        keypath = self.userdata / f"{self.certcn}.key"
+        if keypath.exists():
+            return keypath.read_text(encoding="utf-8")
+        raise ValueError("We do not have the private key")
+
+    @property
+    def rm_base(self) -> str:
+        """Return RASENMAEHER base url"""
+        manifest = config.load_manifest()
+        return str(manifest["rasenmaeher"]["mtls"])
+
+    async def create_user_dir_and_files(self) -> None:
+        """create the userdata path and make a new tak specific cert/keypair"""
+        self.userdata.mkdir(parents=True, exist_ok=True)
+        certcn = self.certcn
+        privpath = self.userdata / f"{certcn}.key"
+        pubpath = self.userdata / f"{certcn}.pub"
+        csrpath = self.userdata / f"{certcn}.csr"
+        certpath = self.userdata / f"{certcn}.pem"
+
+        ckp = await async_create_keypair(privpath, pubpath)
+        csrpem = await async_create_client_csr(ckp, csrpath, {"CN": self.certcn})
+
+        async with (await self.helpers.tak_mtls_client()) as session:
+            resp = await session.post(f"{self.rm_base}api/v1/product/sign_csr/mtls", json={"csr": csrpem})
+            resp.raise_for_status()
+            payload = await resp.json()
+            certpath.write_text(payload["certificate"], encoding="utf-8")
 
     async def add_new_user(self) -> bool:
         """Add new user to TAK with given certificate"""
+        await self.create_user_dir_and_files()
         await self.helpers.user_cert_write()
         if await self.helpers.user_cert_validate():
             await self.helpers.add_user_to_tak_with_cert()
@@ -42,6 +97,12 @@ class UserCRUD:
             await self.helpers.delete_user_with_cert()
             if (config.TAK_CERTS_FOLDER / f"{self.user.callsign}.pem").is_file():
                 os.remove(config.TAK_CERTS_FOLDER / f"{self.user.callsign}.pem")
+            async with (await self.helpers.tak_mtls_client()) as session:
+                resp = await session.post(f"{self.rm_base}api/v1/product/revoke/mtls", json={"cert": self.certpem})
+                LOGGER.debug("Got response: {}".format(resp))
+                resp.raise_for_status()
+                payload = await resp.json()
+                LOGGER.debug("Got payload: {}".format(payload))
             return True
         return False
 
@@ -78,8 +139,8 @@ class UserCRUD:
 class MissionZip:
     """Mission package class"""
 
-    def __init__(self, user: UserCRUDRequest):
-        self.user: UserCRUDRequest = user
+    def __init__(self, user: UserCRUD):
+        self.user: UserCRUD = user
         self.helpers = Helpers(self.user)
         self.missionpkg = config.TAK_MISSIONPKG_DEFAULT_MISSION
 
@@ -184,9 +245,9 @@ class MissionZip:
 class Helpers:
     """Helper class for tak management"""
 
-    def __init__(self, user: UserCRUDRequest):
+    def __init__(self, user: UserCRUD):
         """Helpers init"""
-        self.user: UserCRUDRequest = user
+        self.user: UserCRUD = user
 
     async def remove_tmp_dir(self, dirname: str = "") -> None:
         """Remove temporary folder"""
@@ -211,10 +272,7 @@ class Helpers:
     async def user_cert_write(self) -> None:
         """Write users public cert to TAK certs folder"""
         cert_file_name = config.TAK_CERTS_FOLDER / f"{self.user.callsign}.pem"
-
-        with open(cert_file_name, "w", encoding="utf-8") as cert_file:
-            cert_file.write(self.user.x509cert.replace("\\n", "\n"))
-            cert_file.write("\n")
+        cert_file_name.write_text(self.user.certpem + "\n", encoding="utf-8")
 
     async def user_cert_validate(self) -> bool:
         """Check that the given certificate can at least be opened"""
@@ -280,9 +338,12 @@ class Helpers:
 class RestHelpers:  # pylint: disable=too-few-public-methods
     """Helper class to make queries against TAK rest API"""
 
+    # FIXME: Refactor to separate helpers not requiring a dummy user
     def __init__(
         self,
-        user: UserCRUDRequest = UserCRUDRequest(uuid="not_used_now", callsign="not_used_now", x509cert="not_used_now"),
+        user: UserCRUD = UserCRUD(
+            UserCRUDRequest(uuid="not_used_now", callsign="not_used_now", x509cert="not_used_now")
+        ),
     ):
         """RestHelpers init"""
         self.helpers = Helpers(user)
