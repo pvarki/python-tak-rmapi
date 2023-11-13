@@ -228,10 +228,12 @@ class MissionZip:
         """Handle manifest .p12 rows"""
         # FIXME: do the blocking IO in executor
         if "rasenmaeher_ca-public.p12" in row:
-            srcfile = Path("/ca_public/ca_chain.pem")
+            srcdata = (
+                Path("/ca_public/ca_chain.pem").read_bytes() + Path("/le_certs/rasenmaeher/fullchain.pem").read_bytes()
+            )
             tgtfile = Path(tmp_folder) / "content" / "rasenmaeher_ca-public.p12"
             LOGGER.info("Creating {}".format(tgtfile))
-            p12bytes = convert_pem_to_pkcs12(srcfile, None, "public", None, srcfile.stem)
+            p12bytes = convert_pem_to_pkcs12(srcdata, None, "public", None, "ca-chains")
             tgtfile.parent.mkdir(parents=True, exist_ok=True)
             LOGGER.debug("{} exists: {}".format(tgtfile.parent, tgtfile.parent.exists()))
             tgtfile.write_bytes(p12bytes)
