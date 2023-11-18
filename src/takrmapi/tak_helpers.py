@@ -228,10 +228,10 @@ class MissionZip:
         """Handle manifest .p12 rows"""
         # FIXME: do the blocking IO in executor
         if "rasenmaeher_ca-public.p12" in row:
-            srcdata = (
-                Path("/ca_public/ca_chain.pem").read_bytes() + Path("/le_certs/rasenmaeher/fullchain.pem").read_bytes()
-            )
-            tgtfile = Path(tmp_folder) / "content" / "rasenmaeher_ca-public.p12"
+            # FIXME: instead of adding the root key into the software, need a way to get full chain with Root CA
+            isrg_root_x1 = f"{config.TAK_MISSIONPKG_TMP}/isrg-root-x1.pem"
+            srcdata = Path("/le_certs/rasenmaeher/fullchain.pem").read_bytes() + Path(isrg_root_x1).read_bytes()
+            tgtfile = Path(tmp_folder) / "rasenmaeher_ca-public.p12"
             LOGGER.info("Creating {}".format(tgtfile))
             p12bytes = convert_pem_to_pkcs12(srcdata, None, "public", None, "ca-chains")
             tgtfile.parent.mkdir(parents=True, exist_ok=True)
@@ -239,7 +239,7 @@ class MissionZip:
             tgtfile.write_bytes(p12bytes)
             LOGGER.debug("{} exists: {}".format(tgtfile, tgtfile.exists()))
         elif f"{self.user.callsign}.p12" in row:
-            tgtfile = Path(tmp_folder) / "content" / f"{self.user.callsign}.p12"
+            tgtfile = Path(tmp_folder) / f"{self.user.callsign}.p12"
             LOGGER.info("Creating {}".format(tgtfile))
             p12bytes = convert_pem_to_pkcs12(
                 self.user.certpem, self.user.certkey, self.user.callsign, None, self.user.callsign
