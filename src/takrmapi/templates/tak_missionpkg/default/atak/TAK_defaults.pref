@@ -5,7 +5,7 @@
         <!-- Clear content -->
         <entry key="clearingContent" class="class java.lang.Boolean">true</entry>
         <!-- Default Map  -->
-        <entry key="MobileLayerSelectionAdapter.selected" class="class java.lang.String">02 Google Hybrid</entry>
+        <entry key="MobileLayerSelectionAdapter.selected" class="class java.lang.String">4 Google Hybrid</entry>
         <entry key="rng_meters_display_pref" class="class java.lang.String">2000</entry>
         <!-- Unit for Speed, 0 = imperial 1 = metric -->
         <entry key="speed_unit_pref" class="class java.lang.String">1</entry>
