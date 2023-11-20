@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <customMapSource>
-    <name>4 Google Hybrid</name>
+    <name>3 Google Roadmap</name>
     <minZoom>0</minZoom>
-    <maxZoom>21</maxZoom>
-    <tileType>png</tileType>
+    <maxZoom>20</maxZoom>
+    <tileType>jpg</tileType>
     <tileUpdate>None</tileUpdate>
-    <url>https://mt.google.com/vt/lyrs=y,hl=en&amp;x={$x}&amp;y={$y}&amp;z={$z}</url>
+    <url>https://mt1.google.com/vt/lyrs=m&amp;x={$x}&amp;y={$y}&amp;z={$z}</url>
     <backgroundColor>#000000</backgroundColor>
 </customMapSource>
