@@ -1,5 +1,5 @@
 """Helper functions to manage tak"""
-from typing import Any, Mapping, Union, cast
+from typing import Any, Mapping, Union, Sequence, cast
 import os
 import asyncio
 import shutil
@@ -43,8 +43,13 @@ class UserCRUD:
         return f"{self.user.callsign}_tak"
 
     @property
+    def rm_certpem(self) -> str:
+        """RASENMAEHER Cert contents as PEM"""
+        return self.user.x509cert.replace("\\n", "\n")
+
+    @property
     def certpem(self) -> str:
-        """Cert contents as PEM"""
+        """Local TAK-specific cert contents as PEM (or RASENMAEHER cert if local is not available)"""
         certpath = self.userdata / f"{self.certcn}.pem"
         if certpath.exists():
             return certpath.read_text(encoding="utf-8")
@@ -282,6 +287,8 @@ class Helpers:
         """Write users public cert to TAK certs folder"""
         cert_file_name = config.TAK_CERTS_FOLDER / f"{self.user.callsign}.pem"
         cert_file_name.write_text(self.user.certpem + "\n", encoding="utf-8")
+        cert_file_name2 = config.TAK_CERTS_FOLDER / f"{self.user.callsign}_rm.pem"
+        cert_file_name2.write_text(self.user.rm_certpem + "\n", encoding="utf-8")
 
     async def user_cert_validate(self) -> bool:
         """Check that the given certificate can at least be opened"""
@@ -298,6 +305,11 @@ class Helpers:
             LOGGER.warning("User '{}' certificate check failed ::: {}".format(self.user.callsign, err))
             return False
 
+    @property
+    def enable_user_cert_names(self) -> Sequence[str]:
+        """Return the stems for cert PEM files"""
+        return (self.user.callsign, f"{self.user.callsign}_rm")
+
     async def add_user_to_tak_with_cert(self) -> bool:
         """Add user to TAK. Certificate with callsign should be available by now..."""
         #
@@ -305,14 +317,18 @@ class Helpers:
         #
         environ = os.environ.copy()
         environ["TAKCL_CORECONFIG_PATH"] = str(config.TAKCL_CORECONFIG_PATH)
-        environ["USER_CERT_NAME"] = self.user.callsign
-        proc = await asyncio.create_subprocess_exec(
-            "/opt/scripts/enable_user.sh", stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE, env=environ
-        )
+        for certname in self.enable_user_cert_names:
+            environ["USER_CERT_NAME"] = certname
+            proc = await asyncio.create_subprocess_exec(
+                "/opt/scripts/enable_user.sh",
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+                env=environ,
+            )
 
-        stdout, stderr = await proc.communicate()
-        LOGGER.info("useradd STDOUT: {!r}".format(stdout))
-        LOGGER.info("useradd STDERR: {!r}".format(stderr))
+            stdout, stderr = await proc.communicate()
+            LOGGER.debug("useradd STDOUT: {!r}".format(stdout))
+            LOGGER.debug("useradd STDERR: {!r}".format(stderr))
         return True
 
     async def add_admin_to_tak_with_cert(self) -> bool:
@@ -322,11 +338,15 @@ class Helpers:
         #
         environ = os.environ.copy()
         environ["TAKCL_CORECONFIG_PATH"] = str(config.TAKCL_CORECONFIG_PATH)
-        environ["ADMIN_CERT_NAME"] = self.user.callsign
-        proc = await asyncio.create_subprocess_exec(
-            "/opt/scripts/enable_admin.sh", stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE, env=environ
-        )
-        _, _ = await proc.communicate()
+        for certname in self.enable_user_cert_names:
+            environ["ADMIN_CERT_NAME"] = certname
+            proc = await asyncio.create_subprocess_exec(
+                "/opt/scripts/enable_admin.sh",
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+                env=environ,
+            )
+            _, _ = await proc.communicate()
         return False
 
     async def delete_user_with_cert(self) -> bool:
@@ -336,11 +356,15 @@ class Helpers:
         #
         environ = os.environ.copy()
         environ["TAKCL_CORECONFIG_PATH"] = str(config.TAKCL_CORECONFIG_PATH)
-        environ["USER_CERT_NAME"] = self.user.callsign
-        proc = await asyncio.create_subprocess_exec(
-            "/opt/scripts/delete_user.sh", stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE, env=environ
-        )
-        _, _ = await proc.communicate()
+        for certname in self.enable_user_cert_names:
+            environ["USER_CERT_NAME"] = certname
+            proc = await asyncio.create_subprocess_exec(
+                "/opt/scripts/delete_user.sh",
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+                env=environ,
+            )
+            _, _ = await proc.communicate()
         return False
 
 
