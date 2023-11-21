@@ -133,3 +133,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+
+# Allow MANIFEST under templates
+!src/takrmapi/templates/tak_missionpkg/*/*/MANIFEST

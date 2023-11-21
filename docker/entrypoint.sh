@@ -1,8 +1,10 @@
 #!/bin/bash -l
-set -e
+. /container-init.sh
+TR=/opt/tak
+CR=${TR}/certs
+
 if [ "$#" -eq 0 ]; then
-  # TODO: Put your actual program start here
-  exec true
+  exec gunicorn "takrmapi.app:get_app()" --bind 0.0.0.0:8003 --forwarded-allow-ips='*' -w 4 -k uvicorn.workers.UvicornWorker
 else
   exec "$@"
 fi
