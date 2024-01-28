@@ -318,7 +318,11 @@ class Helpers:
         for certname in self.enable_user_cert_names:
             tasks.append(
                 asyncio.shield(
-                    call_cmd(f"USER_CERT_NAME={certname} /opt/scripts/enable_user.sh", timeout=SHELL_TIMEOUT)
+                    call_cmd(
+                        f"USER_CERT_NAME={certname} /opt/scripts/enable_user.sh",
+                        timeout=SHELL_TIMEOUT,
+                        stderr_warn=False,
+                    )
                 )
             )
         try:
@@ -347,7 +351,11 @@ class Helpers:
         for certname in self.enable_user_cert_names:
             tasks.append(
                 asyncio.shield(
-                    call_cmd(f"ADMIN_CERT_NAME={certname} /opt/scripts/enable_admin.sh", timeout=SHELL_TIMEOUT)
+                    call_cmd(
+                        f"ADMIN_CERT_NAME={certname} /opt/scripts/enable_admin.sh",
+                        timeout=SHELL_TIMEOUT,
+                        stderr_warn=False,
+                    )
                 )
             )
         try:
@@ -375,7 +383,11 @@ class Helpers:
         for certname in self.enable_user_cert_names:
             tasks.append(
                 asyncio.shield(
-                    call_cmd(f"USER_CERT_NAME={certname} /opt/scripts/delete_user.sh", timeout=SHELL_TIMEOUT)
+                    call_cmd(
+                        f"USER_CERT_NAME={certname} /opt/scripts/delete_user.sh",
+                        timeout=SHELL_TIMEOUT,
+                        stderr_warn=False,
+                    )
                 )
             )
         try:
