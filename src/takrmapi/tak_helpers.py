@@ -14,12 +14,13 @@ from libpvarki.schemas.product import UserCRUDRequest
 from libpvarki.mtlshelp.session import get_session as libsession
 from libpvarki.mtlshelp.pkcs12 import convert_pem_to_pkcs12
 from libpvarki.mtlshelp.csr import async_create_keypair, async_create_client_csr
+from libpvarki.shell import call_cmd
 
 from takrmapi import config
 
 
 LOGGER = logging.getLogger(__name__)
-DEFAULT_TIMEOUT = 3.0
+SHELL_TIMEOUT = 5.0
 
 # FIXME: Convert the helpers to dataclasses
 
@@ -118,8 +119,7 @@ class UserCRUD:
     async def promote_user(self) -> bool:
         """Promote user to admin"""
         if await self.helpers.user_cert_validate():
-            await self.helpers.add_admin_to_tak_with_cert()
-            return True
+            return await self.helpers.add_admin_to_tak_with_cert()
         return False
 
     async def demote_user(self) -> bool:
@@ -127,10 +127,9 @@ class UserCRUD:
         # TODO # THIS WORKS POORLY UNTIL PROPER REST IS FOUND OR SOME OTHER ALTERNATIVE
         # WE JUST RECREATE THE USER HERE AND GET RID OF THE ADMIN PERMISSIONS THAT WAY
         if await self.helpers.user_cert_validate():
-            await self.helpers.delete_user_with_cert()
-            await self.helpers.add_user_to_tak_with_cert()
-            return True
-
+            if not await self.helpers.delete_user_with_cert():
+                return False
+            return await self.helpers.add_user_to_tak_with_cert()
         return False
 
     async def update_user(self) -> bool:
@@ -140,8 +139,7 @@ class UserCRUD:
         await self.helpers.user_cert_write()
         if await self.helpers.user_cert_validate():
             # TODO check/find out if the user is admin and add as admin
-            await self.helpers.add_user_to_tak_with_cert()
-            return True
+            return await self.helpers.add_user_to_tak_with_cert()
         return False
 
 
@@ -314,58 +312,80 @@ class Helpers:
         """Add user to TAK. Certificate with callsign should be available by now..."""
         #
         # THIS SHOULD BE CHANGED TO BE DONE THROUGH REST IF POSSIBLE
+        # Or via Pyjnius, or via PyIgnite
         #
-        environ = os.environ.copy()
-        environ["TAKCL_CORECONFIG_PATH"] = str(config.TAKCL_CORECONFIG_PATH)
+        tasks = []
         for certname in self.enable_user_cert_names:
-            environ["USER_CERT_NAME"] = certname
-            proc = await asyncio.create_subprocess_exec(
-                "/opt/scripts/enable_user.sh",
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,
-                env=environ,
+            tasks.append(
+                asyncio.create_task(
+                    call_cmd(f"USER_CERT_NAME={certname} /opt/scripts/enable_user.sh", timeout=SHELL_TIMEOUT)
+                )
             )
-
-            stdout, stderr = await proc.communicate()
-            LOGGER.debug("useradd STDOUT: {!r}".format(stdout))
-            LOGGER.debug("useradd STDERR: {!r}".format(stderr))
+        try:
+            results = await asyncio.gather(*tasks)
+            for code, _stdout, _stderr in results:
+                if code != 0:
+                    return False
+        except asyncio.TimeoutError:
+            LOGGER.error("Shell command timed out")
+            return False
+        except Exception as err:  # pylint: disable=W0718
+            LOGGER.exception(err)
+            return False
         return True
 
     async def add_admin_to_tak_with_cert(self) -> bool:
         """Add admin user to TAK using shell"""
         #
         # THIS SHOULD BE CHANGED TO BE DONE THROUGH REST IF POSSIBLE
+        # Or via Pyjnius, or via PyIgnite
         #
-        environ = os.environ.copy()
-        environ["TAKCL_CORECONFIG_PATH"] = str(config.TAKCL_CORECONFIG_PATH)
+
+        tasks = []
         for certname in self.enable_user_cert_names:
-            environ["ADMIN_CERT_NAME"] = certname
-            proc = await asyncio.create_subprocess_exec(
-                "/opt/scripts/enable_admin.sh",
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,
-                env=environ,
+            tasks.append(
+                asyncio.create_task(
+                    call_cmd(f"ADMIN_CERT_NAME={certname} /opt/scripts/enable_admin.sh", timeout=SHELL_TIMEOUT)
+                )
             )
-            _, _ = await proc.communicate()
-        return False
+        try:
+            results = await asyncio.gather(*tasks)
+            for code, _stdout, _stderr in results:
+                if code != 0:
+                    return False
+        except asyncio.TimeoutError:
+            LOGGER.error("Shell command timed out")
+            return False
+        except Exception as err:  # pylint: disable=W0718
+            LOGGER.exception(err)
+            return False
+        return True
 
     async def delete_user_with_cert(self) -> bool:
-        """Add admin user to TAK using shell"""
+        """Remove user from TAK using shell"""
         #
         # THIS SHOULD BE CHANGED TO BE DONE THROUGH REST IF POSSIBLE
+        # Or via Pyjnius, or via PyIgnite
         #
-        environ = os.environ.copy()
-        environ["TAKCL_CORECONFIG_PATH"] = str(config.TAKCL_CORECONFIG_PATH)
+        tasks = []
         for certname in self.enable_user_cert_names:
-            environ["USER_CERT_NAME"] = certname
-            proc = await asyncio.create_subprocess_exec(
-                "/opt/scripts/delete_user.sh",
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,
-                env=environ,
+            tasks.append(
+                asyncio.create_task(
+                    call_cmd(f"USER_CERT_NAME={certname} /opt/scripts/delete_user.sh", timeout=SHELL_TIMEOUT)
+                )
             )
-            _, _ = await proc.communicate()
-        return False
+        try:
+            results = await asyncio.gather(*tasks)
+            for code, _stdout, _stderr in results:
+                if code != 0:
+                    return False
+        except asyncio.TimeoutError:
+            LOGGER.error("Shell command timed out")
+            return False
+        except Exception as err:  # pylint: disable=W0718
+            LOGGER.exception(err)
+            return False
+        return True
 
 
 class RestHelpers:  # pylint: disable=too-few-public-methods
