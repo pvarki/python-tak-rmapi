@@ -317,7 +317,7 @@ class Helpers:
         tasks = []
         for certname in self.enable_user_cert_names:
             tasks.append(
-                asyncio.create_task(
+                asyncio.shield(
                     call_cmd(f"USER_CERT_NAME={certname} /opt/scripts/enable_user.sh", timeout=SHELL_TIMEOUT)
                 )
             )
@@ -329,6 +329,8 @@ class Helpers:
         except asyncio.TimeoutError:
             LOGGER.error("Shell command timed out")
             return False
+        except asyncio.CancelledError:
+            LOGGER.info("Cancellation shielded, just wait")
         except Exception as err:  # pylint: disable=W0718
             LOGGER.exception(err)
             return False
@@ -344,7 +346,7 @@ class Helpers:
         tasks = []
         for certname in self.enable_user_cert_names:
             tasks.append(
-                asyncio.create_task(
+                asyncio.shield(
                     call_cmd(f"ADMIN_CERT_NAME={certname} /opt/scripts/enable_admin.sh", timeout=SHELL_TIMEOUT)
                 )
             )
@@ -356,6 +358,8 @@ class Helpers:
         except asyncio.TimeoutError:
             LOGGER.error("Shell command timed out")
             return False
+        except asyncio.CancelledError:
+            LOGGER.info("Cancellation shielded, just wait")
         except Exception as err:  # pylint: disable=W0718
             LOGGER.exception(err)
             return False
@@ -370,7 +374,7 @@ class Helpers:
         tasks = []
         for certname in self.enable_user_cert_names:
             tasks.append(
-                asyncio.create_task(
+                asyncio.shield(
                     call_cmd(f"USER_CERT_NAME={certname} /opt/scripts/delete_user.sh", timeout=SHELL_TIMEOUT)
                 )
             )
@@ -382,6 +386,8 @@ class Helpers:
         except asyncio.TimeoutError:
             LOGGER.error("Shell command timed out")
             return False
+        except asyncio.CancelledError:
+            LOGGER.info("Cancellation shielded, just wait")
         except Exception as err:  # pylint: disable=W0718
             LOGGER.exception(err)
             return False
