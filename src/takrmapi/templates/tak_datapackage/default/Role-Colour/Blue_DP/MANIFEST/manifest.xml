@@ -1,0 +1,10 @@
+<MissionPackageManifest version="2">
+  <Configuration>
+    <Parameter name="name" value="Blue_DP.zip" />
+    <Parameter name="onReceiveImport" value="true"/>
+    <Parameter name="uid" value="a623af2f-cf35-4da2-3ab4-208dcf8a5fa8"/>
+  </Configuration>
+  <Contents>
+    <Content zipEntry="prefs/Blue.pref" ignore="false" />
+  </Contents>
+</MissionPackageManifest>

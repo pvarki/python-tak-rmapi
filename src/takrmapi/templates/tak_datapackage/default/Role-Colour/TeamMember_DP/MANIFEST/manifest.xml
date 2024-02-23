@@ -1,0 +1,10 @@
+<MissionPackageManifest version="2">
+  <Configuration>
+    <Parameter name="name" value="TeamMember_DP.zip" />
+    <Parameter name="onReceiveImport" value="true"/>
+    <Parameter name="uid" value="28a22c69-8133-45b3-add6-d02c45acdfe4"/>
+  </Configuration>
+  <Contents>
+    <Content zipEntry="prefs/TeamMember.pref" ignore="false" />
+  </Contents>
+</MissionPackageManifest>

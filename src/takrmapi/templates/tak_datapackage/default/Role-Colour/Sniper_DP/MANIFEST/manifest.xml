@@ -1,0 +1,10 @@
+<MissionPackageManifest version="2">
+  <Configuration>
+    <Parameter name="name" value="Sniper_DP.zip" />
+    <Parameter name="onReceiveImport" value="true"/>
+    <Parameter name="uid" value="1a4c764e-ccb5-47c6-aaca-a14e336f1d27"/>
+  </Configuration>
+  <Contents>
+    <Content zipEntry="prefs/Sniper.pref" ignore="false" />
+  </Contents>
+</MissionPackageManifest>
