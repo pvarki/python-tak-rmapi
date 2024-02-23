@@ -1,0 +1,10 @@
+<MissionPackageManifest version="2">
+  <Configuration>
+    <Parameter name="name" value="DarkBlue_DP.zip" />
+    <Parameter name="onReceiveImport" value="true"/>
+    <Parameter name="uid" value="7be56832-ecec-4cd9-ab64-5bef2c6873ff"/>
+  </Configuration>
+  <Contents>
+    <Content zipEntry="prefs/DarkBlue.pref" ignore="false" />
+  </Contents>
+</MissionPackageManifest>

@@ -1,0 +1,10 @@
+<MissionPackageManifest version="2">
+  <Configuration>
+    <Parameter name="name" value="RTO_DP.zip" />
+    <Parameter name="onReceiveImport" value="true"/>
+    <Parameter name="uid" value="f958f028-3050-4cfe-97db-6c849681534b"/>
+  </Configuration>
+  <Contents>
+    <Content zipEntry="prefs/RTO.pref" ignore="false" />
+  </Contents>
+</MissionPackageManifest>

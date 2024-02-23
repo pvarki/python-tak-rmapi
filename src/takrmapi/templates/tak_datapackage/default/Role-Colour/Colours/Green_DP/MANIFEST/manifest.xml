@@ -1,0 +1,10 @@
+<MissionPackageManifest version="2">
+  <Configuration>
+    <Parameter name="name" value="Green_DP.zip" />
+    <Parameter name="onReceiveImport" value="true"/>
+    <Parameter name="uid" value="fe1bb5a3-cf7d-4dde-afba-a1c0420447dc"/>
+  </Configuration>
+  <Contents>
+    <Content zipEntry="prefs/Green.pref" ignore="false" />
+  </Contents>
+</MissionPackageManifest>

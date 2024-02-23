@@ -1,0 +1,10 @@
+<MissionPackageManifest version="2">
+  <Configuration>
+    <Parameter name="name" value="K9_DP.zip" />
+    <Parameter name="onReceiveImport" value="true"/>
+    <Parameter name="uid" value="d2d2ae88-fa3e-45f7-84fd-d1d24f30729f"/>
+  </Configuration>
+  <Contents>
+    <Content zipEntry="prefs/K9.pref" ignore="false" />
+  </Contents>
+</MissionPackageManifest>
