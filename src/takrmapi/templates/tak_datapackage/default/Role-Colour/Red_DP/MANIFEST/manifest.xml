@@ -1,0 +1,10 @@
+<MissionPackageManifest version="2">
+  <Configuration>
+    <Parameter name="name" value="Red_DP.zip" />
+    <Parameter name="onReceiveImport" value="true"/>
+    <Parameter name="uid" value="93143e7a-6f87-41c8-89de-dc670d1ded53"/>
+  </Configuration>
+  <Contents>
+    <Content zipEntry="prefs/Red.pref" ignore="false" />
+  </Contents>
+</MissionPackageManifest>

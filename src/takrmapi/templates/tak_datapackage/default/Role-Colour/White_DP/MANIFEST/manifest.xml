@@ -1,0 +1,10 @@
+<MissionPackageManifest version="2">
+  <Configuration>
+    <Parameter name="name" value="White_DP.zip" />
+    <Parameter name="onReceiveImport" value="true"/>
+    <Parameter name="uid" value="08304270-1665-4880-8c34-04209b8cb18d"/>
+  </Configuration>
+  <Contents>
+    <Content zipEntry="prefs/White.pref" ignore="false" />
+  </Contents>
+</MissionPackageManifest>

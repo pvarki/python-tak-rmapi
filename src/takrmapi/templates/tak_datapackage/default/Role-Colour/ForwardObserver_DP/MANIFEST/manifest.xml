@@ -1,0 +1,10 @@
+<MissionPackageManifest version="2">
+  <Configuration>
+    <Parameter name="name" value="ForwardObserver_DP.zip" />
+    <Parameter name="onReceiveImport" value="true"/>
+    <Parameter name="uid" value="e5fb550c-8008-4b3e-8811-6c070d517a91"/>
+  </Configuration>
+  <Contents>
+    <Content zipEntry="prefs/ForwardObserver.pref" ignore="false" />
+  </Contents>
+</MissionPackageManifest>
