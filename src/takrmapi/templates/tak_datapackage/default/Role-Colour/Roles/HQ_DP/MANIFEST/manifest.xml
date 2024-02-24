@@ -1,0 +1,10 @@
+<MissionPackageManifest version="2">
+  <Configuration>
+    <Parameter name="name" value="HQ_DP.zip" />
+    <Parameter name="onReceiveImport" value="true"/>
+    <Parameter name="uid" value="e78394ba-90c5-49ab-add3-7d5713c5ea82"/>
+  </Configuration>
+  <Contents>
+    <Content zipEntry="prefs/HQ.pref" ignore="false" />
+  </Contents>
+</MissionPackageManifest>

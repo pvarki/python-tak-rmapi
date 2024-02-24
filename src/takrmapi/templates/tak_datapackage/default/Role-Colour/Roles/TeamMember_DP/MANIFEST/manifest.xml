@@ -2,7 +2,7 @@
   <Configuration>
     <Parameter name="name" value="TeamMember_DP.zip" />
     <Parameter name="onReceiveImport" value="true"/>
-    <Parameter name="uid" value="28a22c69-8133-45b3-add6-d02c45acdfe4"/>
+    <Parameter name="uid" value="642b83d0-bc68-4beb-a813-b4ea34eeb5ae"/>
   </Configuration>
   <Contents>
     <Content zipEntry="prefs/TeamMember.pref" ignore="false" />

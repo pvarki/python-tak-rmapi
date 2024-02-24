@@ -2,7 +2,7 @@
   <Configuration>
     <Parameter name="name" value="Cyan_DP.zip" />
     <Parameter name="onReceiveImport" value="true"/>
-    <Parameter name="uid" value="91342fb7-7fb3-4bc9-b8c4-1551b0a855b0"/>
+    <Parameter name="uid" value="c7e89995-d3c0-4b4f-81cb-11fb9ff73a1b"/>
   </Configuration>
   <Contents>
     <Content zipEntry="prefs/Cyan.pref" ignore="false" />

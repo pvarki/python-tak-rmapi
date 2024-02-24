@@ -2,7 +2,7 @@
   <Configuration>
     <Parameter name="name" value="Maroon_DP.zip" />
     <Parameter name="onReceiveImport" value="true"/>
-    <Parameter name="uid" value="8215a65e-e1b2-451c-80b6-0377d575a0f2"/>
+    <Parameter name="uid" value="7ac877ec-4eec-4fc9-b489-15c2d96d0c29"/>
   </Configuration>
   <Contents>
     <Content zipEntry="prefs/Maroon.pref" ignore="false" />

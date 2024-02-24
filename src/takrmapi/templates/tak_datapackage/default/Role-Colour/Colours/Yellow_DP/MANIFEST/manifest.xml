@@ -2,7 +2,7 @@
   <Configuration>
     <Parameter name="name" value="Yellow_DP.zip" />
     <Parameter name="onReceiveImport" value="true"/>
-    <Parameter name="uid" value="b8f7bf10-0583-4bd7-80ce-07c8a3a28cd2"/>
+    <Parameter name="uid" value="642b83d0-bc68-4beb-a813-b4ea34eeb5ae"/>
   </Configuration>
   <Contents>
     <Content zipEntry="prefs/Yellow.pref" ignore="false" />

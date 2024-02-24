@@ -2,7 +2,7 @@
   <Configuration>
     <Parameter name="name" value="Medic_DP.zip" />
     <Parameter name="onReceiveImport" value="true"/>
-    <Parameter name="uid" value="cdc41a9a-51d6-449b-a513-3bb631f2e52a"/>
+    <Parameter name="uid" value="f4013d59-96bb-4bb7-9573-cf5ad5f7f760"/>
   </Configuration>
   <Contents>
     <Content zipEntry="prefs/Medic.pref" ignore="false" />

@@ -1,0 +1,20 @@
+<?xml version='1.0' standalone='yes'?>
+<preferences>
+    <preference version="1" name="com.atakmap.app.civ_preferences">
+        <entry key="loadout_entry_key_default_loadout_key" class="class java.util.HashSet">
+        <element>title=TeamMember Tools</element>
+        <element>uid=default_loadout_key</element>
+        <element>hidden=redx.xml,brightness.xml,plugin://com.atakmap.android.grgbuilder.plugin/atakplugin.GRGBuilder.xb,plugin://com.atakmap.android.gbr.vx.plugin/com.atakmap.android.gbr.vx.plugin.d,plugin://com.atakmap.android.gbr.pdf.plugin/com.atakmap.android.gbr.pdf.plugin.h,plugin://com.atakmap.android.geocam.plugin/com.atakmap.android.geocam.plugin.GeoCamTool,routes.xml,quicknav.xml,rubbersheet.xml,plugin://com.gotenna.atak/com.gotenna.atak.components.GotennaPluginTool,geofences.xml,linkeud.xml,casevac.xml,resection.xml,goto.xml,firetools.xml,rangeandbearing.xml,firstperson.xml,elevation.xml,lasso.xml,plugin://com.atakmap.android.takchat.plugin/com.atakmap.android.takchat.plugin.TAKChatTool,plugin://com.atakmap.android.vns.plugin/com.atakmap.android.vns.plugin.VNSTool,plugin://com.atakmap.android.uastool.plugin/com.atakmap.android.uastool.plugin.SUASIntegratorTool,radiocontrols.xml,trackhistory.xml</element>
+        <element>buttons=com.atakmap.app.civ:id/tak_nav_button_4###pointdropper.xml,com.atakmap.app.civ:id/tak_nav_button_3###contacts.xml,com.atakmap.app.civ:id/tak_nav_zoom###zoom,com.atakmap.app.civ:id/tak_nav_button_5###quickpic.xml,com.atakmap.app.civ:id/tak_nav_button_0###overlay.xml,com.atakmap.app.civ:id/tak_nav_button_2###plugin://com.atakmap.android.datasync.plugin/com.atakmap.android.datasync.plugin.DataSyncTool,com.atakmap.app.civ:id/tak_nav_button_1###mapsandfavorites.xml</element>
+        <element>version=2</element>
+        </entry>
+        <entry key="loadout_entry_key_4e29c9de-d6bd-46cc-bcda-74684f3c1fe1" class="class java.util.Set">
+        <element>title=TeamLeader Tools</element>
+        <element>uid=4e29c9de-d6bd-46cc-bcda-74684f3c1fe1</element>
+        <element>hidden=redx.xml,brightness.xml,plugin://com.atakmap.android.grgbuilder.plugin/atakplugin.GRGBuilder.xb,plugin://com.atakmap.android.gbr.vx.plugin/com.atakmap.android.gbr.vx.plugin.d,plugin://com.atakmap.android.gbr.pdf.plugin/com.atakmap.android.gbr.pdf.plugin.h,plugin://com.atakmap.android.geocam.plugin/com.atakmap.android.geocam.plugin.GeoCamTool,quicknav.xml,rubbersheet.xml,plugin://com.gotenna.atak/com.gotenna.atak.components.GotennaPluginTool,linkeud.xml,casevac.xml,resection.xml,goto.xml,firetools.xml,firstperson.xml,elevation.xml,plugin://com.atakmap.android.takchat.plugin/com.atakmap.android.takchat.plugin.TAKChatTool,plugin://com.atakmap.android.uastool.plugin/com.atakmap.android.uastool.plugin.SUASIntegratorTool,radiocontrols.xml,trackhistory.xml</element>
+        <element>buttons=com.atakmap.app.civ:id/tak_nav_button_4###pointdropper.xml,com.atakmap.app.civ:id/tak_nav_button_3###contacts.xml,com.atakmap.app.civ:id/tak_nav_zoom###zoom,com.atakmap.app.civ:id/tak_nav_button_5###quickpic.xml,com.atakmap.app.civ:id/tak_nav_button_0###overlay.xml,com.atakmap.app.civ:id/tak_nav_button_2###plugin://com.atakmap.android.datasync.plugin/com.atakmap.android.datasync.plugin.DataSyncTool,com.atakmap.app.civ:id/tak_nav_button_1###mapsandfavorites.xml</element>
+        <element>version=2</element>
+        </entry>
+        <entry key="landscape_extended_buttons" class="class java.lang.Boolean">true</entry>
+    </preference>
+</preferences>

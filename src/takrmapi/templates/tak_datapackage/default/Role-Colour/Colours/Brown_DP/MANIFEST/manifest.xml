@@ -2,7 +2,7 @@
   <Configuration>
     <Parameter name="name" value="Brown_DP.zip" />
     <Parameter name="onReceiveImport" value="true"/>
-    <Parameter name="uid" value="56808aff-b573-48d6-a10f-a42f2c90e267"/>
+    <Parameter name="uid" value="53826af1-2ea3-40e6-9993-eda175c8c984"/>
   </Configuration>
   <Contents>
     <Content zipEntry="prefs/Brown.pref" ignore="false" />
