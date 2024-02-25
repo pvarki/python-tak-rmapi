@@ -6,7 +6,7 @@
       <Parameter name="onReceiveImport" value="true"/>
    </Configuration>
    <Contents>
-      <!-- Choose which toolbar to use  --> 
+      <!-- Choose which toolbar to use  -->
       <Content ignore="false" zipEntry="TeamMember_Toolbar.pref"/>
       <!-- <Content ignore="false" zipEntry="TeamLeader_Toolbar.pref"/> -->
    </Contents>
