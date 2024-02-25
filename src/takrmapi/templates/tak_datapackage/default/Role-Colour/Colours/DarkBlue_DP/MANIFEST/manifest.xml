@@ -2,7 +2,7 @@
   <Configuration>
     <Parameter name="name" value="DarkBlue_DP.zip" />
     <Parameter name="onReceiveImport" value="true"/>
-    <Parameter name="uid" value="7be56832-ecec-4cd9-ab64-5bef2c6873ff"/>
+    <Parameter name="uid" value="d7850fb9-6fb4-4521-9c19-60ac297d7870"/>
   </Configuration>
   <Contents>
     <Content zipEntry="prefs/DarkBlue.pref" ignore="false" />

@@ -2,7 +2,7 @@
   <Configuration>
     <Parameter name="name" value="K9_DP.zip" />
     <Parameter name="onReceiveImport" value="true"/>
-    <Parameter name="uid" value="d2d2ae88-fa3e-45f7-84fd-d1d24f30729f"/>
+    <Parameter name="uid" value="b2961fec-9adb-4fcc-b21e-e1b42e9c5139"/>
   </Configuration>
   <Contents>
     <Content zipEntry="prefs/K9.pref" ignore="false" />

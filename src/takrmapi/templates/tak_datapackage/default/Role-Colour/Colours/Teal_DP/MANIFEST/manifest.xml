@@ -2,7 +2,7 @@
   <Configuration>
     <Parameter name="name" value="Teal_DP.zip" />
     <Parameter name="onReceiveImport" value="true"/>
-    <Parameter name="uid" value="9575b579-bf36-45c6-b7e0-9fd9db31ed96"/>
+    <Parameter name="uid" value="2c639955-7918-4ac5-9bf7-37f0ac0fa294"/>
   </Configuration>
   <Contents>
     <Content zipEntry="prefs/Teal.pref" ignore="false" />

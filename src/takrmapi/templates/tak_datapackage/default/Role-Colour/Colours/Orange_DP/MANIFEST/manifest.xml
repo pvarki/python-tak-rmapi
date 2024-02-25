@@ -2,7 +2,7 @@
   <Configuration>
     <Parameter name="name" value="Orange_DP.zip" />
     <Parameter name="onReceiveImport" value="true"/>
-    <Parameter name="uid" value="4d96ccf6-904a-440d-a619-7db93584d2e6"/>
+    <Parameter name="uid" value="9aafa644-406f-4b4b-88f1-be6b2f4c96c3"/>
   </Configuration>
   <Contents>
     <Content zipEntry="prefs/Orange.pref" ignore="false" />

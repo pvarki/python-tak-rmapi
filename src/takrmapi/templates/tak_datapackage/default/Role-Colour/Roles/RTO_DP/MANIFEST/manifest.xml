@@ -2,7 +2,7 @@
   <Configuration>
     <Parameter name="name" value="RTO_DP.zip" />
     <Parameter name="onReceiveImport" value="true"/>
-    <Parameter name="uid" value="f958f028-3050-4cfe-97db-6c849681534b"/>
+    <Parameter name="uid" value="66b52bab-edf0-4bd4-b40b-987a68015e93"/>
   </Configuration>
   <Contents>
     <Content zipEntry="prefs/RTO.pref" ignore="false" />

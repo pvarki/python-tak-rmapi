@@ -2,7 +2,7 @@
   <Configuration>
     <Parameter name="name" value="White_DP.zip" />
     <Parameter name="onReceiveImport" value="true"/>
-    <Parameter name="uid" value="08304270-1665-4880-8c34-04209b8cb18d"/>
+    <Parameter name="uid" value="af50d81b-8cd8-46aa-8bcd-fdd1b179599f"/>
   </Configuration>
   <Contents>
     <Content zipEntry="prefs/White.pref" ignore="false" />
