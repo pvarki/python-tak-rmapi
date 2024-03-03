@@ -1,1 +1,1 @@
-Missing the pref file for wintak.
+Missing the settings pref file for wintak.
