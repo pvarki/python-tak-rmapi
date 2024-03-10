@@ -234,7 +234,7 @@ class MissionZip:
 
     async def manifest_p12_row(self, row: str, tmp_folder: str) -> None:
         """Handle manifest .p12 rows"""
-
+        tmp_folder = await self.chk_manifest_file_extra_folder(row=row, tmp_folder=tmp_folder)
         # FIXME: do the blocking IO in executor
         if "rasenmaeher_ca-public.p12" in row:
             # FIXME: instead of adding the root key into the software, need a way to get full chain with Root CA
@@ -259,12 +259,13 @@ class MissionZip:
         else:
             raise RuntimeError("IDK what to do")
 
-    async def chk_manifest_file_folder(self, row: str, tmp_folder: str) -> str:
+    async def chk_manifest_file_extra_folder(self, row: str, tmp_folder: str) -> str:
         """Check folder path from manifest, return updated path if folder was located"""
         xml_value: str = row.split(">")[1].split("<")[0]
         if "/" in xml_value:
             manifest_file = Path(tmp_folder) / xml_value
             manifest_file.parent.mkdir(parents=True, exist_ok=True)
+            LOGGER.info("File defined in manifest in folder {}".format(manifest_file.parent.absolute()))
             return str(manifest_file.parent.absolute())
         return tmp_folder
 
