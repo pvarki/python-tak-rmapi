@@ -165,7 +165,9 @@ class MissionZip:
         if os.path.exists(f"{walk_dir}/itak"):
             zip_file = await self.create_mission_zip(app_version="itak", walk_dir=f"{walk_dir}/itak")
             returnable.append(zip_file)
-
+        if os.path.exists(f"{walk_dir}/wintak"):
+            zip_file = await self.create_mission_zip(app_version="wintak", walk_dir=f"{walk_dir}/wintak")
+            returnable.append(zip_file)
         return returnable
 
     async def create_mission_zip(self, app_version: str = "", walk_dir: str = "") -> str:
@@ -189,6 +191,9 @@ class MissionZip:
                     rendered_template = await self.render_tak_manifest_template(template=template)
                     new_dst_file = dst_file.replace(".tpl", "")
                     if new_dst_file.endswith("manifest.xml"):
+                        await self.tak_manifest_extra(rendered_template, tmp_folder)
+                    # For itak use blueteam.pref.tpl
+                    if app_version == "itak" and new_dst_file.endswith("blueteam.pref"):
                         await self.tak_manifest_extra(rendered_template, tmp_folder)
 
                     with open(new_dst_file, "w", encoding="utf-8") as filehandle:
@@ -229,6 +234,7 @@ class MissionZip:
 
     async def manifest_p12_row(self, row: str, tmp_folder: str) -> None:
         """Handle manifest .p12 rows"""
+
         # FIXME: do the blocking IO in executor
         if "rasenmaeher_ca-public.p12" in row:
             # FIXME: instead of adding the root key into the software, need a way to get full chain with Root CA
@@ -252,6 +258,15 @@ class MissionZip:
             LOGGER.debug("{} exists: {}".format(tgtfile, tgtfile.exists()))
         else:
             raise RuntimeError("IDK what to do")
+
+    async def chk_manifest_file_folder(self, row: str, tmp_folder: str) -> str:
+        """Check folder path from manifest, return updated path if folder was located"""
+        xml_value: str = row.split(">")[1].split("<")[0]
+        if "/" in xml_value:
+            manifest_file = Path(tmp_folder) / xml_value
+            manifest_file.parent.mkdir(parents=True, exist_ok=True)
+            return str(manifest_file.parent.absolute())
+        return tmp_folder
 
 
 class Helpers:
