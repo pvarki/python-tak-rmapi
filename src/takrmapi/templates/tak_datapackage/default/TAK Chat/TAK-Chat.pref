@@ -13,7 +13,7 @@
   <!-- XXX."SERVER-IP / Host. Default is "conference" (conference."SERVER IP / HOST") -->
   <entry key="takchatServerConfPrefix" class="class java.lang.String">"SERVER CONF PREFIX"</entry>
   <!-- Notification audio/vibration settings -->
-  <entry key="takchatVibratePhone" class="class java.lang.Boolean">true</entry>  
+  <entry key="takchatVibratePhone" class="class java.lang.Boolean">true</entry>
   <entry key="takchatAudibleNotifyRecv" class="class java.lang.Boolean">false</entry>
   <entry key="takchatAudibleNotifySent" class="class java.lang.Boolean">false</entry>
 </preference>
