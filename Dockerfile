@@ -1,6 +1,10 @@
-ARG TEMURIN_VERSION="17"
-
 # syntax=docker/dockerfile:1.1.7-experimental
+ARG TEMURIN_VERSION="17"
+ARG TAKSERVER_IMAGE="pvarki/takserver:4.10-RELEASE-12-20240302"
+
+# The local reference tak_server is used in future stages
+FROM ${TAKSERVER_IMAGE} as tak_server
+
 #############################################
 # Tox testsuite for multiple python version #
 #############################################
@@ -17,6 +21,7 @@ RUN export RESOLVED_VERSIONS=`pyenv_resolve $PYTHON_VERSIONS` \
         git \
     && rm -rf /var/lib/apt/lists/* \
     && true
+
 
 ######################
 # Base builder image #
@@ -97,11 +102,7 @@ RUN --mount=type=ssh source /.venv/bin/activate \
 #########################
 # Main production build #
 #########################
-FROM pvarki/takserver:4.10-RELEASE-12 as tak_server
-
-# FROM pvarki/takserver:4.10-RELEASE-12 as compose-base
 FROM eclipse-temurin:${TEMURIN_VERSION}-jammy as production
-# FROM python:3.11-slim-bookworm as production
 COPY --from=production_build /tmp/wheelhouse /tmp/wheelhouse
 COPY --from=production_build /docker-entrypoint.sh /docker-entrypoint.sh
 COPY --from=pvarki/kw_product_init:latest /kw_product_init /kw_product_init
@@ -190,7 +191,6 @@ ENTRYPOINT ["/bin/zsh", "-l"]
 ############################
 # Compose container target #
 ############################
-FROM pvarki/takserver:4.10-RELEASE-12 as tak_server
 FROM devel_shell as integ_devel_shell
 COPY --from=tak_server /opt/tak /opt/tak
 COPY --from=tak_server /opt/scripts /opt/scripts
