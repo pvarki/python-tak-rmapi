@@ -5,9 +5,10 @@ import asyncio
 import shutil
 import logging
 from pathlib import Path
+import uuid
+
+
 import aiohttp
-
-
 from OpenSSL import crypto  # FIXME: Move to python-cryptography for cert parsing
 from jinja2 import Template
 from libpvarki.schemas.product import UserCRUDRequest
@@ -188,7 +189,9 @@ class MissionZip:
                     with open(org_file, "r", encoding="utf-8") as filehandle:
                         template = Template(filehandle.read())
 
-                    rendered_template = await self.render_tak_manifest_template(template=template)
+                    rendered_template = await self.render_tak_manifest_template(
+                        template=template, app_version=app_version
+                    )
                     new_dst_file = dst_file.replace(".tpl", "")
                     if new_dst_file.endswith("manifest.xml"):
                         await self.tak_manifest_extra(rendered_template, tmp_folder)
@@ -207,10 +210,11 @@ class MissionZip:
         # await remove_tmp_dir(tmp_folder)
         return f"{tmp_folder}.zip"
 
-    async def render_tak_manifest_template(self, template: Template) -> str:
+    async def render_tak_manifest_template(self, template: Template, app_version: str) -> str:
         """Render tak manifest template"""
+        pkguid = uuid.uuid5(uuid.NAMESPACE_URL, f"{config.TAK_SERVER_FQDN}/{self.user.user.uuid}/{app_version}")
         return template.render(
-            tak_server_uid_name=config.TAK_SERVER_FQDN,
+            tak_server_uid_name=str(pkguid),
             tak_server_name=config.TAK_SERVER_NAME,
             tak_server_address=config.TAK_SERVER_FQDN,
             client_cert_name=self.user.callsign,
