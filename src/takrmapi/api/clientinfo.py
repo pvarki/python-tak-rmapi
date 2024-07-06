@@ -13,7 +13,7 @@ LOGGER = logging.getLogger(__name__)
 router = APIRouter(dependencies=[Depends(MTLSHeader(auto_error=True))])
 
 
-@router.post("/fragment")
+@router.post("/fragment", deprecated=True)
 # async def get_missionpkg(user_mission: UserMissionZipRequest) -> List[Dict[str, str]]:
 async def client_instruction_fragment(user: UserCRUDRequest) -> List[Dict[str, str]]:
     """Return zip package containing client config and certificates"""
