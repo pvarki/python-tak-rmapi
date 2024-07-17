@@ -7,11 +7,10 @@ import logging
 from pathlib import Path
 import uuid
 
-
+from glob import glob
 import aiohttp
 from OpenSSL import crypto  # FIXME: Move to python-cryptography for cert parsing
 from jinja2 import Template
-from glob import glob
 from libpvarki.schemas.product import UserCRUDRequest
 from libpvarki.mtlshelp.session import get_session as libsession
 from libpvarki.mtlshelp.pkcs12 import convert_pem_to_pkcs12
