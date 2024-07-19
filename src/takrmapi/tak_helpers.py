@@ -242,7 +242,7 @@ class MissionZip:
         # FIXME: do the blocking IO in executor
         if "rasenmaeher_ca-public.p12" in row:
             # FIXME: instead of adding the root key into the software, need a way to get full chain with Root CA
-            isrg_chain = Path(__file__).parent / "templates" / "isrg-r3_x1.pem"
+            isrg_chain = Path(__file__).parent / "templates" / "isrg-r10_x1.pem"
             srcdata = Path("/le_certs/rasenmaeher/cert.pem").read_bytes() + isrg_chain.read_bytes()
             tgtfile = Path(tmp_folder) / "rasenmaeher_ca-public.p12"
             LOGGER.info("Creating {}".format(tgtfile))
