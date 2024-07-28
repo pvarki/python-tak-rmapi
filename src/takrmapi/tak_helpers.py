@@ -7,7 +7,7 @@ import logging
 from pathlib import Path
 import uuid
 
-
+from glob import glob
 import aiohttp
 from OpenSSL import crypto  # FIXME: Move to python-cryptography for cert parsing
 from jinja2 import Template
@@ -242,8 +242,13 @@ class MissionZip:
         # FIXME: do the blocking IO in executor
         if "rasenmaeher_ca-public.p12" in row:
             # FIXME: instead of adding the root key into the software, need a way to get full chain with Root CA
-            isrg_chain = Path(__file__).parent / "templates" / "isrg-r3_x1.pem"
-            srcdata = Path("/le_certs/rasenmaeher/cert.pem").read_bytes() + isrg_chain.read_bytes()
+            templates_folder = Path(__file__).parent / "templates"
+            ca_files = sorted(glob(f"{templates_folder}/*.pem"))
+            srcdata = Path("/le_certs/rasenmaeher/fullchain.pem").read_bytes()
+            if ca_files:
+                for ca_f in ca_files:
+                    srcdata = srcdata + Path(ca_f).read_bytes()
+
             tgtfile = Path(tmp_folder) / "rasenmaeher_ca-public.p12"
             LOGGER.info("Creating {}".format(tgtfile))
             p12bytes = convert_pem_to_pkcs12(srcdata, None, "public", None, "ca-chains")
