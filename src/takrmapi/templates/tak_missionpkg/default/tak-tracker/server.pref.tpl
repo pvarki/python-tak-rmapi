@@ -10,4 +10,9 @@
     <entry key="certificateLocation0" class="class java.lang.String">cert/{{ client_cert_name }}.p12</entry>
     <entry key="clientPassword0" class="class java.lang.String">{{ client_cert_password }}</entry>
   </preference>
+  <preference version="1" name="gov.tak.taktracker_preferences">
+    <entry key="callsign" class="class java.lang.String">{{ client_cert_name }}</entry>
+    <entry key="role" class="class java.lang.String">Team Member</entry>
+    <--! hidden, set if needed <entry key="team" class="class java.lang.String">Dark Green</entry> -->
+   </preference>
 </preferences>
