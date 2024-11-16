@@ -16,7 +16,7 @@ def load_manifest(filepth: Path = Path("/pvarki/kraftwerk-init.json")) -> Dict[s
     if not filepth.exists():
         # return a dummy manifest
         LOGGER.warning("Returning dummy manifest")
-        rm_uri = "https://localmaeher.pvarki.fi"
+        rm_uri = "https://localmaeher.dev.pvarki.fi"
         mtls_uri = rm_uri.replace("https://", "https://mtls.")
         return {
             "deployment": "localmaeher",
@@ -25,7 +25,7 @@ def load_manifest(filepth: Path = Path("/pvarki/kraftwerk-init.json")) -> Dict[s
                 "mtls": {"base_uri": mtls_uri},
                 "certcn": "rasenmaeher",
             },
-            "product": {"dns": "tak.localmaeher.pvarki.fi"},
+            "product": {"dns": "tak.localmaeher.dev.pvarki.fi"},
         }
     return cast(Dict[str, Any], json.loads(filepth.read_text(encoding="utf-8")))
 
