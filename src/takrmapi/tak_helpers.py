@@ -189,45 +189,34 @@ class MissionZip:
         self.helpers = Helpers(self.user)
         self.missionpkg = config.TAK_MISSIONPKG_DEFAULT_MISSION
 
-    async def create_missionpkg(self) -> Tuple[list[str], Path]:
+    async def create_missionpkg(self) -> List[Path]:
         """Create tak mission package packages to different app versions"""
+        missionzip_path_list: List[Path] = []
+
         # FIXME: Use Paths until absolutely have to convert to strings
         tmp_folder = Path(tempfile.mkdtemp(suffix=f"_{self.user.callsign}_{self.missionpkg}"))
         walk_dir = Path(config.TAK_MISSIONPKG_TEMPLATES_FOLDER) / self.missionpkg
         tasks: List[asyncio.Task[Any]] = []
         # FIXME: maybe just do this dynamically for all subdirs under templates ?
         if os.path.exists(f"{walk_dir}/atak"):
-            LOGGER.info("Adding ATAK zip generation task")
-            tasks.append(
-                asyncio.create_task(self.create_mission_zip(tmp_folder, app_version="atak", walk_dir=walk_dir / "atak"))
-            )
+            zip_file = await self.create_mission_zip(app_version="atak", walk_dir=f"{walk_dir}/atak")
+            missionzip_path_list.append(zip_file)
         if os.path.exists(f"{walk_dir}/itak"):
-            LOGGER.info("Adding iTAK zip generation task")
-            tasks.append(
-                asyncio.create_task(self.create_mission_zip(tmp_folder, app_version="itak", walk_dir=walk_dir / "itak"))
-            )
+            zip_file = await self.create_mission_zip(app_version="itak", walk_dir=f"{walk_dir}/itak")
+            missionzip_path_list.append(zip_file)
         if os.path.exists(f"{walk_dir}/tak-tracker"):
-            LOGGER.info("Adding taktracker zip generation task")
-            tasks.append(
-                asyncio.create_task(
-                    self.create_mission_zip(tmp_folder, app_version="tak-tracker", walk_dir=walk_dir / "tak-tracker")
-                )
-            )
-        # wintak and atak-mini removed, there are some issues with 5 packages.
-        LOGGER.debug("Waiting for the zip tasks")
-        returnable = await asyncio.gather(*tasks)
-        LOGGER.info("Tasks done")
-        return returnable, tmp_folder
+            zip_file = await self.create_mission_zip(app_version="tak-tracker", walk_dir=f"{walk_dir}/tak-tracker")
+            missionzip_path_list.append(zip_file)
+        return missionzip_path_list
 
-    async def create_mission_zip(  # pylint: disable=too-many-locals
-        self, tmp_base: Path, app_version: str, walk_dir: Path
-    ) -> str:
+    async def create_mission_zip(self, app_version: str = "", walk_dir: str = "") -> Path:
         """Loop through files in missionpkg templates folder"""
         # TODO maybe in memory fs for tmp files...
 
-        # FIXME: use Paths for everything
-        tmp_folder = tmp_base / app_version
-        tmp_folder.mkdir(parents=True, exist_ok=True)
+        # TODO change strings to Paths
+        tmp_folder = f"{config.TAK_MISSIONPKG_TMP}/{self.user.callsign}_{self.missionpkg}/{app_version}"
+        # tmp_folder: Path = Path(config.TAK_MISSIONPKG_TMP) / f"{self.user.callsign}_{self.missionpkg}/{app_version}"
+        os.makedirs(tmp_folder)
         for root, dirs, files in os.walk(walk_dir):
             for name in dirs:
                 dirpath = f"{tmp_folder}{os.path.join(root, name).replace(str(walk_dir), '')}"
@@ -261,9 +250,10 @@ class MissionZip:
 
         await self.zip_folder_content(str(tmp_folder), str(tmp_folder))
 
-        return f"{tmp_folder}.zip"
+        # await remove_tmp_dir(tmp_folder)
+        return Path(f"{tmp_folder}.zip")
 
-    async def render_tak_manifest_template(self, template: Template, app_version: str) -> str:
+    async def render_tak_manifest_template(self, template: Template, app_version: str) -> Any:
         """Render tak manifest template"""
         pkguid = uuid.uuid5(uuid.NAMESPACE_URL, f"{config.TAK_SERVER_FQDN}/{self.user.user.uuid}/{app_version}")
         return template.render(

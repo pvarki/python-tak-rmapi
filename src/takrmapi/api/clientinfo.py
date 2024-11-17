@@ -25,12 +25,11 @@ async def client_instruction_fragment(user: UserCRUDRequest) -> List[Dict[str, s
     for file in zip_files:
         with open(file, "rb") as filehandle:
             contents = filehandle.read()
-        filename = file.split("/")[-1]
         returnable.append(
             {
-                "title": filename,
+                "title": file.name,
                 "data": f"data:application/zip;base64,{base64.b64encode(contents).decode('ascii')}",
-                "filename": f"{user.callsign}_{filename}",
+                "filename": f"{user.callsign}_{file.name}",
             }
         )
     await tak_missionpkg.helpers.remove_tmp_dir(str(tmp_folder))
