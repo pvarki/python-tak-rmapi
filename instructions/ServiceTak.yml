@@ -1,0 +1,148 @@
+- type: "View"
+  name: "ServiceTak"
+  body:
+  - type: div
+    classes:
+    - "service-tak"
+    body:
+    - type: CardsContainer
+      body:
+      - type: FoldableCard
+        title: "serviceTak.foldableCardTitle"
+        image: "../../../assets/icons/taklogo.png"
+        body:
+        - type: "div"
+          classes:
+          - "flex"
+          - "flex-col"
+          - "items-center"
+          - "justify-center"
+          - "p-5"
+          body:
+          - type: ServiceInfoCard
+            title: "serviceTak.serviceInfoCardTitle"
+            image: "../../../assets/icons/taklogo.png"
+          - type: UnfoldableCard
+            title: "serviceTak.unfoldableCardTitle"
+            steps:
+            - description:
+                type: div
+                body:
+                - "serviceTak.step1Description"
+            - description:
+                type: div
+                body:
+                - "serviceTak.step2Description"
+            - description:
+                type: div
+                body:
+                - "serviceTak.step3Description"
+          - type: ServiceTakUsageCard
+          - type: div
+            classes:
+            - "flex"
+            - "flex-col"
+            - "items-center"
+            - "justify-center"
+            - "px-0"
+            - "w-full"
+            body:
+            - type: div
+              classes:
+              - "flex"
+              - "w-full"
+              - "items-center"
+              - "justify-center"
+              - "items-stretch"
+              - "px-0"
+              body:
+              - type: div
+                classes:
+                - "flex-1"
+                - "px-0"
+                body:
+                - type: div
+                  classes:
+                  - "w-full"
+                  body:
+                  - type: Button
+                    variant:
+                      width: "full"
+                    onClick:
+                      navigate: "/app/services/tak/quickstart"
+                    classes:
+                    - "m-1"
+                    - "w-full"
+                    - "min-h-[4rem]"
+                    body:
+                    - type: div
+                      classes:
+                      - "flex"
+                      - "items-center"
+                      - "justify-center"
+                      - "w-full"
+                      - "h-full"
+                      body:
+                      - type: img
+                        src: "../../../assets/icons/byod2.png"
+                        alt: "keys"
+                        classes:
+                        - "h-5"
+                        - "w-5"
+                        - "mr-2"
+                      - "serviceTak.guideButton.quickStart"
+              - type: div
+                classes:
+                - "p-1"
+              - type: div
+                classes:
+                - "flex-1"
+                - "px-0"
+                body:
+                - type: div
+                  classes:
+                  - "w-full"
+                  body:
+                  - type: Button
+                    variant:
+                      width: "full"
+                    onClick:
+                      navigate: "/app/services/tak/usage"
+                    classes:
+                    - "m-1"
+                    - "px-2"
+                    - "w-full"
+                    - "min-h-[4rem]"
+                    body:
+                    - type: div
+                      classes:
+                      - "flex"
+                      - "items-center"
+                      - "justify-center"
+                      - "w-full"
+                      - "h-full"
+                      body:
+                      - type: img
+                        src: "../../../assets/icons/sota.png"
+                        alt: "keys"
+                        classes:
+                        - "h-5"
+                        - "w-5"
+                        - "mr-2"
+                      - "serviceTak.guideButton.usage"
+              - type: div
+                classes:
+                - "p-1"
+            - type: Button
+              variant:
+                width: "full"
+              onClick:
+                modal: "TakDownloadModal"
+              classes:
+              - "m-1"
+              - "px-3"
+              - "bg-success"
+              - "text-white"
+              - "w-full"
+              body:
+              - "serviceTak.grabZipButton"
