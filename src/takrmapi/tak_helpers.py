@@ -1,5 +1,5 @@
 """Helper functions to manage tak"""
-from typing import Any, Mapping, Union, Sequence, cast
+from typing import Any, Mapping, Union, Sequence, cast, List
 import os
 import asyncio
 import shutil
@@ -152,9 +152,10 @@ class MissionZip:
         self.helpers = Helpers(self.user)
         self.missionpkg = config.TAK_MISSIONPKG_DEFAULT_MISSION
 
-    async def create_missionpkg(self) -> list[str]:
+    async def create_missionpkg(self) -> List[Path]:
         """Create tak mission package packages to different app versions"""
-        returnable: list[str] = []
+        missionzip_path_list: List[Path] = []
+
         # FIXME: Use Paths until absolutely have to convert to strings
         tmp_folder = f"{config.TAK_MISSIONPKG_TMP}/{self.user.callsign}_{self.missionpkg}"
         walk_dir = f"{config.TAK_MISSIONPKG_TEMPLATES_FOLDER}/{self.missionpkg}"
@@ -162,20 +163,22 @@ class MissionZip:
         os.makedirs(tmp_folder)
         if os.path.exists(f"{walk_dir}/atak"):
             zip_file = await self.create_mission_zip(app_version="atak", walk_dir=f"{walk_dir}/atak")
-            returnable.append(zip_file)
+            missionzip_path_list.append(zip_file)
         if os.path.exists(f"{walk_dir}/itak"):
             zip_file = await self.create_mission_zip(app_version="itak", walk_dir=f"{walk_dir}/itak")
-            returnable.append(zip_file)
+            missionzip_path_list.append(zip_file)
         if os.path.exists(f"{walk_dir}/wintak"):
             zip_file = await self.create_mission_zip(app_version="wintak", walk_dir=f"{walk_dir}/wintak")
-            returnable.append(zip_file)
-        return returnable
+            missionzip_path_list.append(zip_file)
+        return missionzip_path_list
 
-    async def create_mission_zip(self, app_version: str = "", walk_dir: str = "") -> str:
+    async def create_mission_zip(self, app_version: str = "", walk_dir: str = "") -> Path:
         """Loop through files in missionpkg templates folder"""
         # TODO maybe in memory fs for tmp files...
 
+        # TODO change strings to Paths
         tmp_folder = f"{config.TAK_MISSIONPKG_TMP}/{self.user.callsign}_{self.missionpkg}/{app_version}"
+        # tmp_folder: Path = Path(config.TAK_MISSIONPKG_TMP) / f"{self.user.callsign}_{self.missionpkg}/{app_version}"
         os.makedirs(tmp_folder)
         for root, dirs, files in os.walk(walk_dir):
             for name in dirs:
@@ -208,9 +211,9 @@ class MissionZip:
         await self.zip_folder_content(tmp_folder, tmp_folder)
 
         # await remove_tmp_dir(tmp_folder)
-        return f"{tmp_folder}.zip"
+        return Path(f"{tmp_folder}.zip")
 
-    async def render_tak_manifest_template(self, template: Template, app_version: str) -> str:
+    async def render_tak_manifest_template(self, template: Template, app_version: str) -> Any:
         """Render tak manifest template"""
         pkguid = uuid.uuid5(uuid.NAMESPACE_URL, f"{config.TAK_SERVER_FQDN}/{self.user.user.uuid}/{app_version}")
         return template.render(
