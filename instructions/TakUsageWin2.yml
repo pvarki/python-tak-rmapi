@@ -1,0 +1,4 @@
+- type: "View"
+  name: "TakUsageWin2"
+  path: "usage/win2"
+  body: []

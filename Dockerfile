@@ -113,6 +113,9 @@ COPY --from=tak_server /opt/scripts /opt/scripts
 COPY --from=tak_server /opt/templates /opt/templates
 COPY docker/container-init.sh /container-init.sh
 
+# Add tak specific instructions json
+COPY instructions/tak.json /opt/templates/tak.json
+
 WORKDIR /app
 # Install system level deps for running the package (not devel versions for building wheels)
 # and install the wheels we built in the previous step. generate default config
@@ -145,13 +148,16 @@ ENTRYPOINT ["/usr/bin/tini", "--", "/docker-entrypoint.sh"]
 # Base stage for development builds #
 #####################################
 FROM builder_base as devel_build
+
+# Add tak specific instructions json
+COPY instructions/tak.json /opt/templates/tak.json
+
 # Install deps
 COPY . /app
 WORKDIR /app
 RUN --mount=type=ssh source /.venv/bin/activate \
     && poetry install --no-interaction --no-ansi \
     && true
-
 
 #0############
 # Run tests #

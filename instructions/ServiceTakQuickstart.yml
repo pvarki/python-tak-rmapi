@@ -1,0 +1,41 @@
+- type: "View"
+  name: "ServiceTakQuickStart"
+  path: "quickstart"
+  body:
+  - type: div
+    classes: "pb-10"
+    body:
+    - type: Layout
+      showNavbar: True
+      showFooter: True
+      heroImage: "../../../../assets/heroimages/rakennettu3.jpeg"
+      navbarTitle: "serviceTakQuickstartView.navbarTitle"
+      backUrl: "/"
+      body:
+      - type: "div"
+        body:
+        - type: CardsContainer
+          body:
+          - type: ServiceInfoCard
+            title: "serviceTakQuickstartView.serviceInfoCardTitle"
+            body:
+            - "Select the setup instructions for your device. "
+            - type: br
+            - type: span
+              body:
+              - "The easiest way to learn how to do it, is to work "
+              - type: strong
+                body: "with a partner"
+              - " where one fighter displays the instructions, and the other follows them."
+          - type: Card
+            title: "serviceTakQuickstartView.androidTitle"
+            image: "../../../assets/icons/android.svg"
+            url: "/app/services/tak/quickstart/android1"
+          - type: Card
+            title: "serviceTakQuickstartView.iosTitle"
+            image: "../../../assets/icons/apple.svg"
+            url: "/app/services/tak/quickstart/ios1"
+          - type: Card
+            title: "serviceTakQuickstartView.windowsTitle"
+            image: "../../../assets/icons/windows.svg"
+            url: "/app/services/tak/quickstart/win1"
