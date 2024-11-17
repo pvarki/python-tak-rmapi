@@ -214,8 +214,7 @@ class MissionZip:
         # TODO maybe in memory fs for tmp files...
 
         # TODO change strings to Paths
-        tmp_folder = f"{config.TAK_MISSIONPKG_TMP}/{self.user.callsign}_{self.missionpkg}/{app_version}"
-        # tmp_folder: Path = Path(config.TAK_MISSIONPKG_TMP) / f"{self.user.callsign}_{self.missionpkg}/{app_version}"
+        tmp_folder: Path = Path(config.TAK_MISSIONPKG_TMP) / f"{self.user.callsign}_{self.missionpkg}/{app_version}"
         os.makedirs(tmp_folder)
         for root, dirs, files in os.walk(walk_dir):
             for name in dirs:
@@ -264,11 +263,15 @@ class MissionZip:
             client_cert_password=self.user.callsign,
         )
 
-    async def zip_folder_content(self, zipfile: str, tmp_folder: str) -> None:
+    async def zip_folder_content(self, zipfile: Path, tmp_folder: Path) -> None:
         """Zip folder content"""
+<<<<<<< HEAD
         await asyncio.get_running_loop().run_in_executor(None, shutil.make_archive, zipfile, "zip", tmp_folder)
+=======
+        shutil.make_archive(str(zipfile), "zip", str(tmp_folder))
+>>>>>>> 1f2138f... str->path started
 
-    async def tak_manifest_extra(self, manifest: str, tmp_folder: str) -> None:
+    async def tak_manifest_extra(self, manifest: str, tmp_folder: Path) -> None:
         """Check if there is some extra that needs to be done defined in manfiest"""
         manifest_rows = manifest.splitlines()
         for row in manifest_rows:
@@ -279,7 +282,7 @@ class MissionZip:
             if ".p12" in row:
                 await self.manifest_p12_row(row, tmp_folder)
 
-    async def manifest_p12_row(self, row: str, tmp_folder: str) -> None:
+    async def manifest_p12_row(self, row: str, tmp_folder: Path) -> None:
         """Handle manifest .p12 rows"""
         tmp_folder = await self.chk_manifest_file_extra_folder(row=row, tmp_folder=tmp_folder)
         # FIXME: do the blocking IO in executor
@@ -312,14 +315,14 @@ class MissionZip:
         else:
             raise RuntimeError("IDK what to do")
 
-    async def chk_manifest_file_extra_folder(self, row: str, tmp_folder: str) -> str:
+    async def chk_manifest_file_extra_folder(self, row: str, tmp_folder: Path) -> Path:
         """Check folder path from manifest, return updated path if folder was located"""
         xml_value: str = row.split(">")[1].split("<")[0]
         if "/" in xml_value:
-            manifest_file = Path(tmp_folder) / xml_value
+            manifest_file = tmp_folder / xml_value
             manifest_file.parent.mkdir(parents=True, exist_ok=True)
             LOGGER.info("File defined in manifest in folder {}".format(manifest_file.parent.absolute()))
-            return str(manifest_file.parent.absolute())
+            return Path(manifest_file.parent.absolute())
         return tmp_folder
 
 

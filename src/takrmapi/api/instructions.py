@@ -22,7 +22,6 @@ async def user_intructions(user: UserCRUDRequest) -> Dict[str, str]:
     """return user instructions"""
 
     # TODO load to memory on load,
-    # instruction_content: str = Path("/opt/templates/tak.json").read_text(encoding="utf-8")
     tak_instructions_data = json.loads(Path("/opt/templates/tak.json").read_text(encoding="utf-8"))
 
     localuser = tak_helpers.UserCRUD(user)
