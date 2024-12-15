@@ -13,7 +13,7 @@ LOGGER = logging.getLogger(__name__)
 router = APIRouter(dependencies=[Depends(MTLSHeader(auto_error=True))])
 
 
-@router.post("/fragment")
+@router.post("/fragment", deprecated=True)
 # async def get_missionpkg(user_mission: UserMissionZipRequest) -> List[Dict[str, str]]:
 async def client_instruction_fragment(user: UserCRUDRequest) -> List[Dict[str, str]]:
     """Return zip package containing client config and certificates"""
@@ -24,12 +24,11 @@ async def client_instruction_fragment(user: UserCRUDRequest) -> List[Dict[str, s
     for file in zip_files:
         with open(file, "rb") as filehandle:
             contents = filehandle.read()
-        filename = file.split("/")[-1]
         returnable.append(
             {
-                "title": filename,
+                "title": file.name,
                 "data": f"data:application/zip;base64,{base64.b64encode(contents).decode('ascii')}",
-                "filename": f"{user.callsign}_{filename}",
+                "filename": f"{user.callsign}_{file.name}",
             }
         )
     return returnable

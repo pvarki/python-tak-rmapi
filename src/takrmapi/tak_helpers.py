@@ -1,5 +1,5 @@
 """Helper functions to manage tak"""
-from typing import Any, Mapping, Union, Sequence, cast
+from typing import Any, Mapping, Union, Sequence, cast, List
 import os
 import asyncio
 import shutil
@@ -152,9 +152,10 @@ class MissionZip:
         self.helpers = Helpers(self.user)
         self.missionpkg = config.TAK_MISSIONPKG_DEFAULT_MISSION
 
-    async def create_missionpkg(self) -> list[str]:
+    async def create_missionpkg(self) -> List[Path]:
         """Create tak mission package packages to different app versions"""
-        returnable: list[str] = []
+        missionzip_path_list: List[Path] = []
+
         # FIXME: Use Paths until absolutely have to convert to strings
         tmp_folder = f"{config.TAK_MISSIONPKG_TMP}/{self.user.callsign}_{self.missionpkg}"
         walk_dir = f"{config.TAK_MISSIONPKG_TEMPLATES_FOLDER}/{self.missionpkg}"
@@ -162,20 +163,21 @@ class MissionZip:
         os.makedirs(tmp_folder)
         if os.path.exists(f"{walk_dir}/atak"):
             zip_file = await self.create_mission_zip(app_version="atak", walk_dir=f"{walk_dir}/atak")
-            returnable.append(zip_file)
+            missionzip_path_list.append(zip_file)
         if os.path.exists(f"{walk_dir}/itak"):
             zip_file = await self.create_mission_zip(app_version="itak", walk_dir=f"{walk_dir}/itak")
-            returnable.append(zip_file)
+            missionzip_path_list.append(zip_file)
         if os.path.exists(f"{walk_dir}/wintak"):
             zip_file = await self.create_mission_zip(app_version="wintak", walk_dir=f"{walk_dir}/wintak")
-            returnable.append(zip_file)
-        return returnable
+            missionzip_path_list.append(zip_file)
+        return missionzip_path_list
 
-    async def create_mission_zip(self, app_version: str = "", walk_dir: str = "") -> str:
+    async def create_mission_zip(self, app_version: str = "", walk_dir: str = "") -> Path:
         """Loop through files in missionpkg templates folder"""
         # TODO maybe in memory fs for tmp files...
 
-        tmp_folder = f"{config.TAK_MISSIONPKG_TMP}/{self.user.callsign}_{self.missionpkg}/{app_version}"
+        # TODO change strings to Paths
+        tmp_folder: Path = Path(config.TAK_MISSIONPKG_TMP) / f"{self.user.callsign}_{self.missionpkg}/{app_version}"
         os.makedirs(tmp_folder)
         for root, dirs, files in os.walk(walk_dir):
             for name in dirs:
@@ -208,9 +210,9 @@ class MissionZip:
         await self.zip_folder_content(tmp_folder, tmp_folder)
 
         # await remove_tmp_dir(tmp_folder)
-        return f"{tmp_folder}.zip"
+        return Path(f"{tmp_folder}.zip")
 
-    async def render_tak_manifest_template(self, template: Template, app_version: str) -> str:
+    async def render_tak_manifest_template(self, template: Template, app_version: str) -> Any:
         """Render tak manifest template"""
         pkguid = uuid.uuid5(uuid.NAMESPACE_URL, f"{config.TAK_SERVER_FQDN}/{self.user.user.uuid}/{app_version}")
         return template.render(
@@ -221,11 +223,11 @@ class MissionZip:
             client_cert_password=self.user.callsign,
         )
 
-    async def zip_folder_content(self, zipfile: str, tmp_folder: str) -> None:
+    async def zip_folder_content(self, zipfile: Path, tmp_folder: Path) -> None:
         """Zip folder content"""
-        shutil.make_archive(zipfile, "zip", tmp_folder)
+        shutil.make_archive(str(zipfile), "zip", str(tmp_folder))
 
-    async def tak_manifest_extra(self, manifest: str, tmp_folder: str) -> None:
+    async def tak_manifest_extra(self, manifest: str, tmp_folder: Path) -> None:
         """Check if there is some extra that needs to be done defined in manfiest"""
         manifest_rows = manifest.splitlines()
         for row in manifest_rows:
@@ -236,7 +238,7 @@ class MissionZip:
             if ".p12" in row:
                 await self.manifest_p12_row(row, tmp_folder)
 
-    async def manifest_p12_row(self, row: str, tmp_folder: str) -> None:
+    async def manifest_p12_row(self, row: str, tmp_folder: Path) -> None:
         """Handle manifest .p12 rows"""
         tmp_folder = await self.chk_manifest_file_extra_folder(row=row, tmp_folder=tmp_folder)
         # FIXME: do the blocking IO in executor
@@ -268,14 +270,14 @@ class MissionZip:
         else:
             raise RuntimeError("IDK what to do")
 
-    async def chk_manifest_file_extra_folder(self, row: str, tmp_folder: str) -> str:
+    async def chk_manifest_file_extra_folder(self, row: str, tmp_folder: Path) -> Path:
         """Check folder path from manifest, return updated path if folder was located"""
         xml_value: str = row.split(">")[1].split("<")[0]
         if "/" in xml_value:
-            manifest_file = Path(tmp_folder) / xml_value
+            manifest_file = tmp_folder / xml_value
             manifest_file.parent.mkdir(parents=True, exist_ok=True)
             LOGGER.info("File defined in manifest in folder {}".format(manifest_file.parent.absolute()))
-            return str(manifest_file.parent.absolute())
+            return Path(manifest_file.parent.absolute())
         return tmp_folder
 
 

@@ -1,0 +1,4 @@
+- type: "View"
+  name: "TakUsageAndroid2"
+  path: "usage/android2"
+  body: []

@@ -13,7 +13,7 @@ LOGGER = logging.getLogger(__name__)
 router = APIRouter(dependencies=[Depends(MTLSHeader(auto_error=True))])
 
 
-@router.get("/fragment")
+@router.get("/fragment", deprecated=True)
 async def admin_instruction_fragment() -> UserInstructionFragment:
     """Return user instructions, we use POST because the integration layer might not keep
     track of callsigns and certs by UUID and will probably need both for the instructions"""

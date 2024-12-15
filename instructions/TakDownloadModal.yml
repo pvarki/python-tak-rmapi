@@ -1,0 +1,26 @@
+- type: TakDownloadModal
+  name: "TakDownloadModal"
+  title: "Download Your Client Package"
+  genericErrorMessage: "Unidentified error."
+  errorFromApplication: "Error message from the application:"
+  description:
+  - "You are about to download your TAK Client Package as "
+  - type: DropdownOsSelector
+    options:
+    - label: "iOS ITAK"
+      value: "iOS"
+    - label: "Android ATAK tai Windows WinTAK"
+      value: "Other"
+  - " -compatible."
+  - type: br
+  - type: br
+  - "Is this correct? If not, please change it using the selector above as necessary."
+  button:
+    title: "Download Client Package"
+  success:
+    title: "Client Package Downloaded."
+    description: "Your Client Package has been downloaded. Please install it to your application, according to the Quickstart Guide."
+  failure:
+    title: "Error in Downloading Client Package:"
+    description: "Downloading your Client Package failed. Please try again later."
+  iAmDownloading: "Fetching your package..."
