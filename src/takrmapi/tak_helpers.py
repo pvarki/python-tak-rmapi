@@ -42,7 +42,7 @@ class UserCRUD:
     @property
     def certcn(self) -> str:
         """return CN for the special cert"""
-        return f"{self.user.callsign}_tak"
+        return self.user.callsign
 
     @property
     def rm_certpem(self) -> str:
