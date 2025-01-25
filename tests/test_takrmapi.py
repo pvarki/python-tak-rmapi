@@ -1,4 +1,5 @@
 """Package level tests"""
+
 from takrmapi import __version__
 
 

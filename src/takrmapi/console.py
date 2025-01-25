@@ -1,4 +1,5 @@
 """CLI entrypoints for product integration api"""
+
 import asyncio
 import logging
 import json

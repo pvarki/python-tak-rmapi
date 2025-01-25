@@ -1,4 +1,5 @@
 """Test the HTML fragment"""
+
 from typing import Dict
 import logging
 

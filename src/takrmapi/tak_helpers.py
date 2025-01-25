@@ -1,4 +1,5 @@
 """Helper functions to manage tak"""
+
 from typing import Any, Mapping, Union, Sequence, cast
 import os
 import asyncio
@@ -91,7 +92,7 @@ class UserCRUD:
             "async_create_keypairasync_create_client_csr awaited {} exists: {}".format(csrpath, csrpath.exists())
         )
 
-        async with (await self.helpers.tak_mtls_client()) as session:
+        async with await self.helpers.tak_mtls_client() as session:
             url = f"{self.rm_base}api/v1/product/sign_csr/mtls"
             LOGGER.debug("POSTing to {}".format(url))
             resp = await session.post(url, json={"csr": csrpem})
@@ -112,7 +113,7 @@ class UserCRUD:
     async def revoke_user(self) -> bool:
         """Remove user from TAK"""
         if await self.helpers.user_cert_validate():
-            async with (await self.helpers.tak_mtls_client()) as session:
+            async with await self.helpers.tak_mtls_client() as session:
                 url = f"{self.rm_base}api/v1/product/revoke/mtls"
                 LOGGER.debug("POSTing cert to {}".format(url))
                 resp = await session.post(url, json={"cert": self.certpem})
@@ -457,7 +458,7 @@ class RestHelpers:  # pylint: disable=too-few-public-methods
     # https://takmsg:8443/user-management/api/list-users
     async def tak_api_user_list(self) -> Mapping[str, Any]:
         """Get list of users from TAK"""
-        async with (await self.helpers.tak_mtls_client()) as session:
+        async with await self.helpers.tak_mtls_client() as session:
             try:
                 url = f"{self.helpers.tak_base_url()}/user-management/api/list-users"
                 resp = await session.get(url)

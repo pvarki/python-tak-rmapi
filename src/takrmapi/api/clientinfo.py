@@ -1,4 +1,5 @@
 """Endpoints for information for the end-user"""
+
 import logging
 import base64
 from typing import List, Dict
