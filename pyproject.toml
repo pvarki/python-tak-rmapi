@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "takrmapi"
-version = "1.4.0"
+version = "1.4.1"
 description = "RASENMAEHER integration API for TAK server"
 authors = ["Eero af Heurlin <rambo@iki.fi>", "Ari Karhunen <FIXME@example.com>"]
 homepage = "https://github.com/pvarki/python-tak-rmapi"
