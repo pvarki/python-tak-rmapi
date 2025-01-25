@@ -55,15 +55,18 @@ class UserCRUD:
         certpath = self.userdata / f"{self.certcn}.pem"
         if certpath.exists():
             return certpath.read_text(encoding="utf-8")
-        return self.user.x509cert.replace("\\n", "\n")
+        LOGGER.warning("Local cert {} not found".format(certpath))
+        return self.rm_certpem
 
     @property
     def certkey(self) -> str:
         """Cert private key contents as PEM"""
         keypath = self.userdata / f"{self.certcn}.key"
+        LOGGER.debug("Checking if {} exists: {}".format(keypath, keypath.exists()))
         if keypath.exists():
             return keypath.read_text(encoding="utf-8")
-        raise ValueError("We do not have the private key")
+        LOGGER.debug("userdata contents: {}".format(list(self.userdata.rglob("*"))))
+        raise ValueError("Private key {} not found".format(keypath))
 
     @property
     def rm_base(self) -> str:
@@ -80,8 +83,13 @@ class UserCRUD:
         csrpath = self.userdata / f"{certcn}.csr"
         certpath = self.userdata / f"{certcn}.pem"
 
+        LOGGER.info("Creating TAK specific keypair: {} -> {} ".format(certcn, privpath))
         ckp = await async_create_keypair(privpath, pubpath)
+        LOGGER.debug("async_create_keypair awaited {} exists: {}".format(privpath, privpath.exists()))
         csrpem = await async_create_client_csr(ckp, csrpath, {"CN": self.certcn})
+        LOGGER.debug(
+            "async_create_keypairasync_create_client_csr awaited {} exists: {}".format(csrpath, csrpath.exists())
+        )
 
         async with (await self.helpers.tak_mtls_client()) as session:
             url = f"{self.rm_base}api/v1/product/sign_csr/mtls"
@@ -90,6 +98,7 @@ class UserCRUD:
             resp.raise_for_status()
             payload = await resp.json()
             certpath.write_text(payload["certificate"], encoding="utf-8")
+            LOGGER.info("signed cert written to {}".format(certpath))
 
     async def add_new_user(self) -> bool:
         """Add new user to TAK with given certificate"""
