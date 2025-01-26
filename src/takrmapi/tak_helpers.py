@@ -348,6 +348,7 @@ class Helpers:
 
     async def user_cert_validate(self) -> bool:
         """Check that the given certificate can at least be opened"""
+        await self.user_cert_write()
         try:
             cert_file_name = config.TAK_CERTS_FOLDER / f"{self.user.callsign}.pem"
             with open(cert_file_name, "rb") as cert_file:
@@ -372,6 +373,8 @@ class Helpers:
         # THIS SHOULD BE CHANGED TO BE DONE THROUGH REST IF POSSIBLE
         # Or via Pyjnius, or via PyIgnite
         #
+        if not await self.user_cert_validate():
+            raise ValueError("User TAK certs not valid")
         tasks = []
         for certname in self.enable_user_cert_names:
             tasks.append(
@@ -404,7 +407,8 @@ class Helpers:
         # THIS SHOULD BE CHANGED TO BE DONE THROUGH REST IF POSSIBLE
         # Or via Pyjnius, or via PyIgnite
         #
-
+        if not await self.user_cert_validate():
+            raise ValueError("User TAK certs not valid")
         tasks = []
         for certname in self.enable_user_cert_names:
             tasks.append(
@@ -437,6 +441,8 @@ class Helpers:
         # THIS SHOULD BE CHANGED TO BE DONE THROUGH REST IF POSSIBLE
         # Or via Pyjnius, or via PyIgnite
         #
+        if not await self.user_cert_validate():
+            raise ValueError("User TAK certs not valid")
         tasks = []
         for certname in self.enable_user_cert_names:
             tasks.append(
