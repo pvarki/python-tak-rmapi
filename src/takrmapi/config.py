@@ -43,7 +43,7 @@ def read_deployment_name() -> str:
 
 cfg = Config()  # not supporting .env files anymore because https://github.com/encode/starlette/discussions/2446
 
-LOG_LEVEL: int = cfg("LOG_LEVEL", default=20, cast=int)
+LOG_LEVEL: int = cfg("LOG_LEVEL", default=40, cast=int)
 TEMPLATES_PATH: Path = cfg("TEMPLATES_PATH", cast=Path, default=Path(__file__).parent / "templates")
 
 TAK_CERTS_FOLDER: Path = cfg("TAK_CERTS_FOLDER", cast=Path, default=Path("/opt/tak/data/certs/files"))

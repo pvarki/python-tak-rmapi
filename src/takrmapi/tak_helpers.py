@@ -7,6 +7,7 @@ import shutil
 import logging
 from pathlib import Path
 import uuid
+import tempfile
 
 from glob import glob
 import aiohttp
@@ -63,7 +64,7 @@ class UserCRUD:
 
     async def wait_for_keypair(self) -> None:
         """Wait for keypair to be available"""
-        while self.certpath.exists() or not self.keypath.exists():
+        while not self.certpath.exists() or not self.keypath.exists():
             LOGGER.debug("Waiting for {} / {}".format(self.certpath, self.keypath))
             LOGGER.debug("userdata contents: {}".format(list(self.userdata.rglob("*"))))
             await asyncio.sleep(0.5)
@@ -183,34 +184,39 @@ class MissionZip:
         """Create tak mission package packages to different app versions"""
         returnable: list[str] = []
         # FIXME: Use Paths until absolutely have to convert to strings
-        tmp_folder = f"{config.TAK_MISSIONPKG_TMP}/{self.user.callsign}_{self.missionpkg}"
-        walk_dir = f"{config.TAK_MISSIONPKG_TEMPLATES_FOLDER}/{self.missionpkg}"
-        await self.helpers.remove_tmp_dir(tmp_folder)
-        os.makedirs(tmp_folder)
+        tmp_folder = Path(tempfile.mkdtemp(suffix=f"_{self.user.callsign}_{self.missionpkg}"))
+        walk_dir = Path(config.TAK_MISSIONPKG_TEMPLATES_FOLDER) / self.missionpkg
         if os.path.exists(f"{walk_dir}/atak"):
-            zip_file = await self.create_mission_zip(app_version="atak", walk_dir=f"{walk_dir}/atak")
+            zip_file = await self.create_mission_zip(tmp_folder, app_version="atak", walk_dir=walk_dir / "atak")
             returnable.append(zip_file)
         if os.path.exists(f"{walk_dir}/itak"):
-            zip_file = await self.create_mission_zip(app_version="itak", walk_dir=f"{walk_dir}/itak")
+            zip_file = await self.create_mission_zip(tmp_folder, app_version="itak", walk_dir=walk_dir / "itak")
             returnable.append(zip_file)
         if os.path.exists(f"{walk_dir}/wintak"):
-            zip_file = await self.create_mission_zip(app_version="wintak", walk_dir=f"{walk_dir}/wintak")
+            zip_file = await self.create_mission_zip(tmp_folder, app_version="wintak", walk_dir=walk_dir / "wintak")
             returnable.append(zip_file)
+        await self.helpers.remove_tmp_dir(str(tmp_folder))
         return returnable
 
-    async def create_mission_zip(self, app_version: str = "", walk_dir: str = "") -> str:
+    async def create_mission_zip(  # pylint: disable=too-many-locals
+        self, tmp_base: Path, app_version: str, walk_dir: Path
+    ) -> str:
         """Loop through files in missionpkg templates folder"""
         # TODO maybe in memory fs for tmp files...
 
-        tmp_folder = f"{config.TAK_MISSIONPKG_TMP}/{self.user.callsign}_{self.missionpkg}/{app_version}"
-        os.makedirs(tmp_folder)
+        # FIXME: use Paths for everything
+        tmp_folder = tmp_base / app_version
+        tmp_folder.mkdir(parents=True, exist_ok=True)
         for root, dirs, files in os.walk(walk_dir):
             for name in dirs:
-                os.makedirs(f"{tmp_folder}{os.path.join(root, name).replace(walk_dir, '')}")
+                dirpath = f"{tmp_folder}{os.path.join(root, name).replace(str(walk_dir), '')}"
+                LOGGER.debug("Calling os.makedirs({})".format(dirpath))
+                os.makedirs(dirpath)
 
             for name in files:
                 org_file = os.path.join(root, name)
-                dst_file = f"{tmp_folder}{os.path.join(root, name).replace(walk_dir,'')}"
+                dst_file = f"{tmp_folder}{os.path.join(root, name).replace(str(walk_dir),'')}"
+                LOGGER.debug("org_file={} dst_file={}".format(org_file, dst_file))
 
                 if dst_file.endswith(".tpl"):
                     with open(org_file, "r", encoding="utf-8") as filehandle:
@@ -221,10 +227,10 @@ class MissionZip:
                     )
                     new_dst_file = dst_file.replace(".tpl", "")
                     if new_dst_file.endswith("manifest.xml"):
-                        await self.tak_manifest_extra(rendered_template, tmp_folder)
+                        await self.tak_manifest_extra(rendered_template, str(tmp_folder))
                     # For itak use blueteam.pref.tpl
                     if app_version == "itak" and new_dst_file.endswith("blueteam.pref"):
-                        await self.tak_manifest_extra(rendered_template, tmp_folder)
+                        await self.tak_manifest_extra(rendered_template, str(tmp_folder))
 
                     with open(new_dst_file, "w", encoding="utf-8") as filehandle:
                         filehandle.write(rendered_template)
@@ -232,9 +238,8 @@ class MissionZip:
                 else:
                     shutil.copy(org_file, dst_file)
 
-        await self.zip_folder_content(tmp_folder, tmp_folder)
+        await self.zip_folder_content(str(tmp_folder), str(tmp_folder))
 
-        # await remove_tmp_dir(tmp_folder)
         return f"{tmp_folder}.zip"
 
     async def render_tak_manifest_template(self, template: Template, app_version: str) -> str:
@@ -336,8 +341,8 @@ class Helpers:
 
     async def user_cert_write(self) -> None:
         """Write users public cert to TAK certs folder"""
-        cert_file_name = config.TAK_CERTS_FOLDER / f"{self.user.callsign}.pem"
         await asyncio.wait_for(self.user.wait_for_keypair(), timeout=KEYPAIR_TIMEOUT)
+        cert_file_name = config.TAK_CERTS_FOLDER / f"{self.user.callsign}.pem"
         cert_file_name.write_text(self.user.certpem + "\n", encoding="utf-8")
         cert_file_name2 = config.TAK_CERTS_FOLDER / f"{self.user.callsign}_rm.pem"
         cert_file_name2.write_text(self.user.rm_certpem + "\n", encoding="utf-8")
