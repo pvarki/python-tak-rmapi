@@ -1,11 +1,13 @@
 """Helper functions to manage tak"""
-from typing import Any, Mapping, Union, Sequence, cast
+
+from typing import Any, Mapping, Union, Sequence, cast, Tuple, List
 import os
 import asyncio
 import shutil
 import logging
 from pathlib import Path
 import uuid
+import tempfile
 
 from glob import glob
 import aiohttp
@@ -22,6 +24,7 @@ from takrmapi import config
 
 LOGGER = logging.getLogger(__name__)
 SHELL_TIMEOUT = 5.0
+KEYPAIR_TIMEOUT = 5.0
 
 # FIXME: Convert the helpers to dataclasses
 
@@ -50,20 +53,39 @@ class UserCRUD:
         return self.user.x509cert.replace("\\n", "\n")
 
     @property
+    def certpath(self) -> Path:
+        """Path to local cert"""
+        return self.userdata / f"{self.certcn}.pem"
+
+    @property
+    def keypath(self) -> Path:
+        """Path to local cert"""
+        return self.userdata / f"{self.certcn}.key"
+
+    async def wait_for_keypair(self) -> None:
+        """Wait for keypair to be available"""
+        while not self.certpath.exists() or not self.keypath.exists():
+            LOGGER.debug("Waiting for {} / {}".format(self.certpath, self.keypath))
+            LOGGER.debug("userdata contents: {}".format(list(self.userdata.rglob("*"))))
+            await asyncio.sleep(0.5)
+
+    @property
     def certpem(self) -> str:
         """Local TAK-specific cert contents as PEM (or RASENMAEHER cert if local is not available)"""
-        certpath = self.userdata / f"{self.certcn}.pem"
-        if certpath.exists():
-            return certpath.read_text(encoding="utf-8")
-        return self.user.x509cert.replace("\\n", "\n")
+        LOGGER.debug("Checking if {} exists: {}".format(self.certpath, self.certpath.exists()))
+        if self.certpath.exists():
+            return self.certpath.read_text(encoding="utf-8")
+        LOGGER.debug("userdata contents: {}".format(list(self.userdata.rglob("*"))))
+        raise ValueError("Local cert {} not found".format(self.certpath))
 
     @property
     def certkey(self) -> str:
         """Cert private key contents as PEM"""
-        keypath = self.userdata / f"{self.certcn}.key"
-        if keypath.exists():
-            return keypath.read_text(encoding="utf-8")
-        raise ValueError("We do not have the private key")
+        LOGGER.debug("Checking if {} exists: {}".format(self.keypath, self.keypath.exists()))
+        if self.keypath.exists():
+            return self.keypath.read_text(encoding="utf-8")
+        LOGGER.debug("userdata contents: {}".format(list(self.userdata.rglob("*"))))
+        raise ValueError("Private key {} not found".format(self.keypath))
 
     @property
     def rm_base(self) -> str:
@@ -80,16 +102,22 @@ class UserCRUD:
         csrpath = self.userdata / f"{certcn}.csr"
         certpath = self.userdata / f"{certcn}.pem"
 
+        LOGGER.info("Creating TAK specific keypair: {} -> {} ".format(certcn, privpath))
         ckp = await async_create_keypair(privpath, pubpath)
+        LOGGER.debug("async_create_keypair awaited {} exists: {}".format(privpath, privpath.exists()))
         csrpem = await async_create_client_csr(ckp, csrpath, {"CN": self.certcn})
+        LOGGER.debug(
+            "async_create_keypairasync_create_client_csr awaited {} exists: {}".format(csrpath, csrpath.exists())
+        )
 
-        async with (await self.helpers.tak_mtls_client()) as session:
+        async with await self.helpers.tak_mtls_client() as session:
             url = f"{self.rm_base}api/v1/product/sign_csr/mtls"
             LOGGER.debug("POSTing to {}".format(url))
             resp = await session.post(url, json={"csr": csrpem})
             resp.raise_for_status()
             payload = await resp.json()
             certpath.write_text(payload["certificate"], encoding="utf-8")
+            LOGGER.info("signed cert written to {}".format(certpath))
 
     async def add_new_user(self) -> bool:
         """Add new user to TAK with given certificate"""
@@ -103,7 +131,7 @@ class UserCRUD:
     async def revoke_user(self) -> bool:
         """Remove user from TAK"""
         if await self.helpers.user_cert_validate():
-            async with (await self.helpers.tak_mtls_client()) as session:
+            async with await self.helpers.tak_mtls_client() as session:
                 url = f"{self.rm_base}api/v1/product/revoke/mtls"
                 LOGGER.debug("POSTing cert to {}".format(url))
                 resp = await session.post(url, json={"cert": self.certpem})
@@ -117,9 +145,19 @@ class UserCRUD:
             return True
         return False
 
+    async def _check_and_create_missing_user(self) -> bool:
+        """check if user exists, if not try to create"""
+        if await self.helpers.user_cert_validate():
+            return True
+        await self.add_new_user()
+        if not await self.helpers.user_cert_validate():
+            LOGGER.error("User still does not have a valid cert, something is fscked up")
+            return False
+        return True
+
     async def promote_user(self) -> bool:
         """Promote user to admin"""
-        if await self.helpers.user_cert_validate():
+        if await self._check_and_create_missing_user():
             return await self.helpers.add_admin_to_tak_with_cert()
         return False
 
@@ -127,7 +165,7 @@ class UserCRUD:
         """Demote user from being admin"""
         # TODO # THIS WORKS POORLY UNTIL PROPER REST IS FOUND OR SOME OTHER ALTERNATIVE
         # WE JUST RECREATE THE USER HERE AND GET RID OF THE ADMIN PERMISSIONS THAT WAY
-        if await self.helpers.user_cert_validate():
+        if await self._check_and_create_missing_user():
             if not await self.helpers.delete_user_with_cert():
                 return False
             return await self.helpers.add_user_to_tak_with_cert()
@@ -137,8 +175,7 @@ class UserCRUD:
         """Update user certificate"""
         # TODO # THIS NEED TO BE CHECKED WHAT IT ACTUALLY DOES IN BACKGROUND,
         # DOES IT UPDATE THE CERTIFICATE OR ADD NEW USER OR WHAT??
-        await self.helpers.user_cert_write()
-        if await self.helpers.user_cert_validate():
+        if await self._check_and_create_missing_user():
             # TODO check/find out if the user is admin and add as admin
             return await self.helpers.add_user_to_tak_with_cert()
         return False
@@ -152,38 +189,54 @@ class MissionZip:
         self.helpers = Helpers(self.user)
         self.missionpkg = config.TAK_MISSIONPKG_DEFAULT_MISSION
 
-    async def create_missionpkg(self) -> list[str]:
+    async def create_missionpkg(self) -> Tuple[list[str], Path]:
         """Create tak mission package packages to different app versions"""
-        returnable: list[str] = []
         # FIXME: Use Paths until absolutely have to convert to strings
-        tmp_folder = f"{config.TAK_MISSIONPKG_TMP}/{self.user.callsign}_{self.missionpkg}"
-        walk_dir = f"{config.TAK_MISSIONPKG_TEMPLATES_FOLDER}/{self.missionpkg}"
-        await self.helpers.remove_tmp_dir(tmp_folder)
-        os.makedirs(tmp_folder)
+        tmp_folder = Path(tempfile.mkdtemp(suffix=f"_{self.user.callsign}_{self.missionpkg}"))
+        walk_dir = Path(config.TAK_MISSIONPKG_TEMPLATES_FOLDER) / self.missionpkg
+        tasks: List[asyncio.Task[Any]] = []
+        # FIXME: maybe just do this dynamically for all subdirs under templates ?
         if os.path.exists(f"{walk_dir}/atak"):
-            zip_file = await self.create_mission_zip(app_version="atak", walk_dir=f"{walk_dir}/atak")
-            returnable.append(zip_file)
+            LOGGER.info("Adding ATAK zip generation task")
+            tasks.append(
+                asyncio.create_task(self.create_mission_zip(tmp_folder, app_version="atak", walk_dir=walk_dir / "atak"))
+            )
         if os.path.exists(f"{walk_dir}/itak"):
-            zip_file = await self.create_mission_zip(app_version="itak", walk_dir=f"{walk_dir}/itak")
-            returnable.append(zip_file)
+            LOGGER.info("Adding iTAK zip generation task")
+            tasks.append(
+                asyncio.create_task(self.create_mission_zip(tmp_folder, app_version="itak", walk_dir=walk_dir / "itak"))
+            )
         if os.path.exists(f"{walk_dir}/wintak"):
-            zip_file = await self.create_mission_zip(app_version="wintak", walk_dir=f"{walk_dir}/wintak")
-            returnable.append(zip_file)
-        return returnable
+            LOGGER.info("Adding WinTAK zip generation task")
+            tasks.append(
+                asyncio.create_task(
+                    self.create_mission_zip(tmp_folder, app_version="wintak", walk_dir=walk_dir / "wintak")
+                )
+            )
+        LOGGER.debug("Waiting for the zip tasks")
+        returnable = await asyncio.gather(*tasks)
+        LOGGER.info("Tasks done")
+        return returnable, tmp_folder
 
-    async def create_mission_zip(self, app_version: str = "", walk_dir: str = "") -> str:
+    async def create_mission_zip(  # pylint: disable=too-many-locals
+        self, tmp_base: Path, app_version: str, walk_dir: Path
+    ) -> str:
         """Loop through files in missionpkg templates folder"""
         # TODO maybe in memory fs for tmp files...
 
-        tmp_folder = f"{config.TAK_MISSIONPKG_TMP}/{self.user.callsign}_{self.missionpkg}/{app_version}"
-        os.makedirs(tmp_folder)
+        # FIXME: use Paths for everything
+        tmp_folder = tmp_base / app_version
+        tmp_folder.mkdir(parents=True, exist_ok=True)
         for root, dirs, files in os.walk(walk_dir):
             for name in dirs:
-                os.makedirs(f"{tmp_folder}{os.path.join(root, name).replace(walk_dir, '')}")
+                dirpath = f"{tmp_folder}{os.path.join(root, name).replace(str(walk_dir), '')}"
+                LOGGER.debug("Calling os.makedirs({})".format(dirpath))
+                os.makedirs(dirpath)
 
             for name in files:
                 org_file = os.path.join(root, name)
-                dst_file = f"{tmp_folder}{os.path.join(root, name).replace(walk_dir,'')}"
+                dst_file = f"{tmp_folder}{os.path.join(root, name).replace(str(walk_dir),'')}"
+                LOGGER.debug("org_file={} dst_file={}".format(org_file, dst_file))
 
                 if dst_file.endswith(".tpl"):
                     with open(org_file, "r", encoding="utf-8") as filehandle:
@@ -194,10 +247,10 @@ class MissionZip:
                     )
                     new_dst_file = dst_file.replace(".tpl", "")
                     if new_dst_file.endswith("manifest.xml"):
-                        await self.tak_manifest_extra(rendered_template, tmp_folder)
+                        await self.tak_manifest_extra(rendered_template, str(tmp_folder))
                     # For itak use blueteam.pref.tpl
                     if app_version == "itak" and new_dst_file.endswith("blueteam.pref"):
-                        await self.tak_manifest_extra(rendered_template, tmp_folder)
+                        await self.tak_manifest_extra(rendered_template, str(tmp_folder))
 
                     with open(new_dst_file, "w", encoding="utf-8") as filehandle:
                         filehandle.write(rendered_template)
@@ -205,9 +258,8 @@ class MissionZip:
                 else:
                     shutil.copy(org_file, dst_file)
 
-        await self.zip_folder_content(tmp_folder, tmp_folder)
+        await self.zip_folder_content(str(tmp_folder), str(tmp_folder))
 
-        # await remove_tmp_dir(tmp_folder)
         return f"{tmp_folder}.zip"
 
     async def render_tak_manifest_template(self, template: Template, app_version: str) -> str:
@@ -223,7 +275,7 @@ class MissionZip:
 
     async def zip_folder_content(self, zipfile: str, tmp_folder: str) -> None:
         """Zip folder content"""
-        shutil.make_archive(zipfile, "zip", tmp_folder)
+        await asyncio.get_running_loop().run_in_executor(None, shutil.make_archive, zipfile, "zip", tmp_folder)
 
     async def tak_manifest_extra(self, manifest: str, tmp_folder: str) -> None:
         """Check if there is some extra that needs to be done defined in manfiest"""
@@ -258,6 +310,7 @@ class MissionZip:
             LOGGER.debug("{} exists: {}".format(tgtfile, tgtfile.exists()))
         elif f"{self.user.callsign}.p12" in row:
             tgtfile = Path(tmp_folder) / f"{self.user.callsign}.p12"
+            await asyncio.wait_for(self.user.wait_for_keypair(), timeout=KEYPAIR_TIMEOUT)
             LOGGER.info("Creating {}".format(tgtfile))
             p12bytes = convert_pem_to_pkcs12(
                 self.user.certpem, self.user.certkey, self.user.callsign, None, self.user.callsign
@@ -308,6 +361,7 @@ class Helpers:
 
     async def user_cert_write(self) -> None:
         """Write users public cert to TAK certs folder"""
+        await asyncio.wait_for(self.user.wait_for_keypair(), timeout=KEYPAIR_TIMEOUT)
         cert_file_name = config.TAK_CERTS_FOLDER / f"{self.user.callsign}.pem"
         cert_file_name.write_text(self.user.certpem + "\n", encoding="utf-8")
         cert_file_name2 = config.TAK_CERTS_FOLDER / f"{self.user.callsign}_rm.pem"
@@ -316,6 +370,7 @@ class Helpers:
     async def user_cert_validate(self) -> bool:
         """Check that the given certificate can at least be opened"""
         try:
+            await self.user_cert_write()
             cert_file_name = config.TAK_CERTS_FOLDER / f"{self.user.callsign}.pem"
             with open(cert_file_name, "rb") as cert_file:
                 cert_content = cert_file.read()
@@ -339,6 +394,9 @@ class Helpers:
         # THIS SHOULD BE CHANGED TO BE DONE THROUGH REST IF POSSIBLE
         # Or via Pyjnius, or via PyIgnite
         #
+        if not await self.user_cert_validate():
+            LOGGER.error("User {} TAK certs not valid".format(self.user.callsign))
+            return False
         tasks = []
         for certname in self.enable_user_cert_names:
             tasks.append(
@@ -371,7 +429,9 @@ class Helpers:
         # THIS SHOULD BE CHANGED TO BE DONE THROUGH REST IF POSSIBLE
         # Or via Pyjnius, or via PyIgnite
         #
-
+        if not await self.user_cert_validate():
+            LOGGER.error("User {} TAK certs not valid".format(self.user.callsign))
+            return False
         tasks = []
         for certname in self.enable_user_cert_names:
             tasks.append(
@@ -404,6 +464,9 @@ class Helpers:
         # THIS SHOULD BE CHANGED TO BE DONE THROUGH REST IF POSSIBLE
         # Or via Pyjnius, or via PyIgnite
         #
+        if not await self.user_cert_validate():
+            LOGGER.error("User {} TAK certs not valid".format(self.user.callsign))
+            return False
         tasks = []
         for certname in self.enable_user_cert_names:
             tasks.append(
@@ -448,7 +511,7 @@ class RestHelpers:  # pylint: disable=too-few-public-methods
     # https://takmsg:8443/user-management/api/list-users
     async def tak_api_user_list(self) -> Mapping[str, Any]:
         """Get list of users from TAK"""
-        async with (await self.helpers.tak_mtls_client()) as session:
+        async with await self.helpers.tak_mtls_client() as session:
             try:
                 url = f"{self.helpers.tak_base_url()}/user-management/api/list-users"
                 resp = await session.get(url)

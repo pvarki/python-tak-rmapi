@@ -1,4 +1,5 @@
 """Endpoints for information for the admin"""
+
 from typing import Optional
 import logging
 import os

@@ -1,4 +1,5 @@
 """"factory for the fastpi app"""
+
 from typing import AsyncGenerator
 import logging
 from contextlib import asynccontextmanager

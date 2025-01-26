@@ -1,4 +1,5 @@
 """pytest automagics"""
+
 from typing import Generator, Dict
 import logging
 import os

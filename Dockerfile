@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.1.7-experimental
 ARG TEMURIN_VERSION="17"
-ARG TAKSERVER_IMAGE="pvarki/takserver:4.10-RELEASE-12-20240302"
+ARG TAKSERVER_IMAGE="pvarki/takserver:5.3-RELEASE-24"
 
 # The local reference tak_server is used in future stages
 FROM ${TAKSERVER_IMAGE} as tak_server
@@ -10,7 +10,7 @@ FROM ${TAKSERVER_IMAGE} as tak_server
 #############################################
 FROM advian/tox-base:debian-bookworm as tox
 ARG PYTHON_VERSIONS="3.11 3.10 3.9 3.11"
-ARG POETRY_VERSION="1.5.1"
+ARG POETRY_VERSION="2.0.1"
 RUN export RESOLVED_VERSIONS=`pyenv_resolve $PYTHON_VERSIONS` \
     && echo RESOLVED_VERSIONS=$RESOLVED_VERSIONS \
     && for pyver in $RESOLVED_VERSIONS; do pyenv install -s $pyver; done \
@@ -41,7 +41,7 @@ ENV \
   PIP_DISABLE_PIP_VERSION_CHECK=on \
   PIP_DEFAULT_TIMEOUT=100 \
   # poetry:
-  POETRY_VERSION=1.5.1
+  POETRY_VERSION=2.0.1
 
 
 RUN apt-get update && apt-get install -y \
@@ -75,6 +75,7 @@ WORKDIR /pysetup
 COPY ./poetry.lock ./pyproject.toml /pysetup/
 # Install basic requirements (utilizing an internal docker wheelhouse if available)
 RUN --mount=type=ssh pip3 install wheel virtualenv \
+    && poetry self add poetry-plugin-export \
     && poetry export -f requirements.txt --without-hashes -o /tmp/requirements.txt \
     && pip3 wheel --wheel-dir=/tmp/wheelhouse -r /tmp/requirements.txt \
     && virtualenv /.venv && source /.venv/bin/activate && echo 'source /.venv/bin/activate' >>/root/.profile \
@@ -145,7 +146,8 @@ ENTRYPOINT ["/usr/bin/tini", "--", "/docker-entrypoint.sh"]
 #####################################
 FROM builder_base as devel_build
 # Install deps
-WORKDIR /pysetup
+COPY . /app
+WORKDIR /app
 RUN --mount=type=ssh source /.venv/bin/activate \
     && poetry install --no-interaction --no-ansi \
     && true

@@ -1,4 +1,5 @@
 """ TAK specific schemas """
+
 from pydantic import Field, Extra
 from pydantic.main import BaseModel  # pylint: disable=E0611 # false positive
 
