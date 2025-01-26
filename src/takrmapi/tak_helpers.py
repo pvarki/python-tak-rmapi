@@ -23,6 +23,7 @@ from takrmapi import config
 
 LOGGER = logging.getLogger(__name__)
 SHELL_TIMEOUT = 5.0
+KEYPAIR_TIMEOUT = 5.0
 
 # FIXME: Convert the helpers to dataclasses
 
@@ -51,23 +52,39 @@ class UserCRUD:
         return self.user.x509cert.replace("\\n", "\n")
 
     @property
+    def certpath(self) -> Path:
+        """Path to local cert"""
+        return self.userdata / f"{self.certcn}.pem"
+
+    @property
+    def keypath(self) -> Path:
+        """Path to local cert"""
+        return self.userdata / f"{self.certcn}.key"
+
+    async def wait_for_keypair(self) -> None:
+        """Wait for keypair to be available"""
+        while self.certpath.exists() or not self.keypath.exists():
+            LOGGER.debug("Waiting for {} / {}".format(self.certpath, self.keypath))
+            LOGGER.debug("userdata contents: {}".format(list(self.userdata.rglob("*"))))
+            await asyncio.sleep(0.5)
+
+    @property
     def certpem(self) -> str:
         """Local TAK-specific cert contents as PEM (or RASENMAEHER cert if local is not available)"""
-        certpath = self.userdata / f"{self.certcn}.pem"
-        if certpath.exists():
-            return certpath.read_text(encoding="utf-8")
-        LOGGER.warning("Local cert {} not found".format(certpath))
-        return self.rm_certpem
+        LOGGER.debug("Checking if {} exists: {}".format(self.certpath, self.certpath.exists()))
+        if self.certpath.exists():
+            return self.certpath.read_text(encoding="utf-8")
+        LOGGER.debug("userdata contents: {}".format(list(self.userdata.rglob("*"))))
+        raise ValueError("Local cert {} not found".format(self.certpath))
 
     @property
     def certkey(self) -> str:
         """Cert private key contents as PEM"""
-        keypath = self.userdata / f"{self.certcn}.key"
-        LOGGER.debug("Checking if {} exists: {}".format(keypath, keypath.exists()))
-        if keypath.exists():
-            return keypath.read_text(encoding="utf-8")
+        LOGGER.debug("Checking if {} exists: {}".format(self.keypath, self.keypath.exists()))
+        if self.keypath.exists():
+            return self.keypath.read_text(encoding="utf-8")
         LOGGER.debug("userdata contents: {}".format(list(self.userdata.rglob("*"))))
-        raise ValueError("Private key {} not found".format(keypath))
+        raise ValueError("Private key {} not found".format(self.keypath))
 
     @property
     def rm_base(self) -> str:
@@ -268,6 +285,7 @@ class MissionZip:
             LOGGER.debug("{} exists: {}".format(tgtfile, tgtfile.exists()))
         elif f"{self.user.callsign}.p12" in row:
             tgtfile = Path(tmp_folder) / f"{self.user.callsign}.p12"
+            await asyncio.wait_for(self.user.wait_for_keypair(), timeout=KEYPAIR_TIMEOUT)
             LOGGER.info("Creating {}".format(tgtfile))
             p12bytes = convert_pem_to_pkcs12(
                 self.user.certpem, self.user.certkey, self.user.callsign, None, self.user.callsign
@@ -319,6 +337,7 @@ class Helpers:
     async def user_cert_write(self) -> None:
         """Write users public cert to TAK certs folder"""
         cert_file_name = config.TAK_CERTS_FOLDER / f"{self.user.callsign}.pem"
+        await asyncio.wait_for(self.user.wait_for_keypair(), timeout=KEYPAIR_TIMEOUT)
         cert_file_name.write_text(self.user.certpem + "\n", encoding="utf-8")
         cert_file_name2 = config.TAK_CERTS_FOLDER / f"{self.user.callsign}_rm.pem"
         cert_file_name2.write_text(self.user.rm_certpem + "\n", encoding="utf-8")
