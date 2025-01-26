@@ -41,7 +41,9 @@ def read_deployment_name() -> str:
     return str(load_manifest()["deployment"])
 
 
-cfg = Config()  # not supporting .env files anymore because https://github.com/encode/starlette/discussions/2446
+cfg = Config(
+    env_prefix="TI"
+)  # not supporting .env files anymore because https://github.com/encode/starlette/discussions/2446
 
 LOG_LEVEL: int = cfg("LOG_LEVEL", default=10, cast=int)
 TEMPLATES_PATH: Path = cfg("TEMPLATES_PATH", cast=Path, default=Path(__file__).parent / "templates")
