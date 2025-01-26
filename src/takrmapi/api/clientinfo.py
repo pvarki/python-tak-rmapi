@@ -20,7 +20,7 @@ async def client_instruction_fragment(user: UserCRUDRequest) -> List[Dict[str, s
     """Return zip package containing client config and certificates"""
     localuser = tak_helpers.UserCRUD(user)
     tak_missionpkg = tak_helpers.MissionZip(localuser)
-    zip_files = await tak_missionpkg.create_missionpkg()
+    zip_files, tmp_folder = await tak_missionpkg.create_missionpkg()
     returnable: List[Dict[str, str]] = []
     for file in zip_files:
         with open(file, "rb") as filehandle:
@@ -33,4 +33,5 @@ async def client_instruction_fragment(user: UserCRUDRequest) -> List[Dict[str, s
                 "filename": f"{user.callsign}_{filename}",
             }
         )
+    await tak_missionpkg.helpers.remove_tmp_dir(str(tmp_folder))
     return returnable

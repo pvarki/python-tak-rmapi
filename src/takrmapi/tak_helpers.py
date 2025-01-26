@@ -1,6 +1,6 @@
 """Helper functions to manage tak"""
 
-from typing import Any, Mapping, Union, Sequence, cast
+from typing import Any, Mapping, Union, Sequence, cast, Tuple
 import os
 import asyncio
 import shutil
@@ -180,7 +180,7 @@ class MissionZip:
         self.helpers = Helpers(self.user)
         self.missionpkg = config.TAK_MISSIONPKG_DEFAULT_MISSION
 
-    async def create_missionpkg(self) -> list[str]:
+    async def create_missionpkg(self) -> Tuple[list[str], Path]:
         """Create tak mission package packages to different app versions"""
         returnable: list[str] = []
         # FIXME: Use Paths until absolutely have to convert to strings
@@ -195,8 +195,7 @@ class MissionZip:
         if os.path.exists(f"{walk_dir}/wintak"):
             zip_file = await self.create_mission_zip(tmp_folder, app_version="wintak", walk_dir=walk_dir / "wintak")
             returnable.append(zip_file)
-        await self.helpers.remove_tmp_dir(str(tmp_folder))
-        return returnable
+        return returnable, tmp_folder
 
     async def create_mission_zip(  # pylint: disable=too-many-locals
         self, tmp_base: Path, app_version: str, walk_dir: Path
