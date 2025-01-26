@@ -1,6 +1,6 @@
 """Helper functions to manage tak"""
 
-from typing import Any, Mapping, Union, Sequence, cast, Tuple
+from typing import Any, Mapping, Union, Sequence, cast, Tuple, List
 import os
 import asyncio
 import shutil
@@ -182,19 +182,31 @@ class MissionZip:
 
     async def create_missionpkg(self) -> Tuple[list[str], Path]:
         """Create tak mission package packages to different app versions"""
-        returnable: list[str] = []
         # FIXME: Use Paths until absolutely have to convert to strings
         tmp_folder = Path(tempfile.mkdtemp(suffix=f"_{self.user.callsign}_{self.missionpkg}"))
         walk_dir = Path(config.TAK_MISSIONPKG_TEMPLATES_FOLDER) / self.missionpkg
+        tasks: List[asyncio.Task[Any]] = []
+        # FIXME: maybe just do this dynamically for all subdirs under templates ?
         if os.path.exists(f"{walk_dir}/atak"):
-            zip_file = await self.create_mission_zip(tmp_folder, app_version="atak", walk_dir=walk_dir / "atak")
-            returnable.append(zip_file)
+            LOGGER.info("Adding ATAK zip generation task")
+            tasks.append(
+                asyncio.create_task(self.create_mission_zip(tmp_folder, app_version="atak", walk_dir=walk_dir / "atak"))
+            )
         if os.path.exists(f"{walk_dir}/itak"):
-            zip_file = await self.create_mission_zip(tmp_folder, app_version="itak", walk_dir=walk_dir / "itak")
-            returnable.append(zip_file)
+            LOGGER.info("Adding iTAK zip generation task")
+            tasks.append(
+                asyncio.create_task(self.create_mission_zip(tmp_folder, app_version="itak", walk_dir=walk_dir / "itak"))
+            )
         if os.path.exists(f"{walk_dir}/wintak"):
-            zip_file = await self.create_mission_zip(tmp_folder, app_version="wintak", walk_dir=walk_dir / "wintak")
-            returnable.append(zip_file)
+            LOGGER.info("Adding WinTAK zip generation task")
+            tasks.append(
+                asyncio.create_task(
+                    self.create_mission_zip(tmp_folder, app_version="wintak", walk_dir=walk_dir / "wintak")
+                )
+            )
+        LOGGER.debug("Waiting for the zip tasks")
+        returnable = await asyncio.gather(*tasks)
+        LOGGER.info("Tasks done")
         return returnable, tmp_folder
 
     async def create_mission_zip(  # pylint: disable=too-many-locals
@@ -254,7 +266,7 @@ class MissionZip:
 
     async def zip_folder_content(self, zipfile: str, tmp_folder: str) -> None:
         """Zip folder content"""
-        shutil.make_archive(zipfile, "zip", tmp_folder)
+        await asyncio.get_running_loop().run_in_executor(None, shutil.make_archive, zipfile, "zip", tmp_folder)
 
     async def tak_manifest_extra(self, manifest: str, tmp_folder: str) -> None:
         """Check if there is some extra that needs to be done defined in manfiest"""
