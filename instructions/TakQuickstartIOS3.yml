@@ -1,0 +1,4 @@
+- type: "View"
+  name: "TakQuickstartIos3"
+  path: "quickstart/ios3"
+  body: []
