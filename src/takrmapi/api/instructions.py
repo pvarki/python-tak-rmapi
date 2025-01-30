@@ -18,11 +18,14 @@ router = APIRouter(dependencies=[Depends(MTLSHeader(auto_error=True))])
 
 
 @router.post("/{language}")
-async def user_intructions(user: UserCRUDRequest) -> Dict[str, str]:
+async def user_intructions(user: UserCRUDRequest, language: str) -> Dict[str, str]:
     """return user instructions"""
+    
+    instructions_json_file = Path(f"/opt/templates/tak_{language}.json")
+    if not instructions_json_file.is_file():
+        instructions_json_file = Path("/opt/templates/tak.json")
 
-    # TODO load to memory on load,
-    tak_instructions_data = json.loads(Path("/opt/templates/tak.json").read_text(encoding="utf-8"))
+    tak_instructions_data = json.loads(instructions_json_file.read_text(encoding="utf-8"))
 
     localuser = tak_helpers.UserCRUD(user)
     tak_missionpkg = tak_helpers.MissionZip(localuser)
@@ -38,4 +41,4 @@ async def user_intructions(user: UserCRUDRequest) -> Dict[str, str]:
             }
         )
 
-    return {"callsign": user.callsign, "instructions": json.dumps(tak_instructions_data), "language": "en"}
+    return {"callsign": user.callsign, "instructions": json.dumps(tak_instructions_data), "language": language}
