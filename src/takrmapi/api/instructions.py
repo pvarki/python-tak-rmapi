@@ -20,7 +20,7 @@ router = APIRouter(dependencies=[Depends(MTLSHeader(auto_error=True))])
 @router.post("/{language}")
 async def user_intructions(user: UserCRUDRequest, language: str) -> Dict[str, str]:
     """return user instructions"""
-    
+
     instructions_json_file = Path(f"/opt/templates/tak_{language}.json")
     if not instructions_json_file.is_file():
         instructions_json_file = Path("/opt/templates/tak.json")
