@@ -1,4 +1,5 @@
 """Api endpoints"""
+
 from fastapi.routing import APIRouter
 
 from .usercrud import router as usercrud_router

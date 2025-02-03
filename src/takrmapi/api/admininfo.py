@@ -1,4 +1,5 @@
 """Endpoints for information for the admin"""
+
 import logging
 
 from fastapi import APIRouter, Depends
