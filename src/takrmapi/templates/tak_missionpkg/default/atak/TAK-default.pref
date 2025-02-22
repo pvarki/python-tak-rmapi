@@ -8,8 +8,10 @@
   <!-- Scan plugins on ATAK startup -->
   <entry key="atakPluginScanningOnStartup" class="class java.lang.Boolean">true</entry>
   <entry key="repoStartupSync" class="class java.lang.Boolean">true</entry>
-  <!-- Load DataSync if installed, requires restarting ATAK -->
-  <entry key="shouldLoad-com.atakmap.android.datasync.plugin" class="class java.lang.Boolean">true</entry>
+  <!-- Disable tak.gov connections -->
+  <entry key="eud_api_disable_option" class="class java.lang.Boolean">false</entry>
+  <entry key="eud_api_sync_mapsources" class="class java.lang.Boolean">false</entry>
+  <entry key="eud_api_sync_plugins" class="class java.lang.Boolean">false</entry>
   <!-- Alert options -->
   <entry key="alert_audible" class="class java.lang.Boolean">false</entry>
   <entry key="alert_notification" class="class java.lang.Boolean">true</entry>
@@ -19,7 +21,6 @@
   <entry key="audibleNotify" class="class java.lang.Boolean">false</entry>
   <entry key="fade_notification" class="class java.lang.String">300</entry>
   <entry key="vibratePhone" class="class java.lang.Boolean">true</entry>
-  <entry key="audibleNotify" class="class java.lang.Boolean">false</entry>
   <entry key="useRouteVoiceCues" class="class java.lang.Boolean">false</entry>
   <!-- ATAK display preferencces -->
   <entry key="nav_orientation_right" class="class java.lang.Boolean">true</entry>
@@ -34,14 +35,15 @@
   <entry key="status_tilt_enabled" class="class java.lang.Boolean">true</entry>
   <entry key="lastViewedLayer.autoselect" class="class java.lang.Boolean">true</entry>
   <entry key="viewshed_prefs_height_above" class="class java.lang.Integer">0</entry>
+  <!-- ATAK display as tactical symbols default false -->
+  <entry key="displayAsSymbologyGraphic" class="class java.lang.Boolean">false</entry>
   <!-- ATAK action preferences -->
   <entry key="atakLongPressMap" class="class java.lang.String">nothing</entry>
   <entry key="atakDoubleTapToZoom" class="class java.lang.Boolean">true</entry>
   <entry key="self_coord_action" class="class java.lang.String">nothing</entry>
-  <!-- Selected Map, disable tak.gov default maps  -->
+  <!-- Selected Map  -->
   <entry key="MobileLayerSelectionAdapter.selected" class="class java.lang.String">4 Google Hybrid</entry>
   <entry key="rng_meters_display_pref" class="class java.lang.String">2000</entry>
-  <entry key="eud_api_sync_mapsources" class="class java.lang.Boolean">false</entry>
   <!-- Enable smart cache for maps 2Gbts -->
   <entry key="prefs_enable_smart_cache" class="class java.lang.Boolean">true</entry>
   <entry key="prefs_smart_cache_download_limit" class="class java.lang.String">2000000</entry>
@@ -70,6 +72,8 @@
   <entry key="saHasPhoneNumber" class="class java.lang.Boolean">false</entry>
   <entry key="locationUnitType" class="class java.lang.String">a-f-G-U-C</entry>
   <entry key="viewshed_prefs_radius" class="class java.lang.Integer">1000</entry>
+  <entry key="offscreen_indicator_dist_threshold" class="class java.lang.String">1</entry>
+  <entry key="offscreen_indicator_timeout_threshold" class="class java.lang.String">60</entry>
   <!-- Location reporting settings -->
   <entry key="locationReportingStrategy" class="class java.lang.String">Dynamic</entry>
   <entry key="dynamicReportingRateMaxReliable" class="class java.lang.String">10</entry>
@@ -84,14 +88,24 @@
   <entry key="expireUnknowns" class="class java.lang.Boolean">true</entry>
   <!-- Stale out data timer 0 = Immediately 1-1440 time in minutes -->
   <entry key="expireStaleItemsTime" class="class java.lang.String">60</entry>
-  <!-- Data Sync Settings -->
-  <entry key="datasyncAutodownload" class="class java.lang.Boolean">true</entry>
-  <entry key="datasyncLargeFilePrompt" class="class java.lang.String">15</entry>
-  <entry key="datasyncAutodownload" class="class java.lang.Boolean">true</entry>
   <!-- Enable user location -->
   <entry key="user_location.enabled" class="class java.lang.Boolean">true</entry>
+  <!-- Force ATAK Languege to English -->
+  <entry key="forceEnglish" class="class java.lang.Boolean">true</entry>
   <!-- Avoid accidential quit or shutdown of ATAK -->
   <entry key="atakControlQuitOnBack" class="class java.lang.Boolean">false</entry>
   <entry key="atakControlAskToQuit" class="class java.lang.Boolean">true</entry>
+  <!-- Plugin Settings -->
+  <!-- Data Sync Settings -->
+  <entry key="shouldLoad-com.atakmap.android.datasync.plugin" class="class java.lang.Boolean">true</entry>
+  <entry key="datasyncAutoAcceptInvite" class="class java.lang.Boolean">true</entry>
+  <entry key="datasyncAutodownload" class="class java.lang.Boolean">true</entry>
+  <entry key="datasyncDisplayMissionTimeline" class="class java.lang.Boolean">false</entry>
+  <entry key="datasyncDisplayPublishPrompt" class="class java.lang.Boolean">true</entry>
+  <entry key="datasyncDisplayRemovalPrompt" class="class java.lang.Boolean">true</entry>
+  <entry key="datasyncDontAskAgain" class="class java.lang.Boolean">false</entry>
+  <entry key="datasyncLargeFilePrompt" class="class java.lang.String">30</entry>
+  <entry key="datasyncRequireServerConn" class="class java.lang.Boolean">true</entry>
+  <entry key="datasyncShowNonFeedContent" class="class java.lang.Boolean">true</entry>
  </preference>
 </preferences>
