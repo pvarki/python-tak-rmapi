@@ -206,11 +206,11 @@ class MissionZip:
             tasks.append(
                 asyncio.create_task(self.create_mission_zip(tmp_folder, app_version="itak", walk_dir=walk_dir / "itak"))
             )
-        if os.path.exists(f"{walk_dir}/taktracker"):
+        if os.path.exists(f"{walk_dir}/tak-tracker"):
             LOGGER.info("Adding taktracker zip generation task")
             tasks.append(
                 asyncio.create_task(
-                    self.create_mission_zip(tmp_folder, app_version="taktracker", walk_dir=walk_dir / "taktracker")
+                    self.create_mission_zip(tmp_folder, app_version="tak-tracker", walk_dir=walk_dir / "tak-tracker")
                 )
             )
         if os.path.exists(f"{walk_dir}/wintak"):
