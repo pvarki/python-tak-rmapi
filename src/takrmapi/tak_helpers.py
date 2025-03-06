@@ -213,6 +213,7 @@ class MissionZip:
                     self.create_mission_zip(tmp_folder, app_version="tak-tracker", walk_dir=walk_dir / "tak-tracker")
                 )
             )
+        # wintak and atak-mini commented out, there are some issues with 5 packages.
         # if os.path.exists(f"{walk_dir}/wintak"):
         #     LOGGER.info("Adding WinTAK zip generation task")
         #     tasks.append(
