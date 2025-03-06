@@ -164,7 +164,7 @@ ENTRYPOINT ["/usr/bin/tini", "--", "docker/entrypoint-test.sh"]
 RUN --mount=type=ssh source /.venv/bin/activate \
     && poetry install --no-interaction --no-ansi \
     && ln -s /app/docker/container-init.sh /container-init.sh \
-    && docker/pre_commit_init.sh \
+    && SKIP="poetry-lock" poetry run docker/pre_commit_init.sh \
     && true
 
 
