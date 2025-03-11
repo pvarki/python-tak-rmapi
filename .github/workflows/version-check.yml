@@ -1,0 +1,38 @@
+name: Check Version Bump
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  version-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Get current version from main
+        id: get_main_version
+        run: |
+          git fetch origin main
+          git checkout origin/main
+          main_version=$(grep '^version' pyproject.toml | sed -E 's/version = "(.*)"/\1/')
+          echo "::set-output name=main_version::$main_version"
+
+      - name: Get current version from PR
+        id: get_pr_version
+        run: |
+          pr_version=$(grep '^version' pyproject.toml | sed -E 's/version = "(.*)"/\1/')
+          echo "::set-output name=pr_version::$pr_version"
+
+      - name: Compare versions
+        run: |
+          main_version=${{ steps.get_main_version.outputs.main_version }}
+          pr_version=${{ steps.get_pr_version.outputs.pr_version }}
+          if [ "$(printf '%s\n' "$main_version" "$pr_version" | sort -V | head -n1)" = "$pr_version" ]; then
+            echo "Error: PR version ($pr_version) is not higher than main version ($main_version)"
+            exit 1
+          else
+            echo "PR version ($pr_version) is higher than main version ($main_version)"
+          fi
