@@ -1,0 +1,4 @@
+- type: "View"
+  name: "TakQuickstartIos5"
+  path: "quickstart/ios5"
+  body: []

@@ -1,0 +1,76 @@
+- type: "View"
+  name: "TakQuickstartAndroid1"
+  path: "quickstart/android1"
+  body:
+  - type: div
+    classes:
+    - "pb-20"
+    body:
+    - type: Layout
+      showNavbar: True
+      showFooter: False
+      navbarTitle: "takQuickstartAndroid1.navbarTitle"
+      backUrl: "/app/services/tak/quickstart"
+      body:
+      - type: StatusBar
+        title: "takQuickstartAndroid1.statusBarTitle"
+        progressMax: 5
+        progressNow: 1
+      - type: CardsContainer
+        body:
+        - type: div
+          classes:
+          - "flex"
+          - "flex-col"
+          - "items-center"
+          - "w-full"
+          - "gap-2"
+          - "justify-center"
+          - "p-5"
+          body:
+          - type: ServiceInfoCard
+            title: "takQuickstartAndroid1.serviceInfoCardTitle"
+            image: "../../../assets/icons/tak-logo.png"
+            body:
+            - "takQuickstartAndroid1.serviceInfoCard.details"
+          - type: UnfoldableCard
+            title: "takQuickstartAndroid1.unfoldableCard1.title"
+            styling: "bg-backgroundLight"
+            description1: "takQuickstartAndroid1.unfoldableCard1.description1"
+            image2Src: "TODO: googleplay"
+            image2Link: "https://play.google.com/store/apps/details?id=com.atakmap.app.civ"
+            image2Classes: "w-[200px]"
+            description2: "takQuickstartAndroid1.unfoldableCard1.description2"
+            image3Src: "TODO: googleplay"
+            image3Classes: "w-[200px]"
+            image3Link: "https://play.google.com/store/apps/details?id=com.atakmap.android.datasync.plugin"
+          - type: UnfoldableCard
+            title: "takQuickstartAndroid1.unfoldableCard2.title"
+            styling: "bg-backgroundLight"
+            description1: "takQuickstartAndroid1.unfoldableCard2.description1"
+            description2:
+            - type: Button
+              variant:
+                width: "full"
+              onClick: "TODO: handleDownloadButtonClick"
+              styling:
+              - "m-1"
+              - "px-3"
+              - "bg-success"
+              - "text-white"
+              - "w-full"
+              body:
+                - "TODO: grabZipButton"
+            note: "takQuickstartAndroid1.unfoldableCard2.note"
+          - type: UnfoldableCard
+            title: "takQuickstartAndroid1.unfoldableCard3.title"
+            styling: "bg-backgroundLight"
+            description1: "takQuickstartAndroid1.unfoldableCard3.description1"
+            imageSrc: {wait}
+            imageClasses:
+            - "m-3"
+            - "w-[200px]"
+            description2: "takQuickstartAndroid1.unfoldableCard3.description2"
+      - type: NavigateButtons
+        backUrl: "/app/services/tak/quickstart"
+        forwardUrl: "/app/services/tak/quickstart/android2"

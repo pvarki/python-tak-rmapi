@@ -1,0 +1,14 @@
+- type: "Component"
+  name: "ServiceTakUsageCard"
+  body:
+  - type: div
+    classes:
+    - w-full
+    - m-1
+    - p-0
+    body:
+    - type: "UnfoldableCard"
+      title: "serviceTakUsageCard.title"
+      initialOpen: False
+      content:
+      - "serviceTakUsageCard.content"
