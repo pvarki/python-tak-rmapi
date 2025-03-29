@@ -83,7 +83,7 @@ RUN --mount=type=ssh pip3 install wheel virtualenv \
     && true
 
 # Add tak specific instructions json and static www content
-COPY instructions/tak.json /opt/templates/tak.json
+RUN curl https://github.com/pvarki/rune-tak-metadata/releases/latest/download/rune.json -o /opt/templates/tak.json
 COPY ./tak_www_static /opt/tak_www_static
 
 ####################################
@@ -118,8 +118,9 @@ COPY docker/container-init.sh /container-init.sh
 
 WORKDIR /app
 
-# Add tak specific instructions json
-COPY instructions/tak.json /opt/templates/tak.json
+# Add tak specific instructions json and static www content
+RUN curl https://github.com/pvarki/rune-tak-metadata/releases/latest/download/rune.json -o /opt/templates/tak.json
+COPY ./tak_www_static /opt/tak_www_static
 
 # Install system level deps for running the package (not devel versions for building wheels)
 # and install the wheels we built in the previous step. generate default config
@@ -154,7 +155,8 @@ ENTRYPOINT ["/usr/bin/tini", "--", "/docker-entrypoint.sh"]
 FROM builder_base as devel_build
 
 # Add tak specific instructions json
-COPY instructions/tak.json /opt/templates/tak.json
+RUN curl https://github.com/pvarki/rune-tak-metadata/releases/latest/download/rune.json -o /opt/templates/tak.json
+COPY ./tak_www_static /opt/tak_www_static
 
 # Install deps
 COPY . /app
