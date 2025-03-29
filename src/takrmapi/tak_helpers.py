@@ -29,7 +29,7 @@ from takrmapi import config
 
 LOGGER = logging.getLogger(__name__)
 SHELL_TIMEOUT = 5.0
-KEYPAIR_TIMEOUT = 5.0
+KEYPAIR_TIMEOUT = 15.0
 
 # FIXME: Convert the helpers to dataclasses
 

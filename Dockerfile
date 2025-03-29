@@ -82,6 +82,9 @@ RUN --mount=type=ssh pip3 install wheel virtualenv \
     && pip3 install --no-deps --find-links=/tmp/wheelhouse/ /tmp/wheelhouse/*.whl \
     && true
 
+# Add tak specific instructions json and static www content
+COPY instructions/tak.json /opt/templates/tak.json
+COPY ./tak_www_static /opt/tak_www_static
 
 ####################################
 # Base stage for production builds #
@@ -114,6 +117,10 @@ COPY --from=tak_server /opt/templates /opt/templates
 COPY docker/container-init.sh /container-init.sh
 
 WORKDIR /app
+
+# Add tak specific instructions json
+COPY instructions/tak.json /opt/templates/tak.json
+
 # Install system level deps for running the package (not devel versions for building wheels)
 # and install the wheels we built in the previous step. generate default config
 RUN --mount=type=ssh apt-get update && apt-get install -y \
@@ -145,6 +152,10 @@ ENTRYPOINT ["/usr/bin/tini", "--", "/docker-entrypoint.sh"]
 # Base stage for development builds #
 #####################################
 FROM builder_base as devel_build
+
+# Add tak specific instructions json
+COPY instructions/tak.json /opt/templates/tak.json
+
 # Install deps
 COPY . /app
 WORKDIR /app
@@ -181,8 +192,8 @@ RUN apt-get update && apt-get install -y zsh \
     && echo "source /root/.profile" >>/root/.zshrc \
     && pip3 install git-up \
     # Map the special names to docker host internal ip because 127.0.0.1 is *container* localhost on login
-    && echo "sed 's/.*localmaeher.*//g' /etc/hosts >/etc/hosts.new && cat /etc/hosts.new >/etc/hosts" >>/root/.profile \
-    && echo "echo \"\$(getent hosts host.docker.internal | awk '{ print $1 }') localmaeher.dev.pvarki.fi mtls.localmaeher.dev.pvarki.fi\" >>/etc/hosts" >>/root/.profile \
+    && echo "sed ':begin;$!N;s/.*localmaeher.*//g;tbegin' /etc/hosts >/etc/hosts.new && cat /etc/hosts.new >/etc/hosts" >>/root/.profile \
+    && echo "echo \"\$(getent ahostsv4 host.docker.internal | awk '{ print \$1 }' | head -n1) localmaeher.dev.pvarki.fi mtls.dev.localmaeher.pvarki.fi\" >>/etc/hosts" >>/root/.profile \
     && ln -s /app/docker/container-init.sh /container-init.sh \
     && curl https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh -o /usr/bin/wait-for-it.sh \
     && chmod a+x /usr/bin/wait-for-it.sh \
