@@ -116,13 +116,10 @@ COPY --from=tak_server /opt/tak /opt/tak
 COPY --from=tak_server /opt/scripts /opt/scripts
 COPY --from=tak_server /opt/templates /opt/templates
 COPY docker/container-init.sh /container-init.sh
+COPY --from=builder_base /opt/templates/tak.json /opt/templates/tak.json
+COPY --from=builder_base /opt/tak_www_static /opt/tak_www_static
 
 WORKDIR /app
-
-# Add tak specific instructions json and static www content
-RUN mkdir -p /opt/templates \
-    && curl -L https://github.com/pvarki/rune-tak-metadata/releases/latest/download/rune.json -o /opt/templates/tak.json
-COPY ./tak_www_static /opt/tak_www_static
 
 # Install system level deps for running the package (not devel versions for building wheels)
 # and install the wheels we built in the previous step. generate default config
@@ -155,11 +152,8 @@ ENTRYPOINT ["/usr/bin/tini", "--", "/docker-entrypoint.sh"]
 # Base stage for development builds #
 #####################################
 FROM builder_base as devel_build
-
-# Add tak specific instructions json
-RUN mkdir -p /opt/templates \
-    && curl -L https://github.com/pvarki/rune-tak-metadata/releases/latest/download/rune.json -o /opt/templates/tak.json
-COPY ./tak_www_static /opt/tak_www_static
+COPY --from=builder_base /opt/templates/tak.json /opt/templates/tak.json
+COPY --from=builder_base /opt/tak_www_static /opt/tak_www_static
 
 # Install deps
 COPY . /app
