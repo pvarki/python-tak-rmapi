@@ -44,7 +44,7 @@ pre-commit considerations
 
 If working in Docker instead of native env you need to run the pre-commit checks in docker too::
 
-    docker exec -i takrmapi_devel /bin/bash -c "pre-commit install"
+    docker exec -i takrmapi_devel /bin/bash -c "pre-commit install --install-hooks"
     docker exec -i takrmapi_devel /bin/bash -c "pre-commit run --all-files"
 
 You need to have the container running, see above. Or alternatively use the docker run syntax but using
@@ -87,7 +87,7 @@ TLDR:
 - Install project deps and pre-commit hooks::
 
     poetry install
-    pre-commit install
+    pre-commit install --install-hooks
     pre-commit run --all-files
 
 - Ready to go.
