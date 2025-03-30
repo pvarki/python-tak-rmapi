@@ -21,13 +21,21 @@ router = APIRouter(dependencies=[Depends(MTLSHeader(auto_error=True))])
 async def user_intructions(user: UserCRUDRequest, language: str) -> Dict[str, str]:
     """return user instructions"""
 
+    localuser = tak_helpers.UserCRUD(user)
+
+    # TODO check user data path exists. 
+    if not localuser.userdata.exists():
+        await asyncio.sleep(0.1)
+        # TODO FIX return 404
+        return {"callsign": user.callsign, "instructions": {"err":"not found"}, "language": language}
+
     instructions_json_file = Path(f"/opt/templates/tak_{language}.json")
     if not instructions_json_file.is_file():
         instructions_json_file = Path("/opt/templates/tak.json")
 
     tak_instructions_data = json.loads(instructions_json_file.read_text(encoding="utf-8"))
 
-    localuser = tak_helpers.UserCRUD(user)
+    
     tak_missionpkg = tak_helpers.MissionZip(localuser)
     zip_files, tmp_folder = await tak_missionpkg.create_missionpkg()
 
