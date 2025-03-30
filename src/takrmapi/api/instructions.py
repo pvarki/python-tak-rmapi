@@ -4,9 +4,10 @@ from typing import Dict
 import logging
 import json
 import base64
+import asyncio
 from pathlib import Path
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from libpvarki.middleware import MTLSHeader
 from libpvarki.schemas.product import UserCRUDRequest
 
@@ -23,11 +24,10 @@ async def user_intructions(user: UserCRUDRequest, language: str) -> Dict[str, st
 
     localuser = tak_helpers.UserCRUD(user)
 
-    # TODO check user data path exists. 
+    # Check user data path exists.
     if not localuser.userdata.exists():
         await asyncio.sleep(0.1)
-        # TODO FIX return 404
-        return {"callsign": user.callsign, "instructions": {"err":"not found"}, "language": language}
+        raise HTTPException(status_code=404, detail="User not available or userdata path not populated yet.")
 
     instructions_json_file = Path(f"/opt/templates/tak_{language}.json")
     if not instructions_json_file.is_file():
