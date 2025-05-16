@@ -35,7 +35,6 @@ async def user_intructions(user: UserCRUDRequest, language: str) -> Dict[str, st
 
     tak_instructions_data = json.loads(instructions_json_file.read_text(encoding="utf-8"))
 
-    
     tak_missionpkg = tak_helpers.MissionZip(localuser)
     zip_files, tmp_folder = await tak_missionpkg.create_missionpkg()
 
