@@ -33,8 +33,4 @@ else
     date -u +"%Y%m%dT%H%M" >/data/persistent/firstrun.done
   fi
 
-  # Copy the tak www static content
-  mkdir -p /www_static/content/static
-  cp -r /opt/tak_www_static/* /www_static/content/static/
-
 fi
