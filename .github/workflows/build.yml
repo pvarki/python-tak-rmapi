@@ -9,7 +9,7 @@ jobs:
       pull-requests: write
       checks: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Build test image
         run: |
           docker build --target test -t takrmapi:test .
