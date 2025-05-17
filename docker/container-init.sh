@@ -8,9 +8,11 @@ cat /etc/hosts
 # Make sure /opt/tak and the symlinks to /opt/tak/data exist just in case something still
 # uses the old wrong paths
 TR=/opt/tak
+IGNITE_CONFIG_PATH=${TR}/data/TAKIgniteConfig.xml
 mkdir -p ${TR}
 if [[ ! -L "${TR}/certs"  ]];then
   ln -f -s "${TR}/data/certs/" "${TR}/certs"
+  ln -sf ${IGNITE_CONFIG_PATH} ${TR}/TAKIgniteConfig.xml
 fi
 # Make sure takinit and coreconfig XMLs exist in the default path
 if [[ ! -L "${TR}/TAKIgniteConfig.xml"  ]];then
