@@ -12,6 +12,13 @@ mkdir -p ${TR}
 if [[ ! -L "${TR}/certs"  ]];then
   ln -f -s "${TR}/data/certs/" "${TR}/certs"
 fi
+# Make sure takinit and coreconfig XMLs exist in the default path
+if [[ ! -L "${TR}/TAKIgniteConfig.xml"  ]];then
+  ln -f -s "${TR}/data/TAKIgniteConfig.xml" "${TR}/TAKIgniteConfig.xml"
+fi
+if [[ ! -L "${TR}/CoreConfig.xml"  ]];then
+  ln -f -s "${TR}/data/CoreConfig.xml" "${TR}/CoreConfig.xml"
+fi
 
 if [ -f /data/persistent/firstrun.done ]
 then
