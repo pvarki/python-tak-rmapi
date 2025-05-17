@@ -1,7 +1,6 @@
 # syntax=docker/dockerfile:1.1.7-experimental
 ARG TEMURIN_VERSION="17"
 ARG TAKSERVER_IMAGE="pvarki/takserver:5.4-RELEASE-19"
-ARG RUNE_TAG="v1.0.2"
 
 # The local reference tak_server is used in future stages
 FROM ${TAKSERVER_IMAGE} as tak_server
@@ -29,6 +28,7 @@ RUN export RESOLVED_VERSIONS=`pyenv_resolve $PYTHON_VERSIONS` \
 ######################
 FROM eclipse-temurin:${TEMURIN_VERSION}-jammy as builder_base
 #FROM python:3.11-bookworm as builder_base
+ARG RUNE_TAG="v1.0.2"
 
 ENV \
   # locale
