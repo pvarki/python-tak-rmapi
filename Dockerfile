@@ -83,9 +83,10 @@ RUN --mount=type=ssh pip3 install wheel virtualenv \
     && true
 
 # Add tak specific instructions json and static www content
-RUN mkdir -p /opt/templates \
+RUN mkdir -p /opt/templates /opt/www_static \
     && curl -L https://github.com/pvarki/rune-tak-metadata/releases/latest/download/rune.json -o /opt/templates/tak.json
-COPY ./tak_www_static /opt/tak_www_static
+
+COPY ./tak_www_static /opt/www_static
 
 ####################################
 # Base stage for production builds #
@@ -117,7 +118,7 @@ COPY --from=tak_server /opt/scripts /opt/scripts
 COPY --from=tak_server /opt/templates /opt/templates
 COPY docker/container-init.sh /container-init.sh
 COPY --from=builder_base /opt/templates/tak.json /opt/templates/tak.json
-COPY --from=builder_base /opt/tak_www_static /opt/tak_www_static
+COPY --from=builder_base /opt/www_static /opt/www_static
 
 WORKDIR /app
 
@@ -153,7 +154,7 @@ ENTRYPOINT ["/usr/bin/tini", "--", "/docker-entrypoint.sh"]
 #####################################
 FROM builder_base as devel_build
 COPY --from=builder_base /opt/templates/tak.json /opt/templates/tak.json
-COPY --from=builder_base /opt/tak_www_static /opt/tak_www_static
+COPY --from=builder_base /opt/www_static /opt/www_static
 
 # Install deps
 COPY . /app
