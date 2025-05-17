@@ -8,13 +8,13 @@ from contextlib import asynccontextmanager
 import filelock
 
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from libpvarki.logging import init_logging
 
 from takrmapi import __version__
 from takrmapi import tak_init, config
 from .config import LOG_LEVEL
 from .api import all_routers
-
 
 LOGGER = logging.getLogger(__name__)
 
@@ -55,6 +55,8 @@ def get_app_no_init() -> FastAPI:
     """App init with lifespan"""
     app = FastAPI(docs_url="/api/docs", openapi_url="/api/openapi.json", lifespan=app_lifespan, version=__version__)
     app.include_router(router=all_routers, prefix="/api/v1")
+
+    app.mount("/static", StaticFiles(directory="/opt/www_static"), name="www_static")
 
     return app
 
