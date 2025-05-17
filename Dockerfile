@@ -1,6 +1,7 @@
 # syntax=docker/dockerfile:1.1.7-experimental
 ARG TEMURIN_VERSION="17"
 ARG TAKSERVER_IMAGE="pvarki/takserver:5.3-RELEASE-24"
+ARG RUNE_TAG="v1.0.2"
 
 # The local reference tak_server is used in future stages
 FROM ${TAKSERVER_IMAGE} as tak_server
@@ -84,7 +85,7 @@ RUN --mount=type=ssh pip3 install wheel virtualenv \
 
 # Add tak specific instructions json and static www content
 RUN mkdir -p /opt/templates /opt/www_static \
-    && curl -L https://github.com/pvarki/rune-tak-metadata/releases/latest/download/rune.json -o /opt/templates/tak.json
+    && curl -L https://github.com/pvarki/rune-tak-metadata/releases/download/$RUNE_TAG/rune.json -o /opt/templates/tak.json
 
 COPY ./tak_www_static /opt/www_static
 
