@@ -4,6 +4,7 @@ import asyncio
 import logging
 import shutil
 import random
+from pathlib import Path
 
 import filelock
 from libpvarki.schemas.product import UserCRUDRequest
@@ -30,6 +31,19 @@ async def setup_tak_mgmt_conn() -> None:
     t_helpers = tak_helpers.Helpers(user)
     t_rest_helper = tak_helpers.RestHelpers(user)
 
+    # Wait for the tak API to start responding
+    for _ in range(10):
+        data = await t_rest_helper.tak_api_user_list()
+        
+        if not data:
+            LOGGER.info("TAK API not ready yet. Waiting...")
+            LOGGER.info(data)
+            await asyncio.sleep(10)  # nosec
+        else:
+            LOGGER.info("TAK API responding, moving on...")
+            break
+        
+    
     try:
         lock.acquire(timeout=0.0)
         # Move mtlsclient.pem in place if not there already
@@ -42,7 +56,7 @@ async def setup_tak_mgmt_conn() -> None:
 
         # Check if we can already use TAK rest api. If not then add the mtlsinit as admin user
         data = await t_rest_helper.tak_api_user_list()
-        if not data:
+        if data[0] == False:
             LOGGER.info("Adding mtlsclient as administrator to TAK")
             await t_helpers.add_admin_to_tak_with_cert()
         else:
@@ -53,3 +67,64 @@ async def setup_tak_mgmt_conn() -> None:
         return
     finally:
         lock.release()
+
+async def setup_tak_defaults() -> None:
+    """ Set common required defaults to tak """
+    user: tak_helpers.UserCRUD = tak_helpers.UserCRUD(
+        UserCRUDRequest(uuid="not_needed", callsign="mtlsclient", x509cert="not_needed")
+    )
+    t_helpers = tak_helpers.Helpers(user)
+    t_rest_helper = tak_helpers.RestHelpers(user)
+    
+    LOGGER.info("Starting to set set TAK defaults")
+
+    # Check that the "RECON" mission is available
+    mission_recon_available = await t_rest_helper.tak_api_mission_get(groupname="RECON")
+
+    if not mission_recon_available:
+        mission_added = await t_rest_helper.tak_api_mission_put(
+            groupname="RECON",
+            description="Recon feed for validated information",
+            defaultRole="MISSION_SUBSCRIBER",
+            )
+    
+        if not mission_added:
+            LOGGER.error("Unable to add RECON mission! Check takapi logs for possible errors.")
+            return
+        
+        # Update mission keywords
+        mission_keywords_added = await t_rest_helper.tak_api_mission_keywords(
+            groupname="RECON",
+            keywords=["#RECON"]
+            )
+        if not mission_keywords_added:
+            LOGGER.error("Unable to add keywords to RECON mission! Check takapi logs for possible errors.")
+            return
+    else:
+        LOGGER.info("RECON mission already in place, no need to add again.")
+
+    # Check that the "TAK-Defaults" profile is in place
+    default_profile_available = await t_rest_helper.tak_api_get_device_profile(profile_name="Default-ATAK")
+    
+    if 'status' in default_profile_available and default_profile_available['status'] == "NOT_FOUND":
+        LOGGER.info("Default-ATAK profile missing. Adding profile.")
+        await t_rest_helper.tak_api_add_device_profile(
+            profile_name="Default-ATAK",
+            groups=["default"]
+            )
+        await t_rest_helper.tak_api_update_device_profile(
+            profile_name="Default-ATAK",
+            profile_active=True,
+            apply_on_connect=True,
+            apply_on_enrollment=False,
+            profile_type="Connection",
+            groups=["default"]
+            )
+        await t_rest_helper.tak_api_upload_file_to_profile(
+            profile_name="Default-ATAK",
+            file_path= Path(config.TEMPLATES_PATH / 
+                "tak_datapackage" / 
+                "default" / 
+                "ATAK default settings" /
+                "TAK_defaults.pref" ) 
+            )
