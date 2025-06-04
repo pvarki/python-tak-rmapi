@@ -21,6 +21,7 @@ async def app_lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """Handle lifespan management things"""
     # init
     await tak_init.setup_tak_mgmt_conn()
+    await tak_init.setup_tak_defaults()
     _ = app
     # App runs
     yield
