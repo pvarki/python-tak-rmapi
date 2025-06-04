@@ -46,7 +46,7 @@ cfg = Config(
 )  # not supporting .env files anymore because https://github.com/encode/starlette/discussions/2446
 
 LOG_LEVEL: int = cfg("LOG_LEVEL", default=10, cast=int)
-TEMPLATES_PATH: Path = cfg("TEMPLATES_PATH", cast=Path, default=Path(__file__).parent / "templates" )
+TEMPLATES_PATH: Path = cfg("TEMPLATES_PATH", cast=Path, default=Path(__file__).parent / "templates")
 
 TAK_CERTS_FOLDER: Path = cfg("TAK_CERTS_FOLDER", cast=Path, default=Path("/opt/tak/data/certs/files"))
 RMAPI_PERSISTENT_FOLDER: Path = cfg("RMAPI_PERSISTENT_FOLDER", cast=Path, default=Path("/data/persistent"))
