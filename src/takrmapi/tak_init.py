@@ -3,10 +3,8 @@
 import asyncio
 import logging
 import shutil
-import random
 from pathlib import Path
 
-import filelock
 from libpvarki.schemas.product import UserCRUDRequest
 from takrmapi import config
 from takrmapi import tak_helpers
@@ -20,10 +18,6 @@ LOGGER = logging.getLogger(__name__)
 async def setup_tak_mgmt_conn() -> None:
     """Setup required credentials to manage TAK"""
     # FIXME: Refactor to separate helpers not requiring a dummy user
-    lockpath = config.TAK_CERTS_FOLDER / "takrmapi_init.lock"
-    # Random sleep to the lock file access to avoid race conditions
-    await asyncio.sleep(random.random() / 2)  # nosec
-    lock = filelock.FileLock(lockpath)
 
     user: tak_helpers.UserCRUD = tak_helpers.UserCRUD(
         UserCRUDRequest(uuid="not_needed", callsign="mtlsclient", x509cert="not_needed")
@@ -31,41 +25,33 @@ async def setup_tak_mgmt_conn() -> None:
     t_helpers = tak_helpers.Helpers(user)
     t_rest_helper = tak_helpers.RestHelpers(user)
 
-    # Wait for the tak API to start responding
-    for _ in range(10):
+    # Wait for the TAK API to start responding
+    for _ in range(60):
         data = await t_rest_helper.tak_api_user_list()
 
         if not data["success"]:
             LOGGER.info("TAK API not ready yet. Waiting...")
             LOGGER.info(data)
-            await asyncio.sleep(10)  # nosec
+            await asyncio.sleep(5)  # nosec
         else:
             LOGGER.info("TAK API responding, moving on...")
             break
 
-    try:
-        lock.acquire(timeout=0.0)
-        # Move mtlsclient.pem in place if not there already
-        if not await t_helpers.user_cert_exists():
-            # Copy mtlsclient.pem from /data/persistent/public/mtlsclient.pem to
-            new_filepath = config.TAK_CERTS_FOLDER / "mtlsclient.pem"
-            shutil.copy("/data/persistent/public/mtlsclient.pem", new_filepath)
-        else:
-            LOGGER.info("mtlsclient cert already in place. No need to copy from /data/persistent...")
+    # Move mtlsclient.pem in place if not there already
+    if not await t_helpers.user_cert_exists():
+        # Copy mtlsclient.pem from /data/persistent/public/mtlsclient.pem to
+        new_filepath = config.TAK_CERTS_FOLDER / "mtlsclient.pem"
+        shutil.copy("/data/persistent/public/mtlsclient.pem", new_filepath)
+    else:
+        LOGGER.info("mtlsclient cert already in place. No need to copy from /data/persistent...")
 
-        # Check if we can already use TAK rest api. If not then add the mtlsinit as admin user
-        data = await t_rest_helper.tak_api_user_list()
-        if not data["data"]:
-            LOGGER.info("Adding mtlsclient as administrator to TAK")
-            await t_helpers.add_admin_to_tak_with_cert()
-        else:
-            LOGGER.info("Got user list, mtlsclient cert already added as admin")
-
-    except filelock.Timeout:
-        LOGGER.warning("Someone has already locked {}, leaving this init to them".format(lockpath))
-        return
-    finally:
-        lock.release()
+    # Check if we can already use TAK rest api. If not then add the mtlsinit as admin user
+    data = await t_rest_helper.tak_api_user_list()
+    if not data["data"]:
+        LOGGER.info("Adding mtlsclient as administrator to TAK")
+        await t_helpers.add_admin_to_tak_with_cert()
+    else:
+        LOGGER.info("Got user list, mtlsclient cert already added as admin")
 
 
 async def setup_tak_defaults() -> None:
