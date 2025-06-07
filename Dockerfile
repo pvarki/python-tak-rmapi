@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.1.7-experimental
 ARG TEMURIN_VERSION="17"
-ARG TAKSERVER_IMAGE="pvarki/takserver:5.3-RELEASE-24"
+ARG TAKSERVER_IMAGE="pvarki/takserver:5.4-RELEASE-19"
 
 # The local reference tak_server is used in future stages
 FROM ${TAKSERVER_IMAGE} as tak_server
@@ -28,6 +28,7 @@ RUN export RESOLVED_VERSIONS=`pyenv_resolve $PYTHON_VERSIONS` \
 ######################
 FROM eclipse-temurin:${TEMURIN_VERSION}-jammy as builder_base
 #FROM python:3.11-bookworm as builder_base
+ARG RUNE_TAG="v1.0.2"
 
 ENV \
   # locale
@@ -82,6 +83,11 @@ RUN --mount=type=ssh pip3 install wheel virtualenv \
     && pip3 install --no-deps --find-links=/tmp/wheelhouse/ /tmp/wheelhouse/*.whl \
     && true
 
+# Add tak specific instructions json and static www content
+RUN mkdir -p /opt/templates /opt/www_static \
+    && curl -L https://github.com/pvarki/rune-tak-metadata/releases/download/$RUNE_TAG/rune.json -o /opt/templates/tak.json
+
+COPY ./tak_www_static /opt/www_static
 
 ####################################
 # Base stage for production builds #
@@ -112,8 +118,11 @@ COPY --from=tak_server /opt/tak /opt/tak
 COPY --from=tak_server /opt/scripts /opt/scripts
 COPY --from=tak_server /opt/templates /opt/templates
 COPY docker/container-init.sh /container-init.sh
+COPY --from=builder_base /opt/templates/tak.json /opt/templates/tak.json
+COPY --from=builder_base /opt/www_static /opt/www_static
 
 WORKDIR /app
+
 # Install system level deps for running the package (not devel versions for building wheels)
 # and install the wheels we built in the previous step. generate default config
 RUN --mount=type=ssh apt-get update && apt-get install -y \
@@ -145,6 +154,9 @@ ENTRYPOINT ["/usr/bin/tini", "--", "/docker-entrypoint.sh"]
 # Base stage for development builds #
 #####################################
 FROM builder_base as devel_build
+COPY --from=builder_base /opt/templates/tak.json /opt/templates/tak.json
+COPY --from=builder_base /opt/www_static /opt/www_static
+
 # Install deps
 COPY . /app
 WORKDIR /app
@@ -181,8 +193,8 @@ RUN apt-get update && apt-get install -y zsh \
     && echo "source /root/.profile" >>/root/.zshrc \
     && pip3 install git-up \
     # Map the special names to docker host internal ip because 127.0.0.1 is *container* localhost on login
-    && echo "sed 's/.*localmaeher.*//g' /etc/hosts >/etc/hosts.new && cat /etc/hosts.new >/etc/hosts" >>/root/.profile \
-    && echo "echo \"\$(getent hosts host.docker.internal | awk '{ print $1 }') localmaeher.dev.pvarki.fi mtls.localmaeher.dev.pvarki.fi\" >>/etc/hosts" >>/root/.profile \
+    && echo "sed ':begin;$!N;s/.*localmaeher.*//g;tbegin' /etc/hosts >/etc/hosts.new && cat /etc/hosts.new >/etc/hosts" >>/root/.profile \
+    && echo "echo \"\$(getent ahostsv4 host.docker.internal | awk '{ print \$1 }' | head -n1) localmaeher.dev.pvarki.fi mtls.dev.localmaeher.pvarki.fi\" >>/etc/hosts" >>/root/.profile \
     && ln -s /app/docker/container-init.sh /container-init.sh \
     && curl https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh -o /usr/bin/wait-for-it.sh \
     && chmod a+x /usr/bin/wait-for-it.sh \
