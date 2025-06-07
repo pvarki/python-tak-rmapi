@@ -67,3 +67,5 @@ TAKCL_CORECONFIG_PATH: Path = cfg("TAKCL_CORECONFIG_PATH", cast=Path, default=Pa
 # Used for mission pkgs
 TAK_SERVER_FQDN: str = cfg("TAK_SERVER_FQDN", cast=str, default=read_tak_fqdn())
 TAK_SERVER_NAME: str = cfg("TAK_SERVER_NAME", cast=str, default=read_deployment_name())
+TAK_SERVER_SALT_FILE: Path = cfg("TAK_SERVER_SALT", cast=Path, default=Path("/opt/tak/data/tak_server_salt"))
+TAK_SERVER_SALT_STR: str = ""

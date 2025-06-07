@@ -38,6 +38,13 @@ async def app_lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     finally:
         lock.release()
 
+    # Wait for the init to be completed
+    while lock.is_locked:
+        LOGGER.warning("tak_init has not yet completed. Waiting for {} to be relased.".format(lockpath))
+        await asyncio.sleep(2)
+
+    await tak_init.get_tak_defaults()
+
     _ = app
     # App runs
     yield

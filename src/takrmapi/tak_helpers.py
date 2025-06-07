@@ -1,6 +1,8 @@
 """Helper functions to manage tak"""
 
 from typing import Any, Mapping, Union, Sequence, cast, Tuple, List, Dict
+import hashlib
+import base64
 import os
 import asyncio
 import shutil
@@ -267,15 +269,24 @@ class MissionZip:
 
         return f"{tmp_folder}.zip"
 
+    async def create_tak_network_mesh_key(self) -> str:
+        """Return tak network mesh key"""
+        mesh_key: str = config.TAK_SERVER_SALT_STR + "tak_network_mesh_key"
+        mesh_key_sha256: str = hashlib.sha256(mesh_key.encode("utf-8")).hexdigest()
+        mesh_key_b64: str = base64.urlsafe_b64encode(mesh_key_sha256.encode("utf-8")).rstrip(b"=").decode("utf-8")
+        return mesh_key_b64
+
     async def render_tak_manifest_template(self, template: Template, app_version: str) -> str:
         """Render tak manifest template"""
         pkguid = uuid.uuid5(uuid.NAMESPACE_URL, f"{config.TAK_SERVER_FQDN}/{self.user.user.uuid}/{app_version}")
+        tak_network_mesh_key = await self.create_tak_network_mesh_key()
         return template.render(
             tak_server_uid_name=str(pkguid),
             tak_server_name=config.TAK_SERVER_NAME,
             tak_server_address=config.TAK_SERVER_FQDN,
             client_cert_name=self.user.callsign,
             client_cert_password=self.user.callsign,
+            tak_network_mesh_key=tak_network_mesh_key,
         )
 
     async def zip_folder_content(self, zipfile: str, tmp_folder: str) -> None:
