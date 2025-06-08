@@ -273,8 +273,7 @@ class MissionZip:
         """Return tak network mesh key"""
         mesh_key: str = config.TAK_SERVER_SALT_STR + "tak_network_mesh_key"
         mesh_key_sha256: str = hashlib.sha256(mesh_key.encode("utf-8")).hexdigest()
-        mesh_key_b64: str = base64.urlsafe_b64encode(mesh_key_sha256.encode("utf-8")).rstrip(b"=").decode("utf-8")
-        return mesh_key_b64
+        return mesh_key_sha256
 
     async def render_tak_manifest_template(self, template: Template, app_version: str) -> str:
         """Render tak manifest template"""
