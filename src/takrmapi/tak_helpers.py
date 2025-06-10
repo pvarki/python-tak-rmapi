@@ -2,7 +2,6 @@
 
 from typing import Any, Mapping, Union, Sequence, cast, Tuple, List, Dict
 import hashlib
-import base64
 import os
 import asyncio
 import shutil

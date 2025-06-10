@@ -59,6 +59,10 @@ TAK_MISSIONPKG_TMP: str = cfg(
     "TAK_MISSIONPKG_TMP", cast=str, default="/tmp"  # nosec B108 - TODO maybe in memory stuff to replace /tmp
 )
 
+TAK_DATAPACKAGE_TEMPLATES_FOLDER: Path = cfg(
+    "TAK_DATAPACKAGE_TEMPLATES_FOLDER", cast=Path, default=Path(__file__).parent / "templates" / "tak_datapackage"
+)
+
 TAK_MESSAGING_API_HOST: str = cfg("TAK_MESSAGING_API_HOST", cast=str, default="https://127.0.0.1")  # We are in sidecar
 TAK_MESSAGING_API_PORT: int = cfg("TAK_MESSAGING_API_PORT", cast=int, default=8443)
 
