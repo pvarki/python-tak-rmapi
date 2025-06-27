@@ -13,8 +13,6 @@ LOGGER = logging.getLogger(__name__)
 
 router = APIRouter(dependencies=[Depends(MTLSHeader(auto_error=True))])
 
-test_router = APIRouter()
-
 
 @router.post("/created")
 async def user_created(user: UserCRUDRequest, request: Request) -> OperationResultResponse:
