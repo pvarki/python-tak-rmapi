@@ -24,7 +24,7 @@ def mtlsclient() -> Generator[TestClient, None, None]:
     client = TestClient(
         APP,
         headers={
-            "X-ClientCert-DN": "CN=harjoitus1.pvarki.fi,O=harjoitus1.pvarki.fi,L=KeskiSuomi,ST=Jyvaskyla,C=FI",
+            "X-ClientCert-DN": "CN=rasenmaeher,O=harjoitus1.pvarki.fi,L=KeskiSuomi,ST=Jyvaskyla,C=FI",
         },
     )
     yield client

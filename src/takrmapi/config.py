@@ -75,3 +75,4 @@ TAK_SERVER_NETWORKMESH_KEY_FILE: Path = cfg(
     "TAK_SERVER_NETWORKMESH_KEY_FILE", cast=Path, default=Path("/opt/tak/data/tak_server_networkmesh")
 )
 TAK_SERVER_NETWORKMESH_KEY_STR: str = ""
+RMCN: str = cfg("RMCN", cast=str, default="rasenmaeher")  # expected CN for RASENMAEHERs mTLS cert
