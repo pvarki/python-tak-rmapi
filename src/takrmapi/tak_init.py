@@ -65,10 +65,10 @@ async def setup_tak_defaults() -> None:
 
     LOGGER.info("Starting to set set TAK defaults")
 
-    # Create salt for tak specific secrets. Used for networkMeshKey for example.
-    if not config.TAK_SERVER_SALT_FILE.exists():
-        salt_str: str = "".join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(64))
-        config.TAK_SERVER_SALT_FILE.write_text(salt_str, encoding="utf-8")
+    # Create environment specific networkMeshKey
+    if not config.TAK_SERVER_NETWORKMESH_KEY_FILE.exists():
+        mesh_str: str = "".join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(64))
+        config.TAK_SERVER_NETWORKMESH_KEY_FILE.write_text(mesh_str, encoding="utf-8")
 
     # Check that the "RECON" mission is available
     mission_recon_available = await t_rest_helper.tak_api_mission_get(groupname="RECON")
@@ -119,10 +119,11 @@ async def setup_tak_defaults() -> None:
 
 async def get_tak_defaults() -> None:
     """Get common required defaults used in tak"""
-    # Read the tak server salt to memory.
+
     LOGGER.debug("Getting TAK defaults")
-    while not config.TAK_SERVER_SALT_FILE.exists():
-        LOGGER.debug("Waiting for TAK_SERVER_SALT_FILE to be populated")
+    # Read the tak server networkMeshKey to memory.
+    while not config.TAK_SERVER_NETWORKMESH_KEY_FILE.exists():
+        LOGGER.debug("Waiting for TAK_SERVER_NETWORKMESH_KEY_FILE to be populated")
         await asyncio.sleep(2)
 
-    config.TAK_SERVER_SALT_STR = config.TAK_SERVER_SALT_FILE.read_text(encoding="utf-8")
+    config.TAK_SERVER_NETWORKMESH_KEY_STR = config.TAK_SERVER_NETWORKMESH_KEY_FILE.read_text(encoding="utf-8")
