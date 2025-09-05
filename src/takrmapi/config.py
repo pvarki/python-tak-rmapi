@@ -59,6 +59,10 @@ TAK_MISSIONPKG_TMP: str = cfg(
     "TAK_MISSIONPKG_TMP", cast=str, default="/tmp"  # nosec B108 - TODO maybe in memory stuff to replace /tmp
 )
 
+TAK_DATAPACKAGE_TEMPLATES_FOLDER: Path = cfg(
+    "TAK_DATAPACKAGE_TEMPLATES_FOLDER", cast=Path, default=Path(__file__).parent / "templates" / "tak_datapackage"
+)
+
 TAK_MESSAGING_API_HOST: str = cfg("TAK_MESSAGING_API_HOST", cast=str, default="https://127.0.0.1")  # We are in sidecar
 TAK_MESSAGING_API_PORT: int = cfg("TAK_MESSAGING_API_PORT", cast=int, default=8443)
 
@@ -67,3 +71,7 @@ TAKCL_CORECONFIG_PATH: Path = cfg("TAKCL_CORECONFIG_PATH", cast=Path, default=Pa
 # Used for mission pkgs
 TAK_SERVER_FQDN: str = cfg("TAK_SERVER_FQDN", cast=str, default=read_tak_fqdn())
 TAK_SERVER_NAME: str = cfg("TAK_SERVER_NAME", cast=str, default=read_deployment_name())
+TAK_SERVER_NETWORKMESH_KEY_FILE: Path = cfg(
+    "TAK_SERVER_NETWORKMESH_KEY_FILE", cast=Path, default=Path("/opt/tak/data/tak_server_networkmesh")
+)
+TAK_SERVER_NETWORKMESH_KEY_STR: str = ""
