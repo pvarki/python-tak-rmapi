@@ -1,6 +1,7 @@
 """Helper functions to manage tak"""
 
-from typing import Any, Mapping, Union, Sequence, cast, Tuple, List
+from typing import Any, Mapping, Union, Sequence, cast, Tuple, List, Dict
+import hashlib
 import os
 import asyncio
 import shutil
@@ -8,8 +9,11 @@ import logging
 from pathlib import Path
 import uuid
 import tempfile
+import ssl
+import time
 
 from glob import glob
+import urllib.parse
 import aiohttp
 from OpenSSL import crypto  # FIXME: Move to python-cryptography for cert parsing
 from jinja2 import Template
@@ -18,6 +22,7 @@ from libpvarki.mtlshelp.session import get_session as libsession
 from libpvarki.mtlshelp.pkcs12 import convert_pem_to_pkcs12
 from libpvarki.mtlshelp.csr import async_create_keypair, async_create_client_csr
 from libpvarki.shell import call_cmd
+
 
 from takrmapi import config
 
@@ -263,15 +268,22 @@ class MissionZip:
 
         return f"{tmp_folder}.zip"
 
+    async def create_tak_network_mesh_key(self) -> str:
+        """Return tak network mesh key"""
+        mesh_key_sha256: str = hashlib.sha256(config.TAK_SERVER_NETWORKMESH_KEY_STR.encode("utf-8")).hexdigest()
+        return mesh_key_sha256
+
     async def render_tak_manifest_template(self, template: Template, app_version: str) -> str:
         """Render tak manifest template"""
         pkguid = uuid.uuid5(uuid.NAMESPACE_URL, f"{config.TAK_SERVER_FQDN}/{self.user.user.uuid}/{app_version}")
+        tak_network_mesh_key = await self.create_tak_network_mesh_key()
         return template.render(
             tak_server_uid_name=str(pkguid),
             tak_server_name=config.TAK_SERVER_NAME,
             tak_server_address=config.TAK_SERVER_FQDN,
             client_cert_name=self.user.callsign,
             client_cert_password=self.user.callsign,
+            tak_network_mesh_key=tak_network_mesh_key,
         )
 
     async def zip_folder_content(self, zipfile: str, tmp_folder: str) -> None:
@@ -351,6 +363,17 @@ class Helpers:
         pub_key = config.RMAPI_PERSISTENT_FOLDER / "public" / "mtlsclient.pem"
         return libsession((pub_key, priv_key))
 
+    async def tak_mtls_client_sslcontext(self) -> ssl.SSLContext:
+        """Return sslcontext to connect TAK"""
+        sslcontext = ssl.create_default_context()
+        sslcontext.check_hostname = False
+        sslcontext.verify_mode = ssl.CERT_NONE
+        sslcontext.load_cert_chain(
+            config.RMAPI_PERSISTENT_FOLDER / "public" / "mtlsclient.pem",
+            config.RMAPI_PERSISTENT_FOLDER / "private" / "mtlsclient.key",
+        )
+        return sslcontext
+
     def tak_base_url(self) -> str:
         """Construct the base url"""
         return f"{config.TAK_MESSAGING_API_HOST}:{config.TAK_MESSAGING_API_PORT}"
@@ -371,7 +394,8 @@ class Helpers:
     async def user_cert_validate(self) -> bool:
         """Check that the given certificate can at least be opened"""
         try:
-            await self.user_cert_write()
+            if self.user.callsign != "mtlsclient":
+                await self.user_cert_write()
             cert_file_name = config.TAK_CERTS_FOLDER / f"{self.user.callsign}.pem"
             with open(cert_file_name, "rb") as cert_file:
                 cert_content = cert_file.read()
@@ -435,6 +459,8 @@ class Helpers:
             return False
         tasks = []
         for certname in self.enable_user_cert_names:
+            if certname == "mtlsclient_rm":
+                continue
             tasks.append(
                 asyncio.shield(
                     call_cmd(
@@ -508,16 +534,208 @@ class RestHelpers:  # pylint: disable=too-few-public-methods
         """RestHelpers init"""
         self.helpers = Helpers(user)
 
-    # curl -k --cert public/mtlsclient.pem --key private/mtlsclient.key
-    # https://takmsg:8443/user-management/api/list-users
+    async def output_response_to_output(self, resp: aiohttp.ClientResponse) -> None:
+        """Output response to log"""
+        resp_text = await resp.text()
+        LOGGER.info("Response status : {}, Response text : {}".format(resp.status, resp_text))
+
     async def tak_api_user_list(self) -> Mapping[str, Any]:
         """Get list of users from TAK"""
         async with await self.helpers.tak_mtls_client() as session:
             try:
                 url = f"{self.helpers.tak_base_url()}/user-management/api/list-users"
-                resp = await session.get(url)
+                resp = await session.get(url, ssl=await self.helpers.tak_mtls_client_sslcontext())
                 data = cast(Mapping[str, Union[Any, Mapping[str, Any]]], await resp.json(content_type=None))
             except aiohttp.ClientError:
-                return {}
+                return {"success": False, "data": []}
         LOGGER.info("tak_api_user_list={}".format(data))
-        return data
+
+        return {"success": True, "data": data}
+
+    async def tak_api_mission_get(self, groupname: str) -> Mapping[str, Any]:
+        """Get mission from TAK"""
+        async with await self.helpers.tak_mtls_client() as session:
+            try:
+                url = f"{self.helpers.tak_base_url()}/Marti/api/missions/{groupname}"
+
+                resp = await session.get(url, ssl=await self.helpers.tak_mtls_client_sslcontext())
+                data = cast(Mapping[str, Union[Any, Mapping[str, Any]]], await resp.json(content_type=None))
+
+                if resp.status == 200:
+                    return {"success": True, "data": data}
+
+                LOGGER.info("Unable to find requested mission '{}' from TAK".format(groupname))
+                await self.output_response_to_output(resp)
+                return {"success": True, "data": data}
+            except aiohttp.ClientError as e:
+                LOGGER.exception(e)
+                return {"success": False, "data": []}
+
+    async def tak_api_mission_put(self, groupname: str, description: str, default_role: str) -> Mapping[str, Any]:
+        """Put mission to TAK"""
+
+        description_urlencoded = urllib.parse.quote(description)
+        async with await self.helpers.tak_mtls_client() as session:
+            try:
+                url = f"{self.helpers.tak_base_url()}/Marti/api/missions/\
+{ groupname }?\
+group=default&\
+description={ description_urlencoded }&\
+tool=public&\
+defaultRole={ default_role }&\
+inviteOnly=false&\
+allowGroupChange=false"
+                headers = {"Content-Type": "application/json", "accept": "*/*"}
+
+                resp = await session.put(
+                    url, json='"string"', ssl=await self.helpers.tak_mtls_client_sslcontext(), headers=headers
+                )
+                data = cast(Mapping[str, Union[Any, Mapping[str, Any]]], await resp.json(content_type=None))
+                if resp.status == 201:
+                    return {"success": True, "data": data}
+
+                LOGGER.info("Unable to add requested mission '{}' to TAK".format(groupname))
+                await self.output_response_to_output(resp)
+                return {"success": True, "data": data}
+            except aiohttp.ClientError:
+                return {"success": False, "data": []}
+
+    async def tak_api_mission_keywords(self, groupname: str, keywords: List[str]) -> Mapping[str, Any]:
+        """Put keywords to mission"""
+
+        async with await self.helpers.tak_mtls_client() as session:
+            try:
+                url = f"{self.helpers.tak_base_url()}/Marti/api/missions/{ groupname }/keywords"
+
+                resp = await session.put(url, json=keywords, ssl=await self.helpers.tak_mtls_client_sslcontext())
+                data = cast(Mapping[str, Union[Any, Mapping[str, Any]]], await resp.json(content_type=None))
+
+                if resp.status == 200:
+                    return {"success": True, "data": data}
+
+                LOGGER.info("Unable to add keywords {} to mission '{}'".format(keywords, groupname))
+                await self.output_response_to_output(resp)
+                return {"success": True, "data": data}
+
+            except aiohttp.ClientError:
+                return {"success": False, "data": []}
+
+    async def tak_api_get_device_profile(self, profile_name: str) -> Mapping[str, Any]:
+        """Get device profile from TAK"""
+        async with await self.helpers.tak_mtls_client() as session:
+            try:
+                url = f"{self.helpers.tak_base_url()}/Marti/api/device/profile/{profile_name}"
+
+                resp = await session.get(url, ssl=await self.helpers.tak_mtls_client_sslcontext(), json="{}")
+                data = cast(Mapping[str, Union[Any, Mapping[str, Any]]], await resp.json(content_type=None))
+
+            except aiohttp.ClientError:
+                return {"success": False, "data": []}
+
+            return {"success": True, "data": data}
+
+    async def tak_api_get_device_profile_files(self, profile_name: str) -> Mapping[str, Any]:
+        """Get device profile from TAK"""
+        async with await self.helpers.tak_mtls_client() as session:
+            try:
+                url = f"{self.helpers.tak_base_url()}/Marti/api/device/profile/{profile_name}/files"
+
+                resp = await session.get(url, ssl=await self.helpers.tak_mtls_client_sslcontext(), json="{}")
+                data = cast(Mapping[str, Union[Any, Mapping[str, Any]]], await resp.json(content_type=None))
+            except aiohttp.ClientError:
+                return {"success": False, "data": []}
+
+            return {"success": True, "data": data}
+
+    async def tak_api_add_device_profile(self, profile_name: str, groups: List[str]) -> Mapping[str, Any]:
+        """Add device profile to TAK"""
+        group_str: str = "?group=".join(groups)
+        async with await self.helpers.tak_mtls_client() as session:
+            try:
+                # url = f"{self.helpers.tak_base_url()}/Marti/api/device/profile/{profile_name}"
+                url = f"{self.helpers.tak_base_url()}/Marti/api/device/profile/{profile_name}?group={group_str}"
+
+                resp = await session.post(url, ssl=await self.helpers.tak_mtls_client_sslcontext(), json={})
+                data = cast(Mapping[str, Union[Any, Mapping[str, Any]]], await resp.json(content_type=None))
+
+                if resp.status == 201:
+                    return {"success": True, "data": data}
+
+                LOGGER.info("Unable to add device_profile '{}' ".format(profile_name))
+                await self.output_response_to_output(resp)
+                return {"success": True, "data": data}
+
+            except aiohttp.ClientError:
+                return {"success": False, "data": []}
+
+    async def tak_api_update_device_profile(self, profile_name: str, profile_vars: Dict[Any, Any]) -> Mapping[str, Any]:
+        """Update device profile at TAK"""
+
+        profile_info = await self.tak_api_get_device_profile(profile_name=profile_name)
+
+        async with await self.helpers.tak_mtls_client() as session:
+            try:
+                url = f"{self.helpers.tak_base_url()}/Marti/api/device/profile/{profile_name}"
+
+                updated_time = int(time.time())
+
+                resp = await session.put(
+                    url,
+                    ssl=await self.helpers.tak_mtls_client_sslcontext(),
+                    json={
+                        "id": profile_info["data"]["data"]["id"],
+                        "name": profile_name,
+                        "active": profile_vars["profile_active"],
+                        "applyOnConnect": profile_vars["apply_on_connect"],
+                        "applyOnEnrollment": profile_vars["apply_on_enrollment"],
+                        "type": profile_vars["profile_type"],
+                        "tool": profile_vars["tool"],
+                        "updated": f"{updated_time}",
+                        "groups": profile_vars["groups"],
+                    },
+                )
+                data = cast(Mapping[str, Union[Any, Mapping[str, Any]]], await resp.json(content_type=None))
+
+                if resp.status == 200:
+                    return {"success": True, "data": data}
+
+                LOGGER.info("Unable to update device_profile '{}' ".format(profile_name))
+                await self.output_response_to_output(resp)
+                return {"success": True, "data": data}
+
+            except aiohttp.ClientError:
+                return {"success": False, "data": []}
+
+    async def tak_api_upload_file_to_profile(self, profile_name: str, file_path: Path) -> Mapping[str, Any]:
+        """Add file to device profile at TAK"""
+
+        profile_files = await self.tak_api_get_device_profile_files(
+            profile_name=profile_name,
+        )
+
+        if len(profile_files["data"]["data"]) > 0:
+            for file in profile_files["data"]["data"]:
+                if file["name"] == file_path.name:
+                    LOGGER.info(
+                        "File '{}' is already attached to profile. No need to add again.".format(file_path.name)
+                    )
+                    return {"success": True, "data": profile_files["data"]}
+
+        async with await self.helpers.tak_mtls_client() as session:
+            try:
+                url = f"{self.helpers.tak_base_url()}\
+/Marti/api/device/profile/{profile_name}/file?filename={file_path.name}"
+
+                with open(file_path, "rb") as f:
+                    resp = await session.put(url, ssl=await self.helpers.tak_mtls_client_sslcontext(), data=f.read())
+                    data = cast(Mapping[str, Union[Any, Mapping[str, Any]]], await resp.json(content_type=None))
+
+                    if resp.status == 200:
+                        return {"success": True, "data": data}
+
+                    LOGGER.info("Unable to add device_profile '{}' ".format(profile_name))
+                    await self.output_response_to_output(resp)
+                    return {"success": True, "data": data}
+
+            except aiohttp.ClientError:
+                return {"success": False, "data": []}

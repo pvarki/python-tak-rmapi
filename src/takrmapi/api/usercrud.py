@@ -65,23 +65,3 @@ async def user_updated(user: UserCRUDRequest) -> OperationResultResponse:
     await tak_usercrud.update_user()
     result = OperationResultResponse(success=True)
     return result
-
-
-# REMOVE ME, JUST FOR TESTING
-@router.get("/test-list-m")
-async def test_user_listm() -> OperationResultResponse:
-    """Get user listing from TAK rest api"""
-    t_rest_helper = tak_helpers.RestHelpers()
-    await t_rest_helper.tak_api_user_list()
-    result = OperationResultResponse(success=True)
-    return result
-
-
-# REMOVE ME, JUST FOR TESTING
-@test_router.get("/test-list")
-async def user_list() -> OperationResultResponse:
-    """Get user listing from TAK rest api, no jwt/mtls check"""
-    t_rest_helper = tak_helpers.RestHelpers()
-    await t_rest_helper.tak_api_user_list()
-    result = OperationResultResponse(success=True)
-    return result

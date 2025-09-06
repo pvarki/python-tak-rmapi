@@ -8,7 +8,7 @@ if [ "$#" -eq 0 ]; then
   # Make sure the service itself is installed
   poetry install
   # Make sure pre-commit checks were not missed because reasons
-  poetry run pre-commit run --all-files
+  poetry run docker/pre_commit_init.sh
   # Then run the tests
   poetry run  pytest --junitxml=pytest.xml tests/
   # If pre-commit does not run these, enable them
