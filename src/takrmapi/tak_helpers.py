@@ -1,6 +1,6 @@
 """Helper functions to manage tak"""
 
-from typing import Any, Mapping, Union, Sequence, cast, Tuple, List, Dict
+from typing import Any, Mapping, Union, Sequence, cast, Tuple, List, Dict, Optional
 import hashlib
 import os
 import asyncio
@@ -41,6 +41,22 @@ class UserCRUD:
         self.user: UserCRUDRequest = user
         self.userdata: Path = config.RMAPI_PERSISTENT_FOLDER / "users" / user.uuid
         self.helpers = Helpers(self)
+
+    @classmethod
+    def from_callsign(cls, callsign: str) -> Optional["UserCRUD"]:
+        """Construct just from callsign, resolving RM uuid from the alias"""
+        users_base = config.RMAPI_PERSISTENT_FOLDER / "users"
+        alias_path = users_base / callsign
+        if not alias_path.exists():
+            LOGGER.error("Could not find real path with callsign")
+            return None
+        real_path = alias_path.resolve()
+        if not real_path or not real_path.is_dir():
+            LOGGER.error("Could not resolve real path with callsign")
+            return None
+        user_uuid = real_path.name
+        crudreq = UserCRUDRequest(uuid=user_uuid, callsign=callsign, x509cert="FIXME: READ FROM DIR")
+        return cls(crudreq)
 
     @property
     def callsign(self) -> str:
@@ -133,10 +149,20 @@ class UserCRUD:
         )
         await self.get_csr_signed()
 
+    def ensure_userdir_aliases(self) -> None:
+        """Create aliases for users data files because RM UUID is not always available"""
+        users_base = self.userdata.parent
+        for alias in (self.callsign, None):  # FIXME: Read the serial number from the RM cert
+            if not alias:
+                continue
+            alias_path = users_base / alias
+            alias_path.symlink_to(self.userdata, target_is_directory=True)
+
     async def add_new_user(self) -> bool:
         """Add new user to TAK with given certificate"""
         await self.create_user_dir_and_files()
         await self.helpers.user_cert_write()
+        self.ensure_userdir_aliases()
         if await self.helpers.user_cert_validate():
             await self.helpers.add_user_to_tak_with_cert()
             return True
@@ -171,6 +197,7 @@ class UserCRUD:
 
     async def promote_user(self) -> bool:
         """Promote user to admin"""
+        self.ensure_userdir_aliases()
         if await self._check_and_create_missing_user():
             return await self.helpers.add_admin_to_tak_with_cert()
         return False
@@ -179,6 +206,7 @@ class UserCRUD:
         """Demote user from being admin"""
         # TODO # THIS WORKS POORLY UNTIL PROPER REST IS FOUND OR SOME OTHER ALTERNATIVE
         # WE JUST RECREATE THE USER HERE AND GET RID OF THE ADMIN PERMISSIONS THAT WAY
+        self.ensure_userdir_aliases()
         if await self._check_and_create_missing_user():
             if not await self.helpers.delete_user_with_cert():
                 return False
@@ -189,6 +217,7 @@ class UserCRUD:
         """Update user certificate"""
         # TODO # THIS NEED TO BE CHECKED WHAT IT ACTUALLY DOES IN BACKGROUND,
         # DOES IT UPDATE THE CERTIFICATE OR ADD NEW USER OR WHAT??
+        self.ensure_userdir_aliases()
         if await self._check_and_create_missing_user():
             # TODO check/find out if the user is admin and add as admin
             return await self.helpers.add_user_to_tak_with_cert()
