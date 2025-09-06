@@ -12,7 +12,7 @@ from fastapi.responses import FileResponse
 from libpvarki.middleware import MTLSHeader
 from libpvarki.schemas.product import UserCRUDRequest
 
-from takrmapi import tak_helpers
+from takrmapi import tak_helpers, config
 
 LOGGER = logging.getLogger(__name__)
 
@@ -43,7 +43,10 @@ async def user_intructions(user: UserCRUDRequest, language: str) -> Dict[str, st
         await asyncio.shield(task)
 
     instructions_json_file = Path("/opt/templates/tak.json")
-    tak_instructions_data = json.loads(instructions_json_file.read_text(encoding="utf-8"))
+    rune_text = instructions_json_file.read_text(encoding="utf-8")
+    manifest = config.load_manifest()
+    rune_text = rune_text.replace("__TAKAPI_ASSETS_BASE__", f"{manifest['product']['api']}api/v1/instructions/assets")
+    tak_instructions_data = json.loads(rune_text)
 
     tak_missionpkg = tak_helpers.MissionZip(localuser)
     zip_files, tmp_folder = await tak_missionpkg.create_missionpkg()
