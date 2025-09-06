@@ -83,9 +83,6 @@ RUN --mount=type=ssh pip3 install wheel virtualenv \
     && pip3 install --no-deps --find-links=/tmp/wheelhouse/ /tmp/wheelhouse/*.whl \
     && true
 
-# Add tak specific instructions json and static www content
-RUN mkdir -p /opt/templates /opt/www_static \
-    && curl -L https://github.com/pvarki/rune-tak-metadata/releases/download/$RUNE_TAG/rune.json -o /opt/templates/tak.json
 
 COPY ./tak_www_static /opt/www_static
 
@@ -105,6 +102,21 @@ RUN --mount=type=ssh source /.venv/bin/activate \
     && chmod a+x /docker-entrypoint.sh \
     && true
 
+################################################
+# Build RUNE instructions from local submodule #
+################################################
+FROM builder_base as rune_build
+COPY ./poetry.lock ./pyproject.toml ./README.rst /app/
+COPY ./rune /app/rune
+WORKDIR /app
+RUN --mount=type=ssh source /.venv/bin/activate \
+    && poetry install --no-interaction --no-ansi  --no-root \
+    && ls -lah -R \
+    && mkdir -p /opt/templates \
+    && cd /app/rune \
+    && rune src json >/opt/templates/tak.json \
+    && true
+
 
 #########################
 # Main production build #
@@ -118,7 +130,7 @@ COPY --from=tak_server /opt/tak /opt/tak
 COPY --from=tak_server /opt/scripts /opt/scripts
 COPY --from=tak_server /opt/templates /opt/templates
 COPY docker/container-init.sh /container-init.sh
-COPY --from=builder_base /opt/templates/tak.json /opt/templates/tak.json
+COPY --from=rune_build /opt/templates/tak.json /opt/templates/tak.json
 COPY --from=builder_base /opt/www_static /opt/www_static
 
 WORKDIR /app
@@ -154,8 +166,8 @@ ENTRYPOINT ["/usr/bin/tini", "--", "/docker-entrypoint.sh"]
 # Base stage for development builds #
 #####################################
 FROM builder_base as devel_build
-COPY --from=builder_base /opt/templates/tak.json /opt/templates/tak.json
 COPY --from=builder_base /opt/www_static /opt/www_static
+COPY --from=rune_build /opt/templates/tak.json /opt/templates/tak.json
 
 # Install deps
 COPY . /app
