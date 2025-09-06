@@ -204,8 +204,9 @@ RUN apt-get update && apt-get install -y zsh \
     && sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" \
     && echo "source /root/.profile" >>/root/.zshrc \
     && pip3 install git-up \
+    # FIXME: container-init should already handle this mappings
     # Map the special names to docker host internal ip because 127.0.0.1 is *container* localhost on login
-    && echo "sed ':begin;$!N;s/.*localmaeher.*//g;tbegin' /etc/hosts >/etc/hosts.new && cat /etc/hosts.new >/etc/hosts" >>/root/.profile \
+    && echo "awk '!/.*localmaeher.*/' /etc/hosts >/etc/hosts.new && cat /etc/hosts.new >/etc/hosts" >>/root/.profile \
     && echo "echo \"\$(getent ahostsv4 host.docker.internal | awk '{ print \$1 }' | head -n1) localmaeher.dev.pvarki.fi mtls.dev.localmaeher.pvarki.fi\" >>/etc/hosts" >>/root/.profile \
     && ln -s /app/docker/container-init.sh /container-init.sh \
     && curl https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh -o /usr/bin/wait-for-it.sh \

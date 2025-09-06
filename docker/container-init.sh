@@ -1,7 +1,7 @@
 #!/bin/bash -l
 set -e
 # Resolve our magic names to docker internal ip
-sed ':begin;$!N;s/.*localmaeher.*//g;tbegin' /etc/hosts >/etc/hosts.new && cat /etc/hosts.new >/etc/hosts
+awk '!/.*localmaeher.*/' /etc/hosts >/etc/hosts.new && cat /etc/hosts.new >/etc/hosts
 echo "$(getent ahostsv4 host.docker.internal | awk '{ print $1 }') localmaeher.dev.pvarki.fi mtls.localmaeher.dev.pvarki.fi" >>/etc/hosts
 cat /etc/hosts
 
