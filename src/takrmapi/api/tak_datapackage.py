@@ -38,21 +38,9 @@ async def return_datapackage_file(package_path: str) -> FileResponse:
     # Return
     filename = package_path.split("/")[-1]
     if filename.endswith(".tpl"):
-        with open(filepath, "r", encoding="utf-8") as filehandle:
-            template = Template(filehandle.read())
-
         tak_missionpkg = tak_helpers.MissionZip(user)
-        app_version = package_path.split("/")[0]
+        rendered_file = await tak_missionpkg.render_tak_manifest_template(Path(filepath))
 
-        rendered_template = await tak_missionpkg.render_tak_manifest_template(
-            template=template, app_version=app_version
-        )
-
-        new_filename = filename.replace(".tpl", "")
-        tmp_template_file = Path(tempfile.gettempdir()) / new_filename
-        with open(tmp_template_file, "w", encoding="utf-8") as filehandle:
-            filehandle.write(rendered_template)
-
-        return FileResponse(tmp_template_file, filename=new_filename)
+        return FileResponse(rendered_file, filename=rendered_file.name)
 
     return FileResponse(filepath)
