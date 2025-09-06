@@ -69,6 +69,7 @@ class UserCRUD:
 
     async def wait_for_keypair(self) -> None:
         """Wait for keypair to be available"""
+        await self.get_csr_signed()
         while not self.certpath.exists() or not self.keypath.exists():
             LOGGER.debug("Waiting for {} / {}".format(self.certpath, self.keypath))
             LOGGER.debug("userdata contents: {}".format(list(self.userdata.rglob("*"))))
@@ -98,23 +99,14 @@ class UserCRUD:
         manifest = config.load_manifest()
         return cast(str, manifest["rasenmaeher"]["mtls"]["base_uri"])
 
-    async def create_user_dir_and_files(self) -> None:
-        """create the userdata path and make a new tak specific cert/keypair"""
-        self.userdata.mkdir(parents=True, exist_ok=True)
-        certcn = self.certcn
-        privpath = self.userdata / f"{certcn}.key"
-        pubpath = self.userdata / f"{certcn}.pub"
-        csrpath = self.userdata / f"{certcn}.csr"
-        certpath = self.userdata / f"{certcn}.pem"
-
-        LOGGER.info("Creating TAK specific keypair: {} -> {} ".format(certcn, privpath))
-        ckp = await async_create_keypair(privpath, pubpath)
-        LOGGER.debug("async_create_keypair awaited {} exists: {}".format(privpath, privpath.exists()))
-        csrpem = await async_create_client_csr(ckp, csrpath, {"CN": self.certcn})
-        LOGGER.debug(
-            "async_create_keypairasync_create_client_csr awaited {} exists: {}".format(csrpath, csrpath.exists())
-        )
-
+    async def get_csr_signed(self, force: bool = False) -> None:
+        """Get the CSR signed"""
+        certpath = self.certpath
+        csrpath = self.userdata / f"{self.certcn}.csr"
+        csrpem = csrpath.read_text(encoding="utf-8")
+        if certpath.exists() and not force:
+            LOGGER.info("Cert already exists")
+            return
         async with await self.helpers.tak_mtls_client() as session:
             url = f"{self.rm_base}api/v1/product/sign_csr/mtls"
             LOGGER.debug("POSTing to {}".format(url))
@@ -123,6 +115,23 @@ class UserCRUD:
             payload = await resp.json()
             certpath.write_text(payload["certificate"], encoding="utf-8")
             LOGGER.info("signed cert written to {}".format(certpath))
+
+    async def create_user_dir_and_files(self) -> None:
+        """create the userdata path and make a new tak specific cert/keypair"""
+        self.userdata.mkdir(parents=True, exist_ok=True)
+        certcn = self.certcn
+        privpath = self.userdata / f"{certcn}.key"
+        pubpath = self.userdata / f"{certcn}.pub"
+        csrpath = self.userdata / f"{certcn}.csr"
+
+        LOGGER.info("Creating TAK specific keypair: {} -> {} ".format(certcn, privpath))
+        ckp = await async_create_keypair(privpath, pubpath)
+        LOGGER.debug("async_create_keypair awaited {} exists: {}".format(privpath, privpath.exists()))
+        _csrpem = await async_create_client_csr(ckp, csrpath, {"CN": self.certcn})
+        LOGGER.debug(
+            "async_create_keypairasync_create_client_csr awaited {} exists: {}".format(csrpath, csrpath.exists())
+        )
+        await self.get_csr_signed()
 
     async def add_new_user(self) -> bool:
         """Add new user to TAK with given certificate"""
