@@ -3,7 +3,7 @@
 from pathlib import Path
 import logging
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import FileResponse
 from libpvarki.middleware import MTLSHeader
 from libpvarki.schemas.product import UserCRUDRequest
@@ -17,15 +17,34 @@ LOGGER = logging.getLogger(__name__)
 router = APIRouter(dependencies=[Depends(MTLSHeader(auto_error=True))])
 
 
+@router.get("/clientzip/{variant}.zip")
+async def return_tak_zip(request: Request, variant: str) -> FileResponse:
+    """Return TAK client zip as file"""
+    certdn = request.state.mtlsdn
+    user = tak_helpers.UserCRUD.from_callsign(certdn["CN"])
+    if not user:
+        raise HTTPException(status_code=404, detail="User data not found")
+    zip_tmp_path = user.userdata / "ziptmp" / variant
+    zip_tmp_path.mkdir(exist_ok=True, parents=True)
+    mhelper = tak_helpers.MissionZip(user)
+    walk_dir = mhelper.templates_dir / variant
+    if not walk_dir.is_dir():
+        raise HTTPException(status_code=404, detail="Variant not found")
+    zipfile = await mhelper.create_mission_zip(zip_tmp_path, variant, walk_dir)
+    return FileResponse(path=zipfile)
+
+
 @router.get("/{package_path:path}", response_class=FileResponse)
-async def return_datapackage_file(package_path: str) -> FileResponse:
+async def return_datapackage_file(request: Request, package_path: str) -> FileResponse:
     # async def return_datapackage_file(user: UserCRUDRequest, package_path: str) -> FileResponse:
     """Return file from tak_datapackages. If file ends with .tpl, return rendered file"""
-
-    # TODO is there need for user specific stuff? Need to find out how to get the userCrud...
-    user: tak_helpers.UserCRUD = tak_helpers.UserCRUD(
-        UserCRUDRequest(uuid="todo_fix_proper_user", callsign="todo_fix_proper_user", x509cert="todo_fix_proper_user")
-    )
+    certdn = request.state.mtlsdn
+    user = tak_helpers.UserCRUD.from_callsign(certdn["CN"])
+    if not user:
+        LOGGER.warning("Could not resolve user, faking one since this route does not use specific data")
+        user = tak_helpers.UserCRUD(
+            UserCRUDRequest(uuid="invalid_user", callsign="invalid_user", x509cert="invalid_user")
+        )
 
     filepath = Path(TAK_DATAPACKAGE_TEMPLATES_FOLDER) / package_path
 

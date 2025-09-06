@@ -231,6 +231,11 @@ class MissionZip:
         self.user: UserCRUD = user
         self.helpers = Helpers(self.user)
 
+    @property
+    def templates_dir(self) -> Path:
+        """Return the tempplate directory"""
+        return Path(config.TAK_MISSIONPKG_TEMPLATES_FOLDER) / self.missionpkg
+
     # async def c(self) -> Tuple[list[str], Path]:
     async def create_zip_bundles(
         self, template_folders: list[Path], is_mission_package: bool = False
@@ -238,7 +243,6 @@ class MissionZip:
         """Create tak mission package packages to different app versions"""
         # TODO tmpfile in memory
         tmp_folder = Path(tempfile.mkdtemp(suffix=f"_{self.user.callsign}"))
-
         tasks: List[asyncio.Task[Any]] = []
         for t_folder in template_folders:
             LOGGER.info("Added {} to background tasks".format(t_folder.name))
