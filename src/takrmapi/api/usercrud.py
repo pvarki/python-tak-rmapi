@@ -17,6 +17,9 @@ router = APIRouter(dependencies=[Depends(MTLSHeader(auto_error=True))])
 test_router = APIRouter()
 
 
+# FIXME: Check that the CRUD requests actually come from RASENMAEHER
+
+
 @router.post("/created")
 async def user_created(user: UserCRUDRequest) -> OperationResultResponse:
     """New device cert was created"""

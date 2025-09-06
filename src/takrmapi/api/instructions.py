@@ -7,7 +7,8 @@ import base64
 import asyncio
 from pathlib import Path
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import FileResponse
 from libpvarki.middleware import MTLSHeader
 from libpvarki.schemas.product import UserCRUDRequest
 
@@ -16,6 +17,16 @@ from takrmapi import tak_helpers
 LOGGER = logging.getLogger(__name__)
 
 router = APIRouter(dependencies=[Depends(MTLSHeader(auto_error=True))])
+
+
+@router.get("/assets/{file_path:path}")
+async def get_asset(file_path: str) -> FileResponse:
+    """Asset file"""
+    basepath = Path("/opt/templates/assets")
+    assetpath = basepath / file_path
+    if not assetpath.exists():
+        raise HTTPException(status_code=404, detail="File not found")
+    return FileResponse(path=str(assetpath))
 
 
 @router.post("/{language}")
