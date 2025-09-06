@@ -51,16 +51,14 @@ async def user_intructions(user: UserCRUDRequest, language: str) -> Dict[str, st
     tak_missionpkg = tak_helpers.MissionZip(localuser)
     zip_files, tmp_folder = await tak_missionpkg.create_missionpkg()
 
-    for file in zip_files:
-        with open(file, "rb") as filehandle:
-            contents = filehandle.read()
-        filename = file.split("/")[-1]  # FIXME: use pathlib.Path
-
+    # FIXME: Replace with links to /api/v1/tak-datapackages/clientzip/variant.zip
+    for filestr in zip_files:
+        file = Path(filestr)
         tak_instructions_data.append(
             {
                 "type": "Asset",
-                "name": filename,
-                "body": f"data:application/zip;base64,{base64.b64encode(contents).decode('ascii')}",
+                "name": file.name,
+                "body": f"data:application/zip;base64,{base64.b64encode(file.read_bytes()).decode('ascii')}",
             }
         )
 
