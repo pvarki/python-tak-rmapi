@@ -8,7 +8,7 @@ from fastapi.responses import FileResponse
 from libpvarki.middleware import MTLSHeader
 from libpvarki.schemas.product import UserCRUDRequest
 
-from takrmapi import tak_helpers
+from takrmapi import tak_helpers, config
 
 from ..config import TAK_DATAPACKAGE_TEMPLATES_FOLDER
 
@@ -27,10 +27,10 @@ async def return_tak_zip(request: Request, variant: str) -> FileResponse:
     zip_tmp_path = user.userdata / "ziptmp" / variant
     zip_tmp_path.mkdir(exist_ok=True, parents=True)
     mhelper = tak_helpers.MissionZip(user)
-    walk_dir = mhelper.templates_dir / variant
+    walk_dir = Path(config.TAK_MISSIONPKG_TEMPLATES_FOLDER) / variant
     if not walk_dir.is_dir():
         raise HTTPException(status_code=404, detail="Variant not found")
-    zipfile = await mhelper.create_mission_zip(zip_tmp_path, variant, walk_dir)
+    zipfile = await mhelper.create_mission_zip(zip_tmp_path, walk_dir, is_mission_package=True)
     return FileResponse(path=zipfile)
 
 
