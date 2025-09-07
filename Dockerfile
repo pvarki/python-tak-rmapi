@@ -80,7 +80,7 @@ RUN --mount=type=ssh pip3 install wheel virtualenv \
     && poetry export -f requirements.txt --without-hashes -o /tmp/requirements.txt \
     && pip3 wheel --wheel-dir=/tmp/wheelhouse -r /tmp/requirements.txt \
     && virtualenv /.venv && source /.venv/bin/activate && echo 'source /.venv/bin/activate' >>/root/.profile \
-    && pip3 install --no-deps --find-links=/tmp/wheelhouse/ /tmp/wheelhouse/*.whl \
+    && pip3 install --no-deps --find-links=/tmp/wheelhouse/ -r /tmp/requirements.txt \
     && true
 
 
