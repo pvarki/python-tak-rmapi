@@ -2,8 +2,6 @@
 
 from pathlib import Path
 import logging
-import tempfile
-from jinja2 import Template
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import FileResponse

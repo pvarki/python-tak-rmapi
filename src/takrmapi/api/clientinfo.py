@@ -22,19 +22,17 @@ async def client_instruction_fragment(user: UserCRUDRequest) -> List[Dict[str, s
     localuser = tak_helpers.UserCRUD(user)
     tak_missionpkg = tak_helpers.MissionZip(localuser)
     zip_files, tmp_folder = await tak_missionpkg.create_zip_bundles(
-        template_folders = TAK_MISSIONPKG_ENABLED_PACKAGES,
-        is_mission_package = True
+        template_folders=TAK_MISSIONPKG_ENABLED_PACKAGES, is_mission_package=True
     )
     returnable: List[Dict[str, str]] = []
+
     for file in zip_files:
-        with open(file, "rb") as filehandle:
-            contents = filehandle.read()
-        filename = file.split("/")[-1]
+        contents = file.read_bytes()
         returnable.append(
             {
-                "title": filename,
+                "title": file.name,
                 "data": f"data:application/zip;base64,{base64.b64encode(contents).decode('ascii')}",
-                "filename": f"{user.callsign}_{filename}",
+                "filename": f"{user.callsign}_{file.name}",
             }
         )
     await tak_missionpkg.helpers.remove_tmp_dir(str(tmp_folder))

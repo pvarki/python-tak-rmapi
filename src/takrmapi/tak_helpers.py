@@ -194,18 +194,22 @@ class MissionZip:
         self.helpers = Helpers(self.user)
 
     # async def c(self) -> Tuple[list[str], Path]:
-    async def create_zip_bundles(self, template_folders: list[Path], is_mission_package: bool = False) -> Tuple[list[Path], Path]:
+    async def create_zip_bundles(
+        self, template_folders: list[Path], is_mission_package: bool = False
+    ) -> Tuple[list[Path], Path]:
         """Create tak mission package packages to different app versions"""
         # TODO tmpfile in memory
         tmp_folder = Path(tempfile.mkdtemp(suffix=f"_{self.user.callsign}"))
-        
+
         tasks: List[asyncio.Task[Any]] = []
         for t_folder in template_folders:
             LOGGER.info("Added {} to background tasks".format(t_folder.name))
 
             if t_folder.is_dir():
                 tasks.append(
-                    asyncio.create_task(self.create_mission_zip(tmp_folder, walk_dir=t_folder, is_mission_package=is_mission_package ))
+                    asyncio.create_task(
+                        self.create_mission_zip(tmp_folder, walk_dir=t_folder, is_mission_package=is_mission_package)
+                    )
                 )
             else:
                 raise ValueError("'{}' is file. create_zip_bundles works only with directories.".format(t_folder.name))
@@ -215,7 +219,6 @@ class MissionZip:
         LOGGER.info("Background zipping tasks done")
         return returnable, tmp_folder
 
-
     async def create_mission_zip(  # pylint: disable=too-many-locals
         self, tmp_base: Path, walk_dir: Path, is_mission_package: bool = False
     ) -> Path:
@@ -223,33 +226,30 @@ class MissionZip:
         # TODO maybe in memory fs for tmp files...
 
         # FIXME: use Paths for everything
+
         tmp_zip_folder = tmp_base / walk_dir.name
         tmp_zip_folder.mkdir(parents=True, exist_ok=True)
-        for root, dirs, files in os.walk(walk_dir):
-            for name in dirs:
-                dirpath = f"{tmp_zip_folder}{os.path.join(root, name).replace(str(walk_dir), '')}"
-                LOGGER.debug("Calling os.makedirs({})".format(dirpath))
-                os.makedirs(dirpath)
 
+        LOGGER.debug("Moving files from '{}' to '{}' for bundling.".format(walk_dir, tmp_zip_folder))
+        for root, _, files in os.walk(walk_dir):
 
             for name in files:
-                org_file = os.path.join(root, name)
-                dst_file = f"{tmp_zip_folder}{os.path.join(root, name).replace(str(walk_dir),'')}"
-                LOGGER.debug("org_file={} dst_file={}".format(org_file, dst_file))
+                org_file = Path(root) / name
+                zip_file_path = Path(str(org_file).replace(str(walk_dir) + "/", ""))
 
-                if dst_file.endswith(".tpl"):
-                    rendered_file = await self.render_tak_manifest_template(Path(org_file))
-                    
+                dst_file = tmp_zip_folder / zip_file_path
+                dst_file.parent.mkdir(parents=True, exist_ok=True)
+
+                LOGGER.debug("org_file={} dst_file={}".format(org_file, dst_file))
+                if dst_file.name.endswith(".tpl"):
+                    rendered_file = await self.render_tak_manifest_template(org_file)
                     # Missionpackage zip specific peculiarities here
                     if is_mission_package:
-                        if rendered_file.name("manifest.xml"):
-                            await self.tak_missionpackage_extras(rendered_template, str(tmp_zip_folder))
-                    
-                        # itak, blueteam.pref extra
-                        if walk_dir.name == "itak" and rendered_file.endswith("blueteam.pref"):
-                            await self.tak_missionpackage_extras(rendered_template, str(tmp_zip_folder))
-                    shutil.copy(rendered_file, dst_file)
-                
+                        if rendered_file.name == "manifest.xml":
+                            await self.tak_missionpackage_extras(rendered_file, tmp_zip_folder)
+
+                    shutil.copy(rendered_file, str(dst_file).replace(".tpl", ""))
+
                 else:
                     shutil.copy(org_file, dst_file)
 
@@ -270,7 +270,7 @@ class MissionZip:
         with open(template_file, "r", encoding="utf-8") as filehandle:
             template = Template(filehandle.read())
 
-        rendered_template_str: str =  template.render(
+        rendered_template_str: str = template.render(
             tak_server_uid_name=str(pkguid),
             tak_server_name=config.TAK_SERVER_NAME,
             tak_server_address=config.TAK_SERVER_FQDN,
@@ -282,16 +282,16 @@ class MissionZip:
         tmp_template_file = Path(tempfile.gettempdir()) / template_file.name.replace(".tpl", "")
         with open(tmp_template_file, "w", encoding="utf-8") as filehandle:
             filehandle.write(rendered_template_str)
-        
+
         return tmp_template_file
 
     async def zip_folder_content(self, zipfile: str, tmp_folder: str) -> None:
         """Zip folder content"""
         await asyncio.get_running_loop().run_in_executor(None, shutil.make_archive, zipfile, "zip", tmp_folder)
 
-    async def tak_missionpackage_extras(self, manifest: str, tmp_folder: str) -> None:
+    async def tak_missionpackage_extras(self, manifest_file: Path, tmp_folder: Path) -> None:
         """Check if there is some extra that needs to be done defined in manfiest"""
-        manifest_rows = manifest.splitlines()
+        manifest_rows = manifest_file.read_text().splitlines()
         for row in manifest_rows:
             # .p12 rows
             # <!--
@@ -302,7 +302,7 @@ class MissionZip:
             if ".p12" in row:
                 await self.tak_missionpackage_add_p12(row, tmp_folder)
 
-    async def tak_missionpackage_add_p12(self, row: str, tmp_folder: str) -> None:
+    async def tak_missionpackage_add_p12(self, row: str, tmp_folder: Path) -> None:
         """Handle manifest .p12 rows"""
         tmp_folder = await self.chk_manifest_file_extra_folder(row=row, tmp_folder=tmp_folder)
         # FIXME: do the blocking IO in executor
@@ -335,14 +335,14 @@ class MissionZip:
         else:
             raise RuntimeError("IDK what to do")
 
-    async def chk_manifest_file_extra_folder(self, row: str, tmp_folder: str) -> str:
+    async def chk_manifest_file_extra_folder(self, row: str, tmp_folder: Path) -> Path:
         """Check folder path from manifest, return updated path if folder was located"""
         xml_value: str = row.split(">")[1].split("<")[0]
         if "/" in xml_value:
-            manifest_file = Path(tmp_folder) / xml_value
+            manifest_file = tmp_folder / xml_value
             manifest_file.parent.mkdir(parents=True, exist_ok=True)
             LOGGER.info("File defined in manifest in folder {}".format(manifest_file.parent.absolute()))
-            return str(manifest_file.parent.absolute())
+            return manifest_file.parent.absolute()
         return tmp_folder
 
 
