@@ -82,3 +82,8 @@ repos:
     hooks:
     -   id: poetry-check
     -   id: poetry-lock
+-   repo: https://github.com/rhysd/actionlint
+    rev: "v1.7.7"
+    hooks:
+        - id: actionlint
+          args: ["-shellcheck", "''"]
