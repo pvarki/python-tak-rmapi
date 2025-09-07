@@ -61,9 +61,8 @@ async def user_intructions(user: UserCRUDRequest, language: str) -> Dict[str, st
             }
         )
 
-    # FIXME: can we avoid that decode ?
     return {
         "callsign": user.callsign,
-        "instructions": orjson.dumps(tak_instructions_data).decode("utf-8"),
+        "instructions": tak_instructions_data,
         "language": language,
     }
