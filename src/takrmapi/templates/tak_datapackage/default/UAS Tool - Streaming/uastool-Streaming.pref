@@ -1,0 +1,28 @@
+<?xml version='1.0' standalone='yes'?>
+<preferences>
+  <preference version='1' name='com.atakmap.app_preferences'>
+    <!-- Streaming settings for uastool -->
+    <entry key="uastool.ROUTES_WAYPOINTS_OVERLAY" class="class java.lang.Boolean">true</entry>
+    <entry key="uastool.fov_use_dted" class="class java.lang.Boolean">true</entry>
+    <entry key="uastool.pref_broadcast_size" class="class java.lang.String">1920x1080 (high)</entry>
+    <entry key="uastool.pref_broadcast_ssl" class="class java.lang.Boolean">true</entry>
+    <entry key="uastool.pref_cached_network_endpoints" class="class java.util.HashSet"><element>{{ tak_server_name }}</element></entry>
+    <entry key="uastool.pref_callsign" class="class java.lang.String">UAS-{{ client_cert_name }}</entry>
+    <entry key="uastool.pref_last_saved_RTSP_Observer_URL" class="class java.lang.String">rtsps://{{ tak_server_name }}:8322/live/uas/UAS-{{ client_cert_name }}?tcp</entry>
+    <entry key="uastool.pref_last_used_rtsp_port" class="class java.lang.String">8322</entry>
+    <entry key="uastool.pref_poi_id_template" class="class java.lang.String">%-POI</entry>
+    <entry key="uastool.pref_rtsp_observer_url_reliable" class="class java.lang.Boolean">true</entry>
+    <entry key="uastool.pref_ui_ar_on" class="class java.lang.Boolean">true</entry>
+    <entry key="uastool.pref_ui_dont_show_warning" class="class java.lang.Boolean">true</entry>
+    <entry key="uastool.pref_video_broadcast_bitrate" class="class java.lang.String">2000</entry>
+    <entry key="uastool.pref_video_broadcast_destination" class="class java.lang.String">RTSP-Push (VMS systems)</entry>
+    <entry key="uastool.pref_video_broadcast_path" class="class java.lang.String">live/uas/UAS-{{ client_cert_name }}</entry>
+    <entry key="uastool.pref_video_dest_ip" class="class java.lang.String">{{ tak_server_name }}</entry>
+    <entry key="uastool.pref_video_dest_port" class="class java.lang.String">8322</entry>
+    <entry key="uastool.pref_video_observer_url" class="class java.lang.String">rtsps://{{ tak_server_name }}:8322/live/uas/UAS-{{ client_cert_name }}?tcp</entry>
+    <entry key="uastool.pref_video_record_bitrate" class="class java.lang.String">2000</entry>
+    <!-- Input user name and password automatically.
+    <entry key="uastool.pref_video_dest_password" class="class java.lang.String">input script here</entry>
+    <entry key="uastool.pref_video_dest_username" class="class java.lang.String">input script here</entry> -->
+  </preference>
+</preferences>
