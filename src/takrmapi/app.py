@@ -1,4 +1,4 @@
-""""factory for the fastpi app"""
+""" "factory for the fastpi app"""
 
 import asyncio
 import random
