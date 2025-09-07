@@ -2,7 +2,6 @@
 
 from typing import Dict
 import logging
-import json
 import asyncio
 from pathlib import Path
 
@@ -10,6 +9,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import FileResponse
 from libpvarki.middleware import MTLSHeader
 from libpvarki.schemas.product import UserCRUDRequest
+import orjson
 
 from takrmapi import tak_helpers, config
 
@@ -46,7 +46,7 @@ async def user_intructions(user: UserCRUDRequest, language: str) -> Dict[str, st
     rune_text = instructions_json_file.read_text(encoding="utf-8")
     manifest = config.load_manifest()
     rune_text = rune_text.replace("__TAKAPI_ASSETS_BASE__", f"{manifest['product']['api']}api/v1/instructions/assets")
-    tak_instructions_data = json.loads(rune_text)
+    tak_instructions_data = orjson.loads(rune_text)
     LOGGER.debug("RUNE JSON loaded")
 
     # FIXME: Check the asset type and body for non-embedded assets, this is a best guess
@@ -61,4 +61,9 @@ async def user_intructions(user: UserCRUDRequest, language: str) -> Dict[str, st
             }
         )
 
-    return {"callsign": user.callsign, "instructions": json.dumps(tak_instructions_data), "language": language}
+    # FIXME: can we avoid that decode ?
+    return {
+        "callsign": user.callsign,
+        "instructions": orjson.dumps(tak_instructions_data).decode("utf-8"),
+        "language": language,
+    }

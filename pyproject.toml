@@ -41,6 +41,9 @@ junit_family="xunit2"
 addopts="--cov=takrmapi --cov-fail-under=25 --cov-branch"
 asyncio_mode="strict"
 
+[tool.pylint]
+extension-pkg-whitelist = ["orjson"]
+
 [tool.pylint.format]
 max-line-length = 120
 
@@ -68,6 +71,7 @@ uvicorn = {version = ">=0.30,<1.0", extras = ["standard"]}
 gunicorn = "^23.0"
 filelock = "^3.12"
 cryptography = ">44.0,<45.0.1"
+orjson = "^3.10"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0"
