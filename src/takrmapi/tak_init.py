@@ -5,6 +5,8 @@ import logging
 import shutil
 import secrets
 import string
+import tempfile
+from pathlib import Path
 
 from libpvarki.schemas.product import UserCRUDRequest
 from takrmapi import config
@@ -114,12 +116,27 @@ async def setup_tak_defaults() -> None:
 
         for profile_file in config.TAK_DATAPACKAGE_DEFAULT_PROFILE_FILES:
             if profile_file.name.endswith(".tpl"):
-                profile_file = await tak_missionpkg.render_tak_manifest_template(profile_file)
+                profile_file_str = await tak_missionpkg.render_tak_manifest_template(profile_file)
 
-            await t_rest_helper.tak_api_upload_file_to_profile(
-                profile_name="Default-ATAK",
-                file_path=profile_file,
-            )
+                # TODO tmpfile in memory
+                tmp_folder = Path(tempfile.mkdtemp(suffix=f"_{user.callsign}"))
+                tmp_template_file = tmp_folder / profile_file.name.replace(".tpl", "")
+
+                with open(tmp_template_file, "w", encoding="utf-8") as filehandle:
+                    filehandle.write(profile_file_str)
+
+                await t_rest_helper.tak_api_upload_file_to_profile(
+                    profile_name="Default-ATAK",
+                    file_path=tmp_template_file,
+                )
+
+                await tak_missionpkg.helpers.remove_tmp_dir(str(tmp_folder))
+
+            else:
+                await t_rest_helper.tak_api_upload_file_to_profile(
+                    profile_name="Default-ATAK",
+                    file_path=profile_file,
+                )
 
         # Create zip bundles and upload to profile
 

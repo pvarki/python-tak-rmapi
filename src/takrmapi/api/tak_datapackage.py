@@ -4,7 +4,7 @@ from pathlib import Path
 import logging
 
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 from libpvarki.middleware import MTLSHeader
 from libpvarki.schemas.product import UserCRUDRequest
 
@@ -17,9 +17,8 @@ LOGGER = logging.getLogger(__name__)
 router = APIRouter(dependencies=[Depends(MTLSHeader(auto_error=True))])
 
 
-@router.get("/{package_path:path}", response_class=FileResponse)
-async def return_datapackage_file(package_path: str) -> FileResponse:
-    # async def return_datapackage_file(user: UserCRUDRequest, package_path: str) -> FileResponse:
+@router.get("/{package_path:path}")
+async def return_datapackage_file(package_path: str) -> Response:
     """Return file from tak_datapackages. If file ends with .tpl, return rendered file"""
 
     # TODO is there need for user specific stuff? Need to find out how to get the userCrud...
@@ -33,12 +32,10 @@ async def return_datapackage_file(package_path: str) -> FileResponse:
     if not filepath.is_file():
         raise HTTPException(status_code=404, detail="Requested datapackage file not found")
 
-    # Return
     filename = package_path.split("/")[-1]
     if filename.endswith(".tpl"):
         tak_missionpkg = tak_helpers.MissionZip(user)
-        rendered_file = await tak_missionpkg.render_tak_manifest_template(Path(filepath))
-
-        return FileResponse(rendered_file, filename=rendered_file.name)
+        rendered_file_str = await tak_missionpkg.render_tak_manifest_template(Path(filepath))
+        return Response(rendered_file_str.encode(encoding="utf-8"), media_type="text/plain")
 
     return FileResponse(filepath)

@@ -242,13 +242,18 @@ class MissionZip:
 
                 LOGGER.debug("org_file={} dst_file={}".format(org_file, dst_file))
                 if dst_file.name.endswith(".tpl"):
-                    rendered_file = await self.render_tak_manifest_template(org_file)
+                    rendered_file_str = await self.render_tak_manifest_template(org_file)
+
+                    dst_template_file = dst_file.parent / dst_file.name.replace(".tpl", "")
+
+                    LOGGER.debug("Handling template file -> '{}' for bundling.".format(dst_template_file))
+                    with open(dst_template_file, "w", encoding="utf-8") as filehandle:
+                        filehandle.write(rendered_file_str)
+
                     # Missionpackage zip specific peculiarities here
                     if is_mission_package:
-                        if rendered_file.name == "manifest.xml":
-                            await self.tak_missionpackage_extras(rendered_file, tmp_zip_folder)
-
-                    shutil.copy(rendered_file, str(dst_file).replace(".tpl", ""))
+                        if dst_template_file.name == "manifest.xml":
+                            await self.tak_missionpackage_extras(dst_template_file, tmp_zip_folder)
 
                 else:
                     shutil.copy(org_file, dst_file)
@@ -262,7 +267,8 @@ class MissionZip:
         mesh_key_sha256: str = hashlib.sha256(config.TAK_SERVER_NETWORKMESH_KEY_STR.encode("utf-8")).hexdigest()
         return mesh_key_sha256
 
-    async def render_tak_manifest_template(self, template_file: Path) -> Path:
+    # async def render_tak_manifest_template(self, template_file: Path) -> Path:
+    async def render_tak_manifest_template(self, template_file: Path) -> str:
         """Render tak manifest template"""
         pkguid = uuid.uuid5(uuid.NAMESPACE_URL, f"{config.TAK_SERVER_FQDN}/{self.user.user.uuid}/{template_file.name}")
         tak_network_mesh_key = await self.create_tak_network_mesh_key()
@@ -279,11 +285,12 @@ class MissionZip:
             tak_network_mesh_key=tak_network_mesh_key,
         )
 
-        tmp_template_file = Path(tempfile.gettempdir()) / template_file.name.replace(".tpl", "")
-        with open(tmp_template_file, "w", encoding="utf-8") as filehandle:
-            filehandle.write(rendered_template_str)
+        # tmp_template_file = Path(tempfile.gettempdir()) / template_file.name.replace(".tpl", "")
 
-        return tmp_template_file
+        # with open(tmp_template_file, "w", encoding="utf-8") as filehandle:
+        #    filehandle.write(rendered_template_str)
+
+        return rendered_template_str
 
     async def zip_folder_content(self, zipfile: str, tmp_folder: str) -> None:
         """Zip folder content"""
