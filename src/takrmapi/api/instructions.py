@@ -51,9 +51,9 @@ async def user_intructions(user: UserCRUDRequest, language: str) -> Dict[str, st
 
     LOGGER.debug("Getting zip files")
     tak_missionpkg = tak_helpers.MissionZip(localuser)
-    zip_files, tmp_folder = await tak_missionpkg.create_zip_bundles(
-        sorted(Path(config.TAK_MISSIONPKG_TEMPLATES_FOLDER).glob("*")), is_mission_package=True
-    )
+    zip_base = Path(config.TAK_MISSIONPKG_TEMPLATES_FOLDER)
+    zip_folders = [zip_base / "atak", zip_base / "itak", zip_base / "tak-tracker"]
+    zip_files, tmp_folder = await tak_missionpkg.create_zip_bundles(zip_folders, is_mission_package=True)
     LOGGER.debug("Got {}".format(zip_files))
 
     # FIXME: Replace with links to /api/v1/tak-datapackages/clientzip/variant.zip
