@@ -85,6 +85,7 @@ httpx = ">=0.23,<1.0" # caret behaviour on 0.x is to lock to 0.x.*
 wrapt = "^1.15"
 types-pyopenssl = "^23.2"
 hyperify-rune = ">=0.1.6"
+dataurlexport = {git = "https://github.com/rambo/-python-dataurlexport.git"}
 
 
 

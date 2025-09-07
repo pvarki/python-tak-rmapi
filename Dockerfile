@@ -115,6 +115,7 @@ RUN --mount=type=ssh source /.venv/bin/activate \
     && mkdir -p /opt/templates \
     && cd /app/rune \
     && rune src json >/opt/templates/tak.json \
+    && dataurlexport /opt/templates/tak.json __TAKAPI_ASSETS_BASE__ \
     && true
 
 

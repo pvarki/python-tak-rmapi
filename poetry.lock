@@ -890,6 +890,26 @@ test = ["certifi (>=2024)", "cryptography-vectors (==44.0.3)", "pretend (>=0.7)"
 test-randomorder = ["pytest-randomly"]
 
 [[package]]
+name = "dataurlexport"
+version = "1.0.0"
+description = "Post-process RUNE outputs and export data urls as files"
+optional = false
+python-versions = "^3.9"
+groups = ["dev"]
+files = []
+develop = false
+
+[package.dependencies]
+click = "^8.1"
+libadvian = "^1.7"
+
+[package.source]
+type = "git"
+url = "https://github.com/rambo/-python-dataurlexport.git"
+reference = "HEAD"
+resolved_reference = "209c4a0dce81e0720928ae739459cd58a1d46608"
+
+[[package]]
 name = "detect-secrets"
 version = "1.5.0"
 description = "Tool for detecting secrets in the codebase"
@@ -1368,7 +1388,7 @@ version = "1.9.0"
 description = "Small helpers that do not warrant their own library"
 optional = false
 python-versions = "<4.0,>=3.9"
-groups = ["main"]
+groups = ["main", "dev"]
 files = [
     {file = "libadvian-1.9.0-py3-none-any.whl", hash = "sha256:2461145e0980c9af95480f063d565c01cd68f52c90f19818ec5efbc537d1f702"},
     {file = "libadvian-1.9.0.tar.gz", hash = "sha256:97c78963cb08a70d856be409faa3c9f9bb088787d036dfce68b8e449a199b736"},
@@ -3142,4 +3162,4 @@ propcache = ">=0.2.1"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<4.0"
-content-hash = "f90fbc2ff10f63fdf9bdd24c2bf493cf946e0ed1d6558d5aa719fb596ac98246"
+content-hash = "8df7eaa5445c1abc86690dedbd877fab1fafe2a25e7703399028fd5209418adc"
