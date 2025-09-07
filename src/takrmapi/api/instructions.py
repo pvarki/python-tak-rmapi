@@ -29,8 +29,9 @@ async def get_asset(file_path: str) -> FileResponse:
     return FileResponse(path=str(assetpath))
 
 
+# FIXME: refactor to smaller methods
 @router.post("/{language}")
-async def user_intructions(user: UserCRUDRequest, language: str) -> Dict[str, str]:
+async def user_intructions(user: UserCRUDRequest, language: str) -> Dict[str, str]:  # pylint: disable=R0914
     """return user instructions"""
     LOGGER.debug("Called")
 
@@ -68,7 +69,20 @@ async def user_intructions(user: UserCRUDRequest, language: str) -> Dict[str, st
             }
         )
 
+    # FIXME: Check the asset type and body for non-embedded assets, this is a best guess
+    for pkgname in Path(config.TAK_MISSIONPKG_TEMPLATES_FOLDER).glob("*"):
+        fname = f"{pkgname}.zip"
+        url = f"{manifest['product']['api']}api/v1/tak-datapackages/clientzip/{fname}"
+        tak_instructions_data.append(
+            {
+                "type": "LinkAsset",
+                "name": fname,
+                "body": f'href="{url}"',
+            }
+        )
+
     LOGGER.debug("Removing {}".format(tmp_folder))
+    # FIXME: Use TaskMaster to background this so we can return earlier
     await tak_missionpkg.helpers.remove_tmp_dir(str(tmp_folder))
     LOGGER.debug("Retuning")
 
