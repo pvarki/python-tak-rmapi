@@ -1,6 +1,6 @@
 """Instructions endpoints"""
 
-from typing import Dict
+from typing import Dict, Any
 import logging
 import asyncio
 from pathlib import Path
@@ -30,7 +30,7 @@ async def get_asset(file_path: str) -> FileResponse:
 
 # FIXME: refactor to smaller methods
 @router.post("/{language}")
-async def user_intructions(user: UserCRUDRequest, language: str) -> Dict[str, str]:  # pylint: disable=R0914
+async def user_intructions(user: UserCRUDRequest, language: str) -> Dict[str, Any]:  # pylint: disable=R0914
     """return user instructions"""
     LOGGER.debug("Called")
 
