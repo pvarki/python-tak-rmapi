@@ -22,7 +22,7 @@ router = APIRouter(dependencies=[Depends(MTLSHeader(auto_error=True))])
 @router.get("/assets/{file_path:path}")
 async def get_asset(file_path: str) -> FileResponse:
     """Asset file"""
-    basepath = Path("/opt/templates/assets")
+    basepath = Path("/opt/templates/rune/assets")
     assetpath = basepath / file_path
     if not assetpath.exists():
         raise HTTPException(status_code=404, detail="File not found")
@@ -32,7 +32,7 @@ async def get_asset(file_path: str) -> FileResponse:
 @router.post("/{language}")
 async def user_intructions(user: UserCRUDRequest, language: str) -> Dict[str, str]:
     """return user instructions"""
-    LOGGER.info("Called")
+    LOGGER.debug("Called")
 
     localuser = tak_helpers.UserCRUD(user)
 
@@ -42,20 +42,24 @@ async def user_intructions(user: UserCRUDRequest, language: str) -> Dict[str, st
         task = asyncio.create_task(localuser.add_new_user())
         await asyncio.shield(task)
 
-    instructions_json_file = Path("/opt/templates/tak.json")
+    instructions_json_file = Path("/opt/templates/rune/tak.json")
     rune_text = instructions_json_file.read_text(encoding="utf-8")
     manifest = config.load_manifest()
     rune_text = rune_text.replace("__TAKAPI_ASSETS_BASE__", f"{manifest['product']['api']}api/v1/instructions/assets")
     tak_instructions_data = json.loads(rune_text)
+    LOGGER.debug("RUNE JSON loaded")
 
+    LOGGER.debug("Getting zip files")
     tak_missionpkg = tak_helpers.MissionZip(localuser)
     zip_files, tmp_folder = await tak_missionpkg.create_zip_bundles(
         sorted(Path(config.TAK_MISSIONPKG_TEMPLATES_FOLDER).glob("*")), is_mission_package=True
     )
+    LOGGER.debug("Got {}".format(zip_files))
 
     # FIXME: Replace with links to /api/v1/tak-datapackages/clientzip/variant.zip
     for filestr in zip_files:
         file = Path(filestr)
+        LOGGER.debug("Embedding {}".format(file))
         tak_instructions_data.append(
             {
                 "type": "Asset",
@@ -64,6 +68,8 @@ async def user_intructions(user: UserCRUDRequest, language: str) -> Dict[str, st
             }
         )
 
+    LOGGER.debug("Removing {}".format(tmp_folder))
     await tak_missionpkg.helpers.remove_tmp_dir(str(tmp_folder))
+    LOGGER.debug("Retuning")
 
     return {"callsign": user.callsign, "instructions": json.dumps(tak_instructions_data), "language": language}

@@ -112,10 +112,10 @@ WORKDIR /app
 RUN --mount=type=ssh source /.venv/bin/activate \
     && poetry install --no-interaction --no-ansi  --no-root \
     && ls -lah -R \
-    && mkdir -p /opt/templates \
+    && mkdir -p /opt/templates/rune \
     && cd /app/rune \
-    && rune src json >/opt/templates/tak.json \
-    && dataurlexport /opt/templates/tak.json __TAKAPI_ASSETS_BASE__ \
+    && rune src json >/opt/templates/rune/tak.json \
+    && dataurlexport /opt/templates/rune/tak.json __TAKAPI_ASSETS_BASE__ \
     && true
 
 
@@ -131,7 +131,7 @@ COPY --from=tak_server /opt/tak /opt/tak
 COPY --from=tak_server /opt/scripts /opt/scripts
 COPY --from=tak_server /opt/templates /opt/templates
 COPY docker/container-init.sh /container-init.sh
-COPY --from=rune_build /opt/templates/tak.json /opt/templates/tak.json
+COPY --from=rune_build /opt/templates/rune /opt/templates/rune
 COPY --from=builder_base /opt/www_static /opt/www_static
 
 WORKDIR /app
@@ -168,7 +168,7 @@ ENTRYPOINT ["/usr/bin/tini", "--", "/docker-entrypoint.sh"]
 #####################################
 FROM builder_base as devel_build
 COPY --from=builder_base /opt/www_static /opt/www_static
-COPY --from=rune_build /opt/templates/tak.json /opt/templates/tak.json
+COPY --from=rune_build /opt/templates/rune /opt/templates/rune
 
 # Install deps
 COPY . /app
