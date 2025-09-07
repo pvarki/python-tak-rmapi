@@ -49,7 +49,9 @@ async def user_intructions(user: UserCRUDRequest, language: str) -> Dict[str, st
     tak_instructions_data = json.loads(rune_text)
 
     tak_missionpkg = tak_helpers.MissionZip(localuser)
-    zip_files, tmp_folder = await tak_missionpkg.create_missionpkg()
+    zip_files, tmp_folder = await tak_missionpkg.create_zip_bundles(
+        sorted(Path(config.TAK_MISSIONPKG_TEMPLATES_FOLDER).glob("*")), is_mission_package=True
+    )
 
     # FIXME: Replace with links to /api/v1/tak-datapackages/clientzip/variant.zip
     for filestr in zip_files:
