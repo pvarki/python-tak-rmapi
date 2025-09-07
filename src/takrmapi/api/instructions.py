@@ -70,8 +70,8 @@ async def user_intructions(user: UserCRUDRequest, language: str) -> Dict[str, st
         )
 
     # FIXME: Check the asset type and body for non-embedded assets, this is a best guess
-    for pkgname in Path(config.TAK_MISSIONPKG_TEMPLATES_FOLDER).glob("*"):
-        fname = f"{pkgname}.zip"
+    for pkgpath in Path(config.TAK_MISSIONPKG_TEMPLATES_FOLDER).glob("*"):
+        fname = f"{pkgpath.name}.zip"
         url = f"{manifest['product']['api']}api/v1/tak-datapackages/clientzip/{fname}"
         tak_instructions_data.append(
             {
