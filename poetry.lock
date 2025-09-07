@@ -891,7 +891,7 @@ test-randomorder = ["pytest-randomly"]
 
 [[package]]
 name = "dataurlexport"
-version = "1.0.0"
+version = "1.1.0"
 description = "Post-process RUNE outputs and export data urls as files"
 optional = false
 python-versions = "^3.9"
@@ -907,7 +907,7 @@ libadvian = "^1.7"
 type = "git"
 url = "https://github.com/rambo/-python-dataurlexport.git"
 reference = "HEAD"
-resolved_reference = "209c4a0dce81e0720928ae739459cd58a1d46608"
+resolved_reference = "3631ecf053c074ce579bac653adf04314814d9c4"
 
 [[package]]
 name = "detect-secrets"
