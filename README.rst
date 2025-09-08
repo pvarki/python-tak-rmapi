@@ -100,4 +100,4 @@ RUNE instructions compile
 
 tldr::
 
-    rune rune/src json >rune/output/rune.json ; dataurlexport rune/output/rune.json __TAKAPI_ASSETS_BASE__
+    rune rune/src json >rune/output/tak.json ; dataurlexport rune/output/tak.json __TAKAPI_ASSETS_BASE__
