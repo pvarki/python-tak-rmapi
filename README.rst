@@ -94,3 +94,10 @@ TLDR:
 
 Remember to activate your virtualenv whenever working on the repo, this is needed
 because pylint and mypy pre-commit hooks use the "system" python for now (because reasons).
+
+RUNE instructions compile
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tldr::
+
+    rune rune/src json >rune/output/tak.json ; dataurlexport rune/output/tak.json __TAKAPI_ASSETS_BASE__

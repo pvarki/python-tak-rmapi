@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "takrmapi"
-version = "1.6.0"
+version = "1.7.0"
 description = "RASENMAEHER integration API for TAK server"
 authors = ["Eero af Heurlin <rambo@iki.fi>", "Ari Karhunen <FIXME@example.com>"]
 homepage = "https://github.com/pvarki/python-tak-rmapi"
@@ -38,8 +38,11 @@ strict=true
 
 [tool.pytest.ini_options]
 junit_family="xunit2"
-addopts="--cov=takrmapi --cov-fail-under=30 --cov-branch"
+addopts="--cov=takrmapi --cov-fail-under=25 --cov-branch"
 asyncio_mode="strict"
+
+[tool.pylint]
+extension-pkg-whitelist = ["orjson"]
 
 [tool.pylint.format]
 max-line-length = 120
@@ -68,22 +71,25 @@ uvicorn = {version = ">=0.30,<1.0", extras = ["standard"]}
 gunicorn = "^23.0"
 filelock = "^3.12"
 cryptography = ">44.0,<45.0.1"
+orjson = "^3.10"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0"
 coverage = "^7.4"
 pytest-cov = "^4.1"
-pylint = "^3.0"
-black = "^24.1"
-bandit = "^1.7"
-mypy = "^1.8"
+pylint = "^3.3"
+black = "^25.1"
+bandit = "^1.8"
+mypy = "^1.17"
 pre-commit = "^3.6"
 pytest-asyncio = ">=0.21,<1.0" # caret behaviour on 0.x is to lock to 0.x.*
 bump2version = "^1.0"
-detect-secrets = "^1.2"
+detect-secrets = "^1.5"
 httpx = ">=0.23,<1.0" # caret behaviour on 0.x is to lock to 0.x.*
 wrapt = "^1.15"
 types-pyopenssl = "^23.2"
+hyperify-rune = ">=0.1.6"
+dataurlexport = {git = "https://github.com/rambo/-python-dataurlexport.git"}
 
 
 

@@ -1,6 +1,6 @@
 """Helper functions to manage tak"""
 
-from typing import Any, Mapping, Union, Sequence, cast, Tuple, List, Dict
+from typing import Any, Mapping, Union, Sequence, cast, Tuple, List, Dict, Optional
 import hashlib
 import os
 import asyncio
@@ -29,7 +29,7 @@ from takrmapi import config
 
 LOGGER = logging.getLogger(__name__)
 SHELL_TIMEOUT = 5.0
-KEYPAIR_TIMEOUT = 5.0
+KEYPAIR_TIMEOUT = 15.0
 
 # FIXME: Convert the helpers to dataclasses
 
@@ -41,6 +41,22 @@ class UserCRUD:
         self.user: UserCRUDRequest = user
         self.userdata: Path = config.RMAPI_PERSISTENT_FOLDER / "users" / user.uuid
         self.helpers = Helpers(self)
+
+    @classmethod
+    def from_callsign(cls, callsign: str) -> Optional["UserCRUD"]:
+        """Construct just from callsign, resolving RM uuid from the alias"""
+        users_base = config.RMAPI_PERSISTENT_FOLDER / "users"
+        alias_path = users_base / callsign
+        if not alias_path.exists():
+            LOGGER.error("Could not find real path with callsign")
+            return None
+        real_path = alias_path.resolve()
+        if not real_path or not real_path.is_dir():
+            LOGGER.error("Could not resolve real path with callsign")
+            return None
+        user_uuid = real_path.name
+        crudreq = UserCRUDRequest(uuid=user_uuid, callsign=callsign, x509cert="FIXME: READ FROM DIR")
+        return cls(crudreq)
 
     @property
     def callsign(self) -> str:
@@ -69,6 +85,7 @@ class UserCRUD:
 
     async def wait_for_keypair(self) -> None:
         """Wait for keypair to be available"""
+        await self.get_csr_signed()
         while not self.certpath.exists() or not self.keypath.exists():
             LOGGER.debug("Waiting for {} / {}".format(self.certpath, self.keypath))
             LOGGER.debug("userdata contents: {}".format(list(self.userdata.rglob("*"))))
@@ -98,23 +115,14 @@ class UserCRUD:
         manifest = config.load_manifest()
         return cast(str, manifest["rasenmaeher"]["mtls"]["base_uri"])
 
-    async def create_user_dir_and_files(self) -> None:
-        """create the userdata path and make a new tak specific cert/keypair"""
-        self.userdata.mkdir(parents=True, exist_ok=True)
-        certcn = self.certcn
-        privpath = self.userdata / f"{certcn}.key"
-        pubpath = self.userdata / f"{certcn}.pub"
-        csrpath = self.userdata / f"{certcn}.csr"
-        certpath = self.userdata / f"{certcn}.pem"
-
-        LOGGER.info("Creating TAK specific keypair: {} -> {} ".format(certcn, privpath))
-        ckp = await async_create_keypair(privpath, pubpath)
-        LOGGER.debug("async_create_keypair awaited {} exists: {}".format(privpath, privpath.exists()))
-        csrpem = await async_create_client_csr(ckp, csrpath, {"CN": self.certcn})
-        LOGGER.debug(
-            "async_create_keypairasync_create_client_csr awaited {} exists: {}".format(csrpath, csrpath.exists())
-        )
-
+    async def get_csr_signed(self, force: bool = False) -> None:
+        """Get the CSR signed"""
+        certpath = self.certpath
+        csrpath = self.userdata / f"{self.certcn}.csr"
+        csrpem = csrpath.read_text(encoding="utf-8")
+        if certpath.exists() and not force:
+            LOGGER.info("Cert already exists")
+            return
         async with await self.helpers.tak_mtls_client() as session:
             url = f"{self.rm_base}api/v1/product/sign_csr/mtls"
             LOGGER.debug("POSTing to {}".format(url))
@@ -124,10 +132,37 @@ class UserCRUD:
             certpath.write_text(payload["certificate"], encoding="utf-8")
             LOGGER.info("signed cert written to {}".format(certpath))
 
+    async def create_user_dir_and_files(self) -> None:
+        """create the userdata path and make a new tak specific cert/keypair"""
+        self.userdata.mkdir(parents=True, exist_ok=True)
+        certcn = self.certcn
+        privpath = self.userdata / f"{certcn}.key"
+        pubpath = self.userdata / f"{certcn}.pub"
+        csrpath = self.userdata / f"{certcn}.csr"
+
+        LOGGER.info("Creating TAK specific keypair: {} -> {} ".format(certcn, privpath))
+        ckp = await async_create_keypair(privpath, pubpath)
+        LOGGER.debug("async_create_keypair awaited {} exists: {}".format(privpath, privpath.exists()))
+        _csrpem = await async_create_client_csr(ckp, csrpath, {"CN": self.certcn})
+        LOGGER.debug(
+            "async_create_keypairasync_create_client_csr awaited {} exists: {}".format(csrpath, csrpath.exists())
+        )
+        await self.get_csr_signed()
+
+    def ensure_userdir_aliases(self) -> None:
+        """Create aliases for users data files because RM UUID is not always available"""
+        users_base = self.userdata.parent
+        for alias in (self.callsign, None):  # FIXME: Read the serial number from the RM cert
+            if not alias:
+                continue
+            alias_path = users_base / alias
+            alias_path.symlink_to(self.userdata, target_is_directory=True)
+
     async def add_new_user(self) -> bool:
         """Add new user to TAK with given certificate"""
         await self.create_user_dir_and_files()
         await self.helpers.user_cert_write()
+        self.ensure_userdir_aliases()
         if await self.helpers.user_cert_validate():
             await self.helpers.add_user_to_tak_with_cert()
             return True
@@ -162,6 +197,7 @@ class UserCRUD:
 
     async def promote_user(self) -> bool:
         """Promote user to admin"""
+        self.ensure_userdir_aliases()
         if await self._check_and_create_missing_user():
             return await self.helpers.add_admin_to_tak_with_cert()
         return False
@@ -170,6 +206,7 @@ class UserCRUD:
         """Demote user from being admin"""
         # TODO # THIS WORKS POORLY UNTIL PROPER REST IS FOUND OR SOME OTHER ALTERNATIVE
         # WE JUST RECREATE THE USER HERE AND GET RID OF THE ADMIN PERMISSIONS THAT WAY
+        self.ensure_userdir_aliases()
         if await self._check_and_create_missing_user():
             if not await self.helpers.delete_user_with_cert():
                 return False
@@ -180,6 +217,7 @@ class UserCRUD:
         """Update user certificate"""
         # TODO # THIS NEED TO BE CHECKED WHAT IT ACTUALLY DOES IN BACKGROUND,
         # DOES IT UPDATE THE CERTIFICATE OR ADD NEW USER OR WHAT??
+        self.ensure_userdir_aliases()
         if await self._check_and_create_missing_user():
             # TODO check/find out if the user is admin and add as admin
             return await self.helpers.add_user_to_tak_with_cert()
@@ -192,92 +230,84 @@ class MissionZip:
     def __init__(self, user: UserCRUD):
         self.user: UserCRUD = user
         self.helpers = Helpers(self.user)
-        self.missionpkg = config.TAK_MISSIONPKG_DEFAULT_MISSION
 
-    async def create_missionpkg(self) -> Tuple[list[str], Path]:
+    # async def c(self) -> Tuple[list[str], Path]:
+    async def create_zip_bundles(
+        self, template_folders: list[Path], is_mission_package: bool = False
+    ) -> Tuple[list[Path], Path]:
         """Create tak mission package packages to different app versions"""
-        # FIXME: Use Paths until absolutely have to convert to strings
-        tmp_folder = Path(tempfile.mkdtemp(suffix=f"_{self.user.callsign}_{self.missionpkg}"))
-        walk_dir = Path(config.TAK_MISSIONPKG_TEMPLATES_FOLDER) / self.missionpkg
+        # TODO tmpfile in memory
+        tmp_folder = Path(tempfile.mkdtemp(suffix=f"_{self.user.callsign}"))
         tasks: List[asyncio.Task[Any]] = []
-        # FIXME: maybe just do this dynamically for all subdirs under templates ?
-        if os.path.exists(f"{walk_dir}/atak"):
-            LOGGER.info("Adding ATAK zip generation task")
-            tasks.append(
-                asyncio.create_task(self.create_mission_zip(tmp_folder, app_version="atak", walk_dir=walk_dir / "atak"))
-            )
-        if os.path.exists(f"{walk_dir}/itak"):
-            LOGGER.info("Adding iTAK zip generation task")
-            tasks.append(
-                asyncio.create_task(self.create_mission_zip(tmp_folder, app_version="itak", walk_dir=walk_dir / "itak"))
-            )
-        if os.path.exists(f"{walk_dir}/tak-tracker"):
-            LOGGER.info("Adding taktracker zip generation task")
-            tasks.append(
-                asyncio.create_task(
-                    self.create_mission_zip(tmp_folder, app_version="tak-tracker", walk_dir=walk_dir / "tak-tracker")
+        for t_folder in template_folders:
+            LOGGER.info("Added {} to background tasks".format(t_folder.name))
+
+            if t_folder.is_dir():
+                tasks.append(
+                    asyncio.create_task(
+                        self.create_mission_zip(tmp_folder, walk_dir=t_folder, is_mission_package=is_mission_package)
+                    )
                 )
-            )
-        # wintak and atak-mini removed, there are some issues with 5 packages.
-        LOGGER.debug("Waiting for the zip tasks")
+            else:
+                raise ValueError("'{}' is file. create_zip_bundles works only with directories.".format(t_folder.name))
+
+        LOGGER.debug("Waiting for the zip tasks to finish")
         returnable = await asyncio.gather(*tasks)
-        LOGGER.info("Tasks done")
+        LOGGER.info("Background zipping tasks done")
         return returnable, tmp_folder
 
     async def create_mission_zip(  # pylint: disable=too-many-locals
-        self, tmp_base: Path, app_version: str, walk_dir: Path
-    ) -> str:
+        self, tmp_base: Path, walk_dir: Path, is_mission_package: bool = False
+    ) -> Path:
         """Loop through files in missionpkg templates folder"""
         # TODO maybe in memory fs for tmp files...
 
         # FIXME: use Paths for everything
-        tmp_folder = tmp_base / app_version
-        tmp_folder.mkdir(parents=True, exist_ok=True)
-        for root, dirs, files in os.walk(walk_dir):
-            for name in dirs:
-                dirpath = f"{tmp_folder}{os.path.join(root, name).replace(str(walk_dir), '')}"
-                LOGGER.debug("Calling os.makedirs({})".format(dirpath))
-                os.makedirs(dirpath)
+
+        tmp_zip_folder = tmp_base / walk_dir.name
+        tmp_zip_folder.mkdir(parents=True, exist_ok=True)
+
+        LOGGER.debug("Moving files from '{}' to '{}' for bundling.".format(walk_dir, tmp_zip_folder))
+        for root, _, files in os.walk(walk_dir):
 
             for name in files:
-                org_file = os.path.join(root, name)
-                dst_file = f"{tmp_folder}{os.path.join(root, name).replace(str(walk_dir),'')}"
+                org_file = Path(root) / name
+                zip_file_path = Path(str(org_file).replace(str(walk_dir) + "/", ""))
+
+                dst_file = tmp_zip_folder / zip_file_path
+                dst_file.parent.mkdir(parents=True, exist_ok=True)
+
                 LOGGER.debug("org_file={} dst_file={}".format(org_file, dst_file))
+                if dst_file.name.endswith(".tpl"):
+                    rendered_file = await self.render_tak_manifest_template(org_file)
+                    # Missionpackage zip specific peculiarities here
+                    if is_mission_package:
+                        if rendered_file.name == "manifest.xml":
+                            await self.tak_missionpackage_extras(rendered_file, tmp_zip_folder)
 
-                if dst_file.endswith(".tpl"):
-                    with open(org_file, "r", encoding="utf-8") as filehandle:
-                        template = Template(filehandle.read())
-
-                    rendered_template = await self.render_tak_manifest_template(
-                        template=template, app_version=app_version
-                    )
-                    new_dst_file = dst_file.replace(".tpl", "")
-                    if new_dst_file.endswith("manifest.xml"):
-                        await self.tak_manifest_extra(rendered_template, str(tmp_folder))
-                    # For itak use blueteam.pref.tpl
-                    if app_version == "itak" and new_dst_file.endswith("blueteam.pref"):
-                        await self.tak_manifest_extra(rendered_template, str(tmp_folder))
-
-                    with open(new_dst_file, "w", encoding="utf-8") as filehandle:
-                        filehandle.write(rendered_template)
+                    shutil.copy(rendered_file, str(dst_file).replace(".tpl", ""))
 
                 else:
                     shutil.copy(org_file, dst_file)
 
-        await self.zip_folder_content(str(tmp_folder), str(tmp_folder))
+        await self.zip_folder_content(str(tmp_zip_folder), str(tmp_zip_folder))
 
-        return f"{tmp_folder}.zip"
+        return Path(f"{tmp_zip_folder}.zip")
 
     async def create_tak_network_mesh_key(self) -> str:
         """Return tak network mesh key"""
         mesh_key_sha256: str = hashlib.sha256(config.TAK_SERVER_NETWORKMESH_KEY_STR.encode("utf-8")).hexdigest()
         return mesh_key_sha256
 
-    async def render_tak_manifest_template(self, template: Template, app_version: str) -> str:
+    async def render_tak_manifest_template(self, template_file: Path) -> Path:
         """Render tak manifest template"""
-        pkguid = uuid.uuid5(uuid.NAMESPACE_URL, f"{config.TAK_SERVER_FQDN}/{self.user.user.uuid}/{app_version}")
+        pkguid = uuid.uuid5(uuid.NAMESPACE_URL, f"{config.TAK_SERVER_FQDN}/{self.user.user.uuid}/{template_file.name}")
         tak_network_mesh_key = await self.create_tak_network_mesh_key()
-        return template.render(
+
+        with open(template_file, "r", encoding="utf-8") as filehandle:
+            template = Template(filehandle.read())
+
+        rendered_template_str: str = template.render(
             tak_server_uid_name=str(pkguid),
             tak_server_name=config.TAK_SERVER_NAME,
             tak_server_address=config.TAK_SERVER_FQDN,
@@ -286,22 +316,30 @@ class MissionZip:
             tak_network_mesh_key=tak_network_mesh_key,
         )
 
+        tmp_template_file = Path(tempfile.gettempdir()) / template_file.name.replace(".tpl", "")
+        with open(tmp_template_file, "w", encoding="utf-8") as filehandle:
+            filehandle.write(rendered_template_str)
+
+        return tmp_template_file
+
     async def zip_folder_content(self, zipfile: str, tmp_folder: str) -> None:
         """Zip folder content"""
         await asyncio.get_running_loop().run_in_executor(None, shutil.make_archive, zipfile, "zip", tmp_folder)
 
-    async def tak_manifest_extra(self, manifest: str, tmp_folder: str) -> None:
+    async def tak_missionpackage_extras(self, manifest_file: Path, tmp_folder: Path) -> None:
         """Check if there is some extra that needs to be done defined in manfiest"""
-        manifest_rows = manifest.splitlines()
+        manifest_rows = manifest_file.read_text().splitlines()
         for row in manifest_rows:
             # .p12 rows
             # <!--
             if "<!--" in row:
                 continue
-            if ".p12" in row:
-                await self.manifest_p12_row(row, tmp_folder)
 
-    async def manifest_p12_row(self, row: str, tmp_folder: str) -> None:
+            # Add certificate file to zip package
+            if ".p12" in row:
+                await self.tak_missionpackage_add_p12(row, tmp_folder)
+
+    async def tak_missionpackage_add_p12(self, row: str, tmp_folder: Path) -> None:
         """Handle manifest .p12 rows"""
         tmp_folder = await self.chk_manifest_file_extra_folder(row=row, tmp_folder=tmp_folder)
         # FIXME: do the blocking IO in executor
@@ -334,14 +372,14 @@ class MissionZip:
         else:
             raise RuntimeError("IDK what to do")
 
-    async def chk_manifest_file_extra_folder(self, row: str, tmp_folder: str) -> str:
+    async def chk_manifest_file_extra_folder(self, row: str, tmp_folder: Path) -> Path:
         """Check folder path from manifest, return updated path if folder was located"""
         xml_value: str = row.split(">")[1].split("<")[0]
         if "/" in xml_value:
-            manifest_file = Path(tmp_folder) / xml_value
+            manifest_file = tmp_folder / xml_value
             manifest_file.parent.mkdir(parents=True, exist_ok=True)
             LOGGER.info("File defined in manifest in folder {}".format(manifest_file.parent.absolute()))
-            return str(manifest_file.parent.absolute())
+            return manifest_file.parent.absolute()
         return tmp_folder
 
 
