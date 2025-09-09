@@ -2,11 +2,9 @@
 
 from pathlib import Path
 import logging
-import tempfile
-from jinja2 import Template
 
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 from libpvarki.middleware import MTLSHeader
 from libpvarki.schemas.product import UserCRUDRequest
 
@@ -19,9 +17,8 @@ LOGGER = logging.getLogger(__name__)
 router = APIRouter(dependencies=[Depends(MTLSHeader(auto_error=True))])
 
 
-@router.get("/{package_path:path}", response_class=FileResponse)
-async def return_datapackage_file(package_path: str) -> FileResponse:
-    # async def return_datapackage_file(user: UserCRUDRequest, package_path: str) -> FileResponse:
+@router.get("/{package_path:path}")
+async def return_datapackage_file(package_path: str) -> Response:
     """Return file from tak_datapackages. If file ends with .tpl, return rendered file"""
 
     # TODO is there need for user specific stuff? Need to find out how to get the userCrud...
@@ -35,24 +32,10 @@ async def return_datapackage_file(package_path: str) -> FileResponse:
     if not filepath.is_file():
         raise HTTPException(status_code=404, detail="Requested datapackage file not found")
 
-    # Return
     filename = package_path.split("/")[-1]
     if filename.endswith(".tpl"):
-        with open(filepath, "r", encoding="utf-8") as filehandle:
-            template = Template(filehandle.read())
-
         tak_missionpkg = tak_helpers.MissionZip(user)
-        app_version = package_path.split("/")[0]
-
-        rendered_template = await tak_missionpkg.render_tak_manifest_template(
-            template=template, app_version=app_version
-        )
-
-        new_filename = filename.replace(".tpl", "")
-        tmp_template_file = Path(tempfile.gettempdir()) / new_filename
-        with open(tmp_template_file, "w", encoding="utf-8") as filehandle:
-            filehandle.write(rendered_template)
-
-        return FileResponse(tmp_template_file, filename=new_filename)
+        rendered_file_str = await tak_missionpkg.render_tak_manifest_template(Path(filepath))
+        return Response(rendered_file_str.encode(encoding="utf-8"), media_type="text/plain")
 
     return FileResponse(filepath)

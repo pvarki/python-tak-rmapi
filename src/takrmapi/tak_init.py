@@ -5,6 +5,7 @@ import logging
 import shutil
 import secrets
 import string
+import tempfile
 from pathlib import Path
 
 from libpvarki.schemas.product import UserCRUDRequest
@@ -96,6 +97,7 @@ async def setup_tak_defaults() -> None:
     default_profile_available = await t_rest_helper.tak_api_get_device_profile(profile_name="Default-ATAK")
     LOGGER.info(default_profile_available)
     if "status" in default_profile_available["data"] and default_profile_available["data"]["status"] == "NOT_FOUND":
+        tak_missionpkg = tak_helpers.MissionZip(user)
         LOGGER.info("Default-ATAK profile missing. Adding profile.")
         await t_rest_helper.tak_api_add_device_profile(profile_name="Default-ATAK", groups=["default"])
         await t_rest_helper.tak_api_update_device_profile(
@@ -109,12 +111,44 @@ async def setup_tak_defaults() -> None:
                 "groups": ["default"],
             },
         )
-        await t_rest_helper.tak_api_upload_file_to_profile(
-            profile_name="Default-ATAK",
-            file_path=Path(
-                config.TEMPLATES_PATH / "tak_datapackage" / "default" / "ATAK default settings" / "TAK_defaults.pref"
-            ),
+
+        # Upload default files to profile
+
+        for profile_file in config.TAK_DATAPACKAGE_DEFAULT_PROFILE_FILES:
+            if profile_file.name.endswith(".tpl"):
+                profile_file_str = await tak_missionpkg.render_tak_manifest_template(profile_file)
+
+                # TODO tmpfile in memory
+                tmp_folder = Path(tempfile.mkdtemp(suffix=f"_{user.callsign}"))
+                tmp_template_file = tmp_folder / profile_file.name.replace(".tpl", "")
+
+                with open(tmp_template_file, "w", encoding="utf-8") as filehandle:
+                    filehandle.write(profile_file_str)
+
+                await t_rest_helper.tak_api_upload_file_to_profile(
+                    profile_name="Default-ATAK",
+                    file_path=tmp_template_file,
+                )
+
+                await tak_missionpkg.helpers.remove_tmp_dir(str(tmp_folder))
+
+            else:
+                await t_rest_helper.tak_api_upload_file_to_profile(
+                    profile_name="Default-ATAK",
+                    file_path=profile_file,
+                )
+
+        # Create zip bundles and upload to profile
+
+        zip_files, tmp_folder = await tak_missionpkg.create_zip_bundles(
+            template_folders=config.TAK_DATAPACKAGE_DEFAULT_PROFILE_ZIP_PACKAGES, is_mission_package=False
         )
+        for file in zip_files:
+            await t_rest_helper.tak_api_upload_file_to_profile(
+                profile_name="Default-ATAK",
+                file_path=file,
+            )
+        await tak_missionpkg.helpers.remove_tmp_dir(str(tmp_folder))
 
 
 async def get_tak_defaults() -> None:

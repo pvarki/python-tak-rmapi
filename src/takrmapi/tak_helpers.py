@@ -192,92 +192,91 @@ class MissionZip:
     def __init__(self, user: UserCRUD):
         self.user: UserCRUD = user
         self.helpers = Helpers(self.user)
-        self.missionpkg = config.TAK_MISSIONPKG_DEFAULT_MISSION
 
-    async def create_missionpkg(self) -> Tuple[list[str], Path]:
+    # async def c(self) -> Tuple[list[str], Path]:
+    async def create_zip_bundles(
+        self, template_folders: list[Path], is_mission_package: bool = False
+    ) -> Tuple[list[Path], Path]:
         """Create tak mission package packages to different app versions"""
-        # FIXME: Use Paths until absolutely have to convert to strings
-        tmp_folder = Path(tempfile.mkdtemp(suffix=f"_{self.user.callsign}_{self.missionpkg}"))
-        walk_dir = Path(config.TAK_MISSIONPKG_TEMPLATES_FOLDER) / self.missionpkg
+        # TODO tmpfile in memory
+        tmp_folder = Path(tempfile.mkdtemp(suffix=f"_{self.user.callsign}"))
+
         tasks: List[asyncio.Task[Any]] = []
-        # FIXME: maybe just do this dynamically for all subdirs under templates ?
-        if os.path.exists(f"{walk_dir}/atak"):
-            LOGGER.info("Adding ATAK zip generation task")
-            tasks.append(
-                asyncio.create_task(self.create_mission_zip(tmp_folder, app_version="atak", walk_dir=walk_dir / "atak"))
-            )
-        if os.path.exists(f"{walk_dir}/itak"):
-            LOGGER.info("Adding iTAK zip generation task")
-            tasks.append(
-                asyncio.create_task(self.create_mission_zip(tmp_folder, app_version="itak", walk_dir=walk_dir / "itak"))
-            )
-        if os.path.exists(f"{walk_dir}/tak-tracker"):
-            LOGGER.info("Adding taktracker zip generation task")
-            tasks.append(
-                asyncio.create_task(
-                    self.create_mission_zip(tmp_folder, app_version="tak-tracker", walk_dir=walk_dir / "tak-tracker")
+        for t_folder in template_folders:
+            LOGGER.info("Added {} to background tasks".format(t_folder.name))
+
+            if t_folder.is_dir():
+                tasks.append(
+                    asyncio.create_task(
+                        self.create_mission_zip(tmp_folder, walk_dir=t_folder, is_mission_package=is_mission_package)
+                    )
                 )
-            )
-        # wintak and atak-mini removed, there are some issues with 5 packages.
-        LOGGER.debug("Waiting for the zip tasks")
+            else:
+                raise ValueError("'{}' is file. create_zip_bundles works only with directories.".format(t_folder.name))
+
+        LOGGER.debug("Waiting for the zip tasks to finish")
         returnable = await asyncio.gather(*tasks)
-        LOGGER.info("Tasks done")
+        LOGGER.info("Background zipping tasks done")
         return returnable, tmp_folder
 
     async def create_mission_zip(  # pylint: disable=too-many-locals
-        self, tmp_base: Path, app_version: str, walk_dir: Path
-    ) -> str:
+        self, tmp_base: Path, walk_dir: Path, is_mission_package: bool = False
+    ) -> Path:
         """Loop through files in missionpkg templates folder"""
         # TODO maybe in memory fs for tmp files...
 
         # FIXME: use Paths for everything
-        tmp_folder = tmp_base / app_version
-        tmp_folder.mkdir(parents=True, exist_ok=True)
-        for root, dirs, files in os.walk(walk_dir):
-            for name in dirs:
-                dirpath = f"{tmp_folder}{os.path.join(root, name).replace(str(walk_dir), '')}"
-                LOGGER.debug("Calling os.makedirs({})".format(dirpath))
-                os.makedirs(dirpath)
+
+        tmp_zip_folder = tmp_base / walk_dir.name
+        tmp_zip_folder.mkdir(parents=True, exist_ok=True)
+
+        LOGGER.debug("Moving files from '{}' to '{}' for bundling.".format(walk_dir, tmp_zip_folder))
+        for root, _, files in os.walk(walk_dir):
 
             for name in files:
-                org_file = os.path.join(root, name)
-                dst_file = f"{tmp_folder}{os.path.join(root, name).replace(str(walk_dir),'')}"
+                org_file = Path(root) / name
+                zip_file_path = Path(str(org_file).replace(str(walk_dir) + "/", ""))
+
+                dst_file = tmp_zip_folder / zip_file_path
+                dst_file.parent.mkdir(parents=True, exist_ok=True)
+
                 LOGGER.debug("org_file={} dst_file={}".format(org_file, dst_file))
+                if dst_file.name.endswith(".tpl"):
+                    rendered_file_str = await self.render_tak_manifest_template(org_file)
 
-                if dst_file.endswith(".tpl"):
-                    with open(org_file, "r", encoding="utf-8") as filehandle:
-                        template = Template(filehandle.read())
+                    dst_template_file = dst_file.parent / dst_file.name.replace(".tpl", "")
 
-                    rendered_template = await self.render_tak_manifest_template(
-                        template=template, app_version=app_version
-                    )
-                    new_dst_file = dst_file.replace(".tpl", "")
-                    if new_dst_file.endswith("manifest.xml"):
-                        await self.tak_manifest_extra(rendered_template, str(tmp_folder))
-                    # For itak use blueteam.pref.tpl
-                    if app_version == "itak" and new_dst_file.endswith("blueteam.pref"):
-                        await self.tak_manifest_extra(rendered_template, str(tmp_folder))
+                    LOGGER.debug("Handling template file -> '{}' for bundling.".format(dst_template_file))
+                    with open(dst_template_file, "w", encoding="utf-8") as filehandle:
+                        filehandle.write(rendered_file_str)
 
-                    with open(new_dst_file, "w", encoding="utf-8") as filehandle:
-                        filehandle.write(rendered_template)
+                    # Missionpackage zip specific peculiarities here
+                    if is_mission_package:
+                        if dst_template_file.name == "manifest.xml":
+                            await self.tak_missionpackage_extras(dst_template_file, tmp_zip_folder)
 
                 else:
                     shutil.copy(org_file, dst_file)
 
-        await self.zip_folder_content(str(tmp_folder), str(tmp_folder))
+        await self.zip_folder_content(str(tmp_zip_folder), str(tmp_zip_folder))
 
-        return f"{tmp_folder}.zip"
+        return Path(f"{tmp_zip_folder}.zip")
 
     async def create_tak_network_mesh_key(self) -> str:
         """Return tak network mesh key"""
         mesh_key_sha256: str = hashlib.sha256(config.TAK_SERVER_NETWORKMESH_KEY_STR.encode("utf-8")).hexdigest()
         return mesh_key_sha256
 
-    async def render_tak_manifest_template(self, template: Template, app_version: str) -> str:
+    # async def render_tak_manifest_template(self, template_file: Path) -> Path:
+    async def render_tak_manifest_template(self, template_file: Path) -> str:
         """Render tak manifest template"""
-        pkguid = uuid.uuid5(uuid.NAMESPACE_URL, f"{config.TAK_SERVER_FQDN}/{self.user.user.uuid}/{app_version}")
+        pkguid = uuid.uuid5(uuid.NAMESPACE_URL, f"{config.TAK_SERVER_FQDN}/{self.user.user.uuid}/{template_file.name}")
         tak_network_mesh_key = await self.create_tak_network_mesh_key()
-        return template.render(
+
+        with open(template_file, "r", encoding="utf-8") as filehandle:
+            template = Template(filehandle.read())
+
+        rendered_template_str: str = template.render(
             tak_server_uid_name=str(pkguid),
             tak_server_name=config.TAK_SERVER_NAME,
             tak_server_address=config.TAK_SERVER_FQDN,
@@ -286,22 +285,31 @@ class MissionZip:
             tak_network_mesh_key=tak_network_mesh_key,
         )
 
+        # tmp_template_file = Path(tempfile.gettempdir()) / template_file.name.replace(".tpl", "")
+
+        # with open(tmp_template_file, "w", encoding="utf-8") as filehandle:
+        #    filehandle.write(rendered_template_str)
+
+        return rendered_template_str
+
     async def zip_folder_content(self, zipfile: str, tmp_folder: str) -> None:
         """Zip folder content"""
         await asyncio.get_running_loop().run_in_executor(None, shutil.make_archive, zipfile, "zip", tmp_folder)
 
-    async def tak_manifest_extra(self, manifest: str, tmp_folder: str) -> None:
+    async def tak_missionpackage_extras(self, manifest_file: Path, tmp_folder: Path) -> None:
         """Check if there is some extra that needs to be done defined in manfiest"""
-        manifest_rows = manifest.splitlines()
+        manifest_rows = manifest_file.read_text().splitlines()
         for row in manifest_rows:
             # .p12 rows
             # <!--
             if "<!--" in row:
                 continue
-            if ".p12" in row:
-                await self.manifest_p12_row(row, tmp_folder)
 
-    async def manifest_p12_row(self, row: str, tmp_folder: str) -> None:
+            # Add certificate file to zip package
+            if ".p12" in row:
+                await self.tak_missionpackage_add_p12(row, tmp_folder)
+
+    async def tak_missionpackage_add_p12(self, row: str, tmp_folder: Path) -> None:
         """Handle manifest .p12 rows"""
         tmp_folder = await self.chk_manifest_file_extra_folder(row=row, tmp_folder=tmp_folder)
         # FIXME: do the blocking IO in executor
@@ -334,14 +342,14 @@ class MissionZip:
         else:
             raise RuntimeError("IDK what to do")
 
-    async def chk_manifest_file_extra_folder(self, row: str, tmp_folder: str) -> str:
+    async def chk_manifest_file_extra_folder(self, row: str, tmp_folder: Path) -> Path:
         """Check folder path from manifest, return updated path if folder was located"""
         xml_value: str = row.split(">")[1].split("<")[0]
         if "/" in xml_value:
-            manifest_file = Path(tmp_folder) / xml_value
+            manifest_file = tmp_folder / xml_value
             manifest_file.parent.mkdir(parents=True, exist_ok=True)
             LOGGER.info("File defined in manifest in folder {}".format(manifest_file.parent.absolute()))
-            return str(manifest_file.parent.absolute())
+            return manifest_file.parent.absolute()
         return tmp_folder
 
 
