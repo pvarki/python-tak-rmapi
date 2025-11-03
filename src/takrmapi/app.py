@@ -13,7 +13,7 @@ from libpvarki.logging import init_logging
 from takrmapi import __version__
 from takrmapi import tak_init, config
 from .config import LOG_LEVEL
-from .api import all_routers
+from .api import all_routers, all_routers_v2
 
 
 LOGGER = logging.getLogger(__name__)
@@ -55,7 +55,7 @@ def get_app_no_init() -> FastAPI:
     """App init with lifespan"""
     app = FastAPI(docs_url="/api/docs", openapi_url="/api/openapi.json", lifespan=app_lifespan, version=__version__)
     app.include_router(router=all_routers, prefix="/api/v1")
-
+    app.include_router(router=all_routers_v2, prefix="/api/v2")
     return app
 
 

@@ -11,6 +11,8 @@ from .description import router as description_router
 from .instructions import router as instructions_router
 from .tak_datapackage import router as takdatapackage_router
 
+from .userinfo import router as userinfo_router
+
 all_routers = APIRouter()
 all_routers.include_router(testing_router, prefix="/users", tags=["users"])  # REMOVE ME
 all_routers.include_router(usercrud_router, prefix="/users", tags=["users"])
@@ -20,3 +22,6 @@ all_routers.include_router(healthcheck_router, prefix="/healthcheck", tags=["hea
 all_routers.include_router(description_router, prefix="/description", tags=["description"])
 all_routers.include_router(instructions_router, prefix="/instructions", tags=["instructions"])
 all_routers.include_router(takdatapackage_router, prefix="/tak-datapackages", tags=["tak-datapackages"])
+
+all_routers_v2 = APIRouter()
+all_routers_v2.include_router(userinfo_router, prefix="/clients", tags=["clients"])
