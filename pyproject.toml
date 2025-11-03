@@ -49,6 +49,7 @@ max-parents = 10
 
 [tool.pylint.messages_control]
 disable=["fixme", "W1202", "C0209"]
+extension-pkg-whitelist = "pydantic"
 
 [tool.pylint.similarities]
 min-similarity-lines = 8
