@@ -2,13 +2,12 @@
 
 import logging
 import base64
-from typing import List, Dict, Any
 from fastapi import APIRouter, Depends
 from libpvarki.middleware import MTLSHeader
 from libpvarki.schemas.product import UserCRUDRequest
-from .schemas import ClientInstructionData, ClientInstructionResponse
-
 from takrmapi import tak_helpers
+from .schemas import TakZipFile, ClientInstructionData, ClientInstructionResponse
+
 from ..config import TAK_MISSIONPKG_ENABLED_PACKAGES
 
 LOGGER = logging.getLogger(__name__)
@@ -24,17 +23,18 @@ async def client_instruction_fragment(user: UserCRUDRequest) -> ClientInstructio
     zip_files, tmp_folder = await tak_missionpkg.create_zip_bundles(
         template_folders=TAK_MISSIONPKG_ENABLED_PACKAGES, is_mission_package=True
     )
-    returnable = []
 
+    tak_zips = []
     for file in zip_files:
         contents = file.read_bytes()
-        returnable.append(
-            {
-                "title": file.name,
-                "filename": f"{user.callsign}_{file.name}",
-                "data": f"data:application/zip;base64,{base64.b64encode(contents).decode('ascii')}",
-            }
+        tak_zips.append(
+            TakZipFile(
+                title=file.name,
+                filename=f"{user.callsign}_{file.name}",
+                data=f"data:application/zip;base64,{base64.b64encode(contents).decode('ascii')}",
+            )
         )
+
     await tak_missionpkg.helpers.remove_tmp_dir(str(tmp_folder))
 
-    return ClientInstructionResponse(data={"tak_zips": returnable})
+    return ClientInstructionResponse(data=ClientInstructionData(tak_zips=tak_zips))
