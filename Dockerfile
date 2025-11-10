@@ -151,6 +151,8 @@ FROM builder_base as devel_build
 # Install deps
 COPY . /app
 COPY ./ui /ui/
+WORKDIR /ui
+RUN CI=true pnpm install && pnpm build
 WORKDIR /app
 RUN --mount=type=ssh source /.venv/bin/activate \
     && poetry install --no-interaction --no-ansi \
@@ -162,7 +164,6 @@ RUN --mount=type=ssh source /.venv/bin/activate \
 #############
 FROM devel_build as test
 WORKDIR /ui
-RUN CI=true pnpm install && pnpm build
 RUN mkdir -p /ui_build && cp -r dist/* /ui_build/
 WORKDIR /app
 ENTRYPOINT ["/usr/bin/tini", "--", "docker/entrypoint-test.sh"]
@@ -179,9 +180,8 @@ RUN --mount=type=ssh source /.venv/bin/activate \
 ###########
 FROM devel_build as devel_shell
 # Copy everything to the image
-COPY --from=pvarki/kw_product_init:latest /kw_product_init /kw_product_init
 WORKDIR /ui
-RUN CI=true pnpm install && pnpm build
+COPY --from=pvarki/kw_product_init:latest /kw_product_init /kw_product_init
 RUN mkdir -p /ui_build && cp -r dist/* /ui_build/
 WORKDIR /app
 RUN apt-get update && apt-get install -y zsh \
