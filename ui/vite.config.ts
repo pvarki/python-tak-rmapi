@@ -1,37 +1,57 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import { federation } from '@module-federation/vite';
-import path from 'path';
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import { federation } from "@module-federation/vite";
+import path from "path";
+import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig(({ mode }) => {
-  const isProd = mode === 'production';
+  const isProd = mode === "production";
 
   return {
-    plugins: [
-      react(),
-      federation({
-        name: 'tak-integration',
-        filename: 'remoteEntry.js',
-        exposes: {
-          './remote-ui': './src/App.tsx',
+    server: {
+      fs: {
+        allow: [".", "../shared"],
+      },
+      proxy: {
+        "/ui/tak": {
+          target: "http://localhost:4174",
+          rewrite: (path) => path.replace(/^\/ui\/tak/, ""),
         },
-        shared: {
-          react: { singleton: true, requiredVersion: '18.3.1' },
-          'react-dom': { singleton: true, requiredVersion: '18.3.1' },
-        },
-        runtime: '@module-federation/enhanced/runtime',
-      }),
-    ],
-    build: {
-      target: 'esnext',
-      outDir: 'dist',
-      emptyOutDir: true,
-      rollupOptions: {
-        preserveEntrySignatures: 'exports-only',
       },
     },
+    build: {
+      target: "chrome89",
+      emptyOutDir: true,
+      rollupOptions: {
+        preserveEntrySignatures: "exports-only",
+      },
+    },
+    plugins: [
+      federation({
+        filename: "remoteEntry.js",
+        name: "tak-integration",
+        exposes: {
+          "./remote-ui": "./src/App.tsx",
+        },
+        remotes: {},
+        shared: {
+          react: {
+            requiredVersion: "19.1.1",
+            singleton: true,
+          },
+        },
+        runtime: "@module-federation/enhanced/runtime",
+      }),
+      react(),
+      tailwindcss(),
+    ],
     resolve: {
-      alias: { '@': path.resolve(__dirname, './src') },
+      alias: { "@": path.resolve(__dirname, "./src") },
+    },
+    define: {
+      __USE_GLOBAL_CSS__: JSON.stringify(
+        process.env.VITE_USE_GLOBAL_CSS === "true",
+      ),
     },
   };
 });
