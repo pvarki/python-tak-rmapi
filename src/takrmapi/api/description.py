@@ -94,24 +94,22 @@ async def return_product_description_extended(language: str) -> ProductDescripti
     """Fetch description from each product in manifest"""
 
     if language == "fi":
-        # FIXME: Localize
         return ProductDescriptionExtended(
             shortname="tak",
             title="TAK: Team Awareness Kit",
             icon=None,
-            description="Situational awareness system",
-            language="en",
+            description="Tilannekuvajärjestelmä",
+            language="fi",
             docs="https://pvarki.github.io/Docusaurus-docs/docs/android/deployapp/home/",
             component=ProductComponent(type="component", ref="/ui/tak/remoteEntry.js"),
         )
     if language == "sv":
-        # FIXME: Localize
         return ProductDescriptionExtended(
             shortname="tak",
             title="TAK: Team Awareness Kit",
             icon=None,
-            description="Situational awareness system",
-            language="en",
+            description="Situationsbildsystem",
+            language="sv",
             docs="https://pvarki.github.io/Docusaurus-docs/docs/android/deployapp/home/",
             component=ProductComponent(type="component", ref="/ui/tak/remoteEntry.js"),
         )
