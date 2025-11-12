@@ -1,13 +1,18 @@
 {
   "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
     "composite": true,
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "allowSyntheticDefaultImports": true,
-    "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": [
+        "./src/*"
+      ]
     }
   },
-  "include": ["vite.config.ts", "module-federation/vite-importmap-shim.ts"]
+  "include": [
+    "vite.config.ts",
+    "module-federation/vite-importmap-shim.ts"
+  ]
 }
