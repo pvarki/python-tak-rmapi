@@ -5,7 +5,7 @@
 mkdir -p /ui_files/tak
 if [ -d "/ui_build" ]; then
     echo "Copying UI files from /ui_build → /ui_files/tak ..."
-    cp /ui_build/* /ui_files/tak/
+    cp -r /ui_build/* /ui_files/tak/
 else
     echo "No UI found at /ui_build, skipping copy."
 fi
