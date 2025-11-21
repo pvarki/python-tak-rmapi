@@ -1,0 +1,45 @@
+{
+  "intro": {
+    "title": "TAK",
+    "description": "TAK (Team Awareness Kit): En GPS-baserad plattform för spårning av egna styrkor i realtid, delning av observationer och mottagning av lägesuppdateringar."
+  },
+  "platform": {
+    "choose": "Välj plattform",
+    "select_placeholder": "Välj plattform",
+
+    "android": "ATAK",
+    "ios": "iTAK",
+    "windows": "WinTAK",
+    "tracker": "TAK Tracker"
+  },
+  "loading": {
+    "user_data": "Laddar användardata..."
+  },
+  "tabs": {
+    "android": {
+      "title": "Installation av ATAK-paket",
+      "step1_download": "Ladda ner zip-paketet:",
+      "step2_install": "Importera paketet till appen.",
+      "step3_done": "ATAK är redo att användas."
+    },
+    "ios": {
+      "title": "Installation av iTAK-paket",
+      "step1_download": "Ladda ner zip-paketet:",
+      "step2_install": "Importera paketet till appen.",
+      "step3_done": "iTAK är redo att användas."
+    },
+    "windows": {
+      "title": "Installation av WinTAK-paket",
+      "step1_download": "Ladda ner zip-paketet:",
+      "step1_note": "WinTAK använder samma paket som ATAK",
+      "step2_install": "Importera paketet till appen.",
+      "step3_done": "WinTAK är redo att användas."
+    },
+    "tracker": {
+      "title": "Installation av TAK Tracker-paket",
+      "step1_download": "Ladda ner zip-paketet:",
+      "step2_install": "Importera paketet till appen.",
+      "step3_done": "TAK Tracker är redo att användas."
+    }
+  }
+}

@@ -17,6 +17,7 @@ import { useTranslation } from "react-i18next";
 
 import enLang from "./locales/en.json";
 import fiLang from "./locales/fi.json";
+import svLang from "./locales/sv.json";
 
 interface Props {
   data: {
@@ -47,6 +48,7 @@ export default ({ data }: Props) => {
       // English is the only requirement due to it being the fallback language frontend.
       i18n.addResourceBundle("en", PRODUCT_SHORTNAME, enLang)
       i18n.addResourceBundle("fi", PRODUCT_SHORTNAME, fiLang)
+      i18n.addResourceBundle("sv", PRODUCT_SHORTNAME, svLang)
 
       await i18n.loadNamespaces(PRODUCT_SHORTNAME)
       
