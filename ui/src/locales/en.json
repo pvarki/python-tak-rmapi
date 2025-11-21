@@ -1,0 +1,48 @@
+{
+  "intro": {
+    "title": "TAK",
+    "description": "TAK (Team Awareness Kit): A GPS-enabled platform for real-time tracking of friendly forces, sharing observations, and receiving command updates."
+  },
+  "platform": {
+    "choose": "Choose your platform",
+    "select_placeholder": "Select platform",
+
+    "android": "ATAK",
+    "ios": "iTAK",
+    "windows": "WinTAK",
+    "tracker": "TAK Tracker"
+  },
+  "loading": {
+    "user_data": "Loading user data..."
+  },
+  "tabs": {
+    "android": {
+      "title": "ATAK Package Installation",
+      "step1_download": "Download the zip package:",
+      "step2_install": "Import the package.",
+      "step3_done": "Done, ATAK is ready to use."
+    },
+
+    "ios": {
+      "title": "iTAK Package Installation",
+      "step1_download": "Download the zip package:",
+      "step2_install": "Import the package.",
+      "step3_done": "Done, iTAK is ready to use."
+    },
+
+    "windows": {
+      "title": "WinTAK Package Installation",
+      "step1_download": "Download the zip package:",
+      "step1_note": "WinTAK uses the same package as ATAK",
+      "step2_install": "Import the package.",
+      "step3_done": "Done, WinTAK is ready to use."
+    },
+
+    "tracker": {
+      "title": "TAK Tracker Package Installation",
+      "step1_download": "Download the zip package:",
+      "step2_install": "Import the package.",
+      "step3_done": "Done, TAK Tracker is ready to use."
+    }
+  }
+}

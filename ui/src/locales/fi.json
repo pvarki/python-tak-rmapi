@@ -1,0 +1,45 @@
+{
+  "intro": {
+    "title": "TAK",
+    "description": "TAK (Team Awareness Kit): GPS-pohjainen alusta reaaliaikaiseen omien joukkojen seurantaan, havaintojen jakamiseen ja tilannepäivitysten vastaanottamiseen."
+  },
+  "platform": {
+    "choose": "Valitse alusta",
+    "select_placeholder": "Valitse alusta",
+
+    "android": "ATAK",
+    "ios": "iTAK",
+    "windows": "WinTAK",
+    "tracker": "TAK Tracker"
+  },
+  "loading": {
+    "user_data": "Ladataan käyttäjän tietoja..."
+  },
+  "tabs": {
+    "android": {
+      "title": "ATAK-paketin asennus",
+      "step1_download": "Lataa zip-paketti:",
+      "step2_install": "Tuo paketti sovellukseen.",
+      "step3_done": "ATAK on käyttövalmis."
+    },
+    "ios": {
+      "title": "iTAK-paketin asennus",
+      "step1_download": "Lataa zip-paketti:",
+      "step2_install": "Tuo paketti sovellukseen.",
+      "step3_done": "iTAK on käyttövalmis."
+    },
+    "windows": {
+      "title": "WinTAK-paketin asennus",
+      "step1_download": "Lataa zip-paketti:",
+      "step1_note": "WinTAK käyttää samaa pakettia, kuin ATAK",
+      "step2_install": "Tuo paketti sovellukseen.",
+      "step3_done": "WinTAK on käyttövalmis."
+    },
+    "tracker": {
+      "title": "TAK Tracker -paketin asennus",
+      "step1_download": "Lataa zip-paketti:",
+      "step2_install": "Tuo paketti sovellukseen.",
+      "step3_done": "TAK Tracker on käyttövalmis."
+    }
+  }
+}

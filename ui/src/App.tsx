@@ -1,4 +1,4 @@
-import { detectOS, OS } from "./lib/detectOs";
+import { detectPlatform, Platform } from "./lib/detectPlatform";
 import { TAK_Zip } from "./lib/interfaces";
 import { AndroidTab } from "./components/tabs/AndroidTab";
 import { IosTab } from "./components/tabs/IosTab";
@@ -11,8 +11,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./components/ui/select";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Spinner } from "./components/ui/spinner";
+import { useTranslation } from "react-i18next";
+
+import enLang from "./locales/en.json";
+import fiLang from "./locales/fi.json";
 
 interface Props {
   data: {
@@ -20,74 +24,91 @@ interface Props {
   };
 }
 
-const osToIndex: Record<OS, number> = {
-  [OS.Android]: 0, // ATAK
-  [OS.iOS]: 1, // ITAK
-  [OS.Windows]: 0, // ATAK
-  [OS.Tracker]: 2, // Tracker
+const platformToIndex: Record<Platform, number> = {
+  [Platform.Android]: 0, // ATAK
+  [Platform.iOS]: 1, // ITAK
+  [Platform.Windows]: 0, // ATAK
+  [Platform.Tracker]: 2, // Tracker
 };
 
-export default ({ data }: Props) => {
-  const defaultOS = detectOS();
-  const [selectedOS, setSelectedOS] = useState<OS>(defaultOS);
+const PRODUCT_SHORTNAME = "tak"
 
-  const getZip = (system: OS) => data.tak_zips[osToIndex[system]];
+export default ({ data }: Props) => {
+  const defaultPlatform = detectPlatform();
+  const [platform, setPlatform] = useState<Platform>(defaultPlatform);
+
+  const [ready, setReady] = useState(false);
+
+  const { t, i18n } = useTranslation(PRODUCT_SHORTNAME);
+
+  useEffect(() => {
+    async function load(){
+      // Load whatever languages the product supports (recommended: en/fi/sv).
+      // English is the only requirement due to it being the fallback language frontend.
+      i18n.addResourceBundle("en", PRODUCT_SHORTNAME, enLang)
+      i18n.addResourceBundle("fi", PRODUCT_SHORTNAME, fiLang)
+
+      await i18n.loadNamespaces(PRODUCT_SHORTNAME)
+      
+      setReady(true)
+    }
+
+    load()
+  }, [])
+  
+  const getZip = (system: Platform) => data.tak_zips[platformToIndex[system]];
 
   return (
     <div className="max-w-3xl mx-auto p-4">
       <div>
-        <h1 className="text-2xl font-bold text-center">TAK</h1>
+        <h1 className="text-2xl font-bold text-center">{t("intro.title")}</h1>
         <div className="text-muted-foreground text-center mt-2">
-          <p>
-            TAK (Team Awareness Kit): A GPS-enabled platform for real-time
-            tracking of friendly forces, sharing observations, and receiving
-            command updates through a centralized Recon Feed.
-          </p>
+          <p>{t("intro.description")}</p>
         </div>
       </div>
 
       {data.tak_zips ? (
         <div className="mt-8 font-black">
-          <p className="text-center">Choose your platform</p>
+          <p className="text-center">{t("platform.choose")}</p>
           <div className="w-full mt-2">
             <Select
-              value={selectedOS}
-              onValueChange={(value) => setSelectedOS(value as OS)}
+              value={platform}
+              onValueChange={(value) => setPlatform(value as Platform)}
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select platform" />
+                <SelectValue placeholder={t("platform.select_placeholder")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={OS.Android}>
+                <SelectItem value={Platform.Android}>
                   <img src="/ui/tak/android.svg" className="h-4 inline mr-2" />{" "}
-                  ATAK
+                  {t("platform.android")}
                 </SelectItem>
-                <SelectItem value={OS.iOS}>
+                <SelectItem value={Platform.iOS}>
                   <img src="/ui/tak/apple.svg" className="h-4 inline mr-2" />{" "}
-                  iTAK
+                  {t("platform.ios")}
                 </SelectItem>
-                <SelectItem value={OS.Windows}>
+                <SelectItem value={Platform.Windows}>
                   <img src="/ui/tak/windows.svg" className="h-4 inline mr-2" />{" "}
-                  WinTAK
+                  {t("platform.windows")}
                 </SelectItem>
-                <SelectItem value={OS.Tracker}>
+                <SelectItem value={Platform.Tracker}>
                   <img src="/ui/tak/android.svg" className="h-4 inline mr-1" />{" "}
                   / <img src="/ui/tak/apple.svg" className="h-4 inline ml-1" />{" "}
-                  TAK Tracker
+                  {t("platform.tracker")}
                 </SelectItem>
               </SelectContent>
             </Select>
 
             <div className="mt-4">
-              {selectedOS === OS.Android && (
-                <AndroidTab zip={getZip(OS.Android)} />
+              {platform === Platform.Android && (
+                <AndroidTab zip={getZip(Platform.Android)} />
               )}
-              {selectedOS === OS.iOS && <IosTab zip={getZip(OS.iOS)} />}
-              {selectedOS === OS.Windows && (
-                <WindowsTab zip={getZip(OS.Windows)} />
+              {platform === Platform.iOS && <IosTab zip={getZip(Platform.iOS)} />}
+              {platform === Platform.Windows && (
+                <WindowsTab zip={getZip(Platform.Windows)} />
               )}
-              {selectedOS === OS.Tracker && (
-                <TrackerTab zip={getZip(OS.Tracker)} />
+              {platform === Platform.Tracker && (
+                <TrackerTab zip={getZip(Platform.Tracker)} />
               )}
             </div>
           </div>
@@ -95,7 +116,7 @@ export default ({ data }: Props) => {
       ) : (
         <div className="flex flex-col items-center justify-center w-full mt-8">
           <Spinner className="size-8 mb-4" />
-          <p className="text-accent-foreground">Loading user data...</p>
+          <p className="text-accent-foreground">{t("loading.user_data")}</p>
         </div>
       )}
     </div>
