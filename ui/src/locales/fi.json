@@ -1,45 +1,44 @@
 {
   "intro": {
-    "title": "TAK",
-    "description": "TAK (Team Awareness Kit): GPS-pohjainen alusta reaaliaikaiseen omien joukkojen seurantaan, havaintojen jakamiseen ja tilannepäivitysten vastaanottamiseen."
-  },
-  "platform": {
-    "choose": "Valitse alusta",
-    "select_placeholder": "Valitse alusta",
-
-    "android": "ATAK",
-    "ios": "iTAK",
-    "windows": "WinTAK",
-    "tracker": "TAK Tracker"
+    "description": "TAK (Team Awareness Kit): GPS-pohjainen alusta reaaliaikaiseen omien joukkojen seurantaan, havaintojen jakamiseen ja tilannep\u00e4ivitysten vastaanottamiseen.",
+    "title": "TAK"
   },
   "loading": {
-    "user_data": "Ladataan käyttäjän tietoja..."
+    "user_data": "Ladataan k\u00e4ytt\u00e4j\u00e4n tietoja..."
+  },
+  "platform": {
+    "android": "ATAK",
+    "choose": "Valitse alusta",
+    "ios": "iTAK",
+    "select_placeholder": "Valitse alusta",
+    "tracker": "TAK Tracker",
+    "windows": "WinTAK"
   },
   "tabs": {
     "android": {
-      "title": "ATAK-paketin asennus",
       "step1_download": "Lataa zip-paketti:",
       "step2_install": "Tuo paketti sovellukseen.",
-      "step3_done": "ATAK on käyttövalmis."
+      "step3_done": "ATAK on k\u00e4ytt\u00f6valmis.",
+      "title": "ATAK-paketin asennus"
     },
     "ios": {
-      "title": "iTAK-paketin asennus",
       "step1_download": "Lataa zip-paketti:",
       "step2_install": "Tuo paketti sovellukseen.",
-      "step3_done": "iTAK on käyttövalmis."
-    },
-    "windows": {
-      "title": "WinTAK-paketin asennus",
-      "step1_download": "Lataa zip-paketti:",
-      "step1_note": "WinTAK käyttää samaa pakettia, kuin ATAK",
-      "step2_install": "Tuo paketti sovellukseen.",
-      "step3_done": "WinTAK on käyttövalmis."
+      "step3_done": "iTAK on k\u00e4ytt\u00f6valmis.",
+      "title": "iTAK-paketin asennus"
     },
     "tracker": {
-      "title": "TAK Tracker -paketin asennus",
       "step1_download": "Lataa zip-paketti:",
       "step2_install": "Tuo paketti sovellukseen.",
-      "step3_done": "TAK Tracker on käyttövalmis."
+      "step3_done": "TAK Tracker on k\u00e4ytt\u00f6valmis.",
+      "title": "TAK Tracker -paketin asennus"
+    },
+    "windows": {
+      "step1_download": "Lataa zip-paketti:",
+      "step1_note": "WinTAK k\u00e4ytt\u00e4\u00e4 samaa pakettia, kuin ATAK",
+      "step2_install": "Tuo paketti sovellukseen.",
+      "step3_done": "WinTAK on k\u00e4ytt\u00f6valmis.",
+      "title": "WinTAK-paketin asennus"
     }
   }
 }

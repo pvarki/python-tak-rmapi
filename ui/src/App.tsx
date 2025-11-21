@@ -51,13 +51,13 @@ export default ({ data }: Props) => {
       i18n.addResourceBundle("sv", PRODUCT_SHORTNAME, svLang)
 
       await i18n.loadNamespaces(PRODUCT_SHORTNAME)
-      
+
       setReady(true)
     }
 
     load()
   }, [])
-  
+
   const getZip = (system: Platform) => data.tak_zips[platformToIndex[system]];
 
   return (

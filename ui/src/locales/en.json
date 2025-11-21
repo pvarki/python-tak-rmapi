@@ -1,48 +1,44 @@
 {
   "intro": {
-    "title": "TAK",
-    "description": "TAK (Team Awareness Kit): A GPS-enabled platform for real-time tracking of friendly forces, sharing observations, and receiving command updates."
-  },
-  "platform": {
-    "choose": "Choose your platform",
-    "select_placeholder": "Select platform",
-
-    "android": "ATAK",
-    "ios": "iTAK",
-    "windows": "WinTAK",
-    "tracker": "TAK Tracker"
+    "description": "TAK (Team Awareness Kit): A GPS-enabled platform for real-time tracking of friendly forces, sharing observations, and receiving command updates.",
+    "title": "TAK"
   },
   "loading": {
     "user_data": "Loading user data..."
   },
+  "platform": {
+    "android": "ATAK",
+    "choose": "Choose your platform",
+    "ios": "iTAK",
+    "select_placeholder": "Select platform",
+    "tracker": "TAK Tracker",
+    "windows": "WinTAK"
+  },
   "tabs": {
     "android": {
-      "title": "ATAK Package Installation",
       "step1_download": "Download the zip package:",
       "step2_install": "Import the package.",
-      "step3_done": "Done, ATAK is ready to use."
+      "step3_done": "Done, ATAK is ready to use.",
+      "title": "ATAK Package Installation"
     },
-
     "ios": {
-      "title": "iTAK Package Installation",
       "step1_download": "Download the zip package:",
       "step2_install": "Import the package.",
-      "step3_done": "Done, iTAK is ready to use."
+      "step3_done": "Done, iTAK is ready to use.",
+      "title": "iTAK Package Installation"
     },
-
+    "tracker": {
+      "step1_download": "Download the zip package:",
+      "step2_install": "Import the package.",
+      "step3_done": "Done, TAK Tracker is ready to use.",
+      "title": "TAK Tracker Package Installation"
+    },
     "windows": {
-      "title": "WinTAK Package Installation",
       "step1_download": "Download the zip package:",
       "step1_note": "WinTAK uses the same package as ATAK",
       "step2_install": "Import the package.",
-      "step3_done": "Done, WinTAK is ready to use."
-    },
-
-    "tracker": {
-      "title": "TAK Tracker Package Installation",
-      "step1_download": "Download the zip package:",
-      "step2_install": "Import the package.",
-      "step3_done": "Done, TAK Tracker is ready to use."
+      "step3_done": "Done, WinTAK is ready to use.",
+      "title": "WinTAK Package Installation"
     }
   }
 }
