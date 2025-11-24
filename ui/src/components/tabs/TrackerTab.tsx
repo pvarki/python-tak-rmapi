@@ -1,17 +1,20 @@
 import { TAK_Zip } from "@/lib/interfaces";
 import { ZipButton } from "../ZipButton";
+import { useTranslation } from "react-i18next";
 
 interface Props {
   zip: TAK_Zip;
 }
 
 export function TrackerTab({ zip }: Props) {
+  const { t } = useTranslation("tak");
+
   return (
     <div className="mt-4">
-      <p className="text-lg font-semibold">TAK Tracker Package Installation</p>
+      <p className="text-lg font-semibold">{t("tabs.tracker.title")}</p>
       <ol className="list-decimal list-inside space-y-4 mt-4">
         <li>
-          Download the zip package:
+          {t("tabs.tracker.step1_download")}
           <br />
           <ZipButton
             data={zip.data}
@@ -20,8 +23,8 @@ export function TrackerTab({ zip }: Props) {
             className="p-2"
           />
         </li>
-        <li>Install the package</li>
-        <li>Done, TAK Tracker is ready to use.</li>
+        <li>{t("tabs.tracker.step2_install")}</li>
+        <li>{t("tabs.tracker.step3_done")}</li>
       </ol>
     </div>
   );

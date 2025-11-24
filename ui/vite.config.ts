@@ -39,6 +39,14 @@ export default defineConfig(({ mode }) => {
             requiredVersion: "19.1.1",
             singleton: true,
           },
+          i18next: {
+            requiredVersion: "25.6.2",
+            singleton: true,
+          },
+          "react-i18next": {
+            requiredVersion: "16.3.3",
+            singleton: true
+          }
         },
         runtime: "@module-federation/enhanced/runtime",
       }),
