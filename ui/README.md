@@ -2,9 +2,17 @@
 
 ## Development
 
-While the federated component works both in rmlocal and rmdev, it is recommended to seperately develop the component. This is partly because the federated component is only built when rmlocal/rmdev is built and hence doesn't currently update in real time.
+### rmdev/rmlocal
 
-**Install dependencies and start the dev server**
+Federated components are built when rmdev or rmlocal is built. In rmdev the component is rebuilt after any changes. To see the changes just refresh your browser.
+
+
+
+### Using Vite dev server
+
+You can also develop components with just the vite dev server, but this is only recommended for simpler components.
+
+Install dependencies and start the dev server:
 
 ```bash
 pnpm install
@@ -27,13 +35,15 @@ When using these assets in code **always** prefix them with `/ui/{shortProductNa
 /ui/tak/taistelija.png
 ```
 
-This is required due to how things are included in the production. `vite.config.ts` rewrites the routes for local development.
+This is required due to how things are included in the production. `vite.config.ts` rewrites the routes if using vite dev server.
 
 
 
-## Sample Data
+## Getting data to the component
+DeployApp automatically fetches and passes user data for the component as props (if the API provides it). In federated components, it is possible to do API calls to other required endpoints.
 
-For developing components it is recommended to manually fetch the user data from the api, for example:
+
+If developing simple components using just the vite dev server, you can fetch the user data from the api. For example:
 
 ```
 https://localmaeher.dev.pvarki.fi:4439/api/v2/instructions/data/tak
@@ -41,10 +51,10 @@ https://localmaeher.dev.pvarki.fi:4439/api/v2/instructions/data/tak
 
 Paste the entire response into `src/main.tsx` as the value of `SAMPLE_DATA`.
 
-It is recommended to test what happens if no data is passed.
+It is recommended to test what happens if no data is passed as it might take a while for the api to return data.
 
 ## Styles
 
 `src/index.css` should reflect the styles of the main UI. It could be outdated, so it might be worth while to copy the file from the main UI here every once in a while.
 
-This file is **not** included in the production build. It is only used to make local development possible. In production the styles of main UI are used.
+This file is **not** included in the production build. It is only used to make development with the vite dev server possible. In production or rmdev the styles of main UI are used.
