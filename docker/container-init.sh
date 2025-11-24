@@ -1,9 +1,13 @@
 #!/bin/bash -l
 set -e
 # Resolve our magic names to docker internal ip
-sed 's/.*localmaeher.*//g' /etc/hosts >/etc/hosts.new && cat /etc/hosts.new >/etc/hosts
-echo "$(getent ahostsv4 host.docker.internal | awk '{ print $1 }') localmaeher.dev.pvarki.fi mtls.localmaeher.dev.pvarki.fi" >>/etc/hosts
+GW_IP=$(getent ahostsv4 host.docker.internal | grep RAW | awk '{ print $1 }')
+echo "GW_IP=$GW_IP"
+grep -v -F -e "$GW_IP"  -- /etc/hosts >/etc/hosts.new && cat /etc/hosts.new >/etc/hosts
+echo "$GW_IP localmaeher.dev.pvarki.fi mtls.localmaeher.dev.pvarki.fi" >>/etc/hosts
+echo "*** BEGIN /etc/hosts ***"
 cat /etc/hosts
+echo "*** END /etc/hosts ***"
 
 # Make sure /opt/tak and the symlinks to /opt/tak/data exist just in case something still
 # uses the old wrong paths
