@@ -638,7 +638,7 @@ allowGroupChange=false"
                 data = cast(Mapping[str, Union[Any, Mapping[str, Any]]], await resp.json(content_type=None))
 
             except aiohttp.ClientError:
-                return {"success": False, "data": []}
+                return {"success": False, "data": {}}
 
             return {"success": True, "data": data}
 
