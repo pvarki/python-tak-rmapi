@@ -81,7 +81,7 @@ async def return_product_description_extended(language: str) -> ProductDescripti
         return ProductDescriptionExtended(
             shortname="tak",
             title="TAK: Team Awareness Kit",
-            icon=None,
+            icon="/ui/tak/taklogo.svg",
             description="Tilannekuvajärjestelmä",
             language="fi",
             docs="https://pvarki.github.io/Docusaurus-docs/docs/android/deployapp/home/",
@@ -91,7 +91,7 @@ async def return_product_description_extended(language: str) -> ProductDescripti
         return ProductDescriptionExtended(
             shortname="tak",
             title="TAK: Team Awareness Kit",
-            icon=None,
+            icon="/ui/tak/taklogo.svg",
             description="Situationsbildsystem",
             language="sv",
             docs="https://pvarki.github.io/Docusaurus-docs/docs/android/deployapp/home/",
@@ -101,7 +101,7 @@ async def return_product_description_extended(language: str) -> ProductDescripti
     return ProductDescriptionExtended(
         shortname="tak",
         title="TAK: Team Awareness Kit",
-        icon=None,
+        icon="/ui/tak/taklogo.svg",
         description="Situational awareness system",
         language="en",
         docs="https://pvarki.github.io/Docusaurus-docs/docs/android/deployapp/home/",
