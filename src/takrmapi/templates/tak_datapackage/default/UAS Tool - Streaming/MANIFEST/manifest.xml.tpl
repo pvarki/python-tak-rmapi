@@ -6,7 +6,6 @@
       <Parameter name="onReceiveImport" value="true"/>
    </Configuration>
    <Contents>
-      <!-- Better scaling for map clarity -->
       <Content ignore="false" zipEntry="uastool-Streaming.pref"/>
    </Contents>
 </MissionPackageManifest>
