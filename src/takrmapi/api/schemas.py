@@ -7,10 +7,10 @@ from pydantic import BaseModel, Field, Extra
 class TakZipFile(BaseModel):  # pylint: disable=too-few-public-methods
     """Represents a single ZIP file containing mission data or product instructions."""
 
-    title: str = Field(..., description="Original filename or title of the zip file.")
-    filename: str = Field(..., description="Filename used for download, includes user callsign.")
+    title: str = Field(description="Original filename or title of the zip file.")
+    filename: str = Field(description="Filename used for download, includes user callsign.")
     data: str = Field(
-        ..., description="Base64-encoded zip file contents", example="data:application/zip;base64,UEsDBBQAAAAI..."
+        description="Base64-encoded zip file contents", examples=["data:application/zip;base64,UEsDBBQAAAAI..."]
     )
 
     class Config:  # pylint: disable=too-few-public-methods
@@ -22,7 +22,7 @@ class TakZipFile(BaseModel):  # pylint: disable=too-few-public-methods
 class ClientInstructionData(BaseModel):  # pylint: disable=too-few-public-methods
     """Container for a list of mission-related ZIP files sent to a client."""
 
-    tak_zips: List[TakZipFile] = Field(..., description="List of packaged mission zip files.")
+    tak_zips: List[TakZipFile] = Field(description="List of packaged mission zip files.")
 
     class Config:  # pylint: disable=too-few-public-methods
         """Pydantic configs"""
@@ -33,7 +33,7 @@ class ClientInstructionData(BaseModel):  # pylint: disable=too-few-public-method
 class ClientInstructionResponse(BaseModel):  # pylint: disable=too-few-public-methods
     """Response schema for returning client mission instructions."""
 
-    data: ClientInstructionData = Field(..., description="Container object for returned data.")
+    data: ClientInstructionData = Field(description="Container object for returned data.")
 
     class Config:  # pylint: disable=too-few-public-methods
         """Pydantic configs"""
