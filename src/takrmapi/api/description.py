@@ -4,6 +4,7 @@ from typing import Optional, Literal
 import logging
 
 from fastapi import APIRouter
+from pydantic import BaseModel, Field, Extra
 from libpvarki.schemas.product import ProductDescription
 
 LOGGER = logging.getLogger(__name__)
