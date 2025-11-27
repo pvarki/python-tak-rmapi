@@ -3,7 +3,7 @@
 import logging
 import base64
 from typing import List, Dict
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, BackgroundTasks
 from libpvarki.middleware import MTLSHeader
 from libpvarki.schemas.product import UserCRUDRequest
 
@@ -16,8 +16,7 @@ router = APIRouter(dependencies=[Depends(MTLSHeader(auto_error=True))])
 
 
 @router.post("/fragment", deprecated=True)
-# async def get_missionpkg(user_mission: UserMissionZipRequest) -> List[Dict[str, str]]:
-async def client_instruction_fragment(user: UserCRUDRequest) -> List[Dict[str, str]]:
+async def client_instruction_fragment(user: UserCRUDRequest, background_tasks: BackgroundTasks) -> List[Dict[str, str]]:
     """Return zip package containing client config and certificates"""
     localuser = tak_helpers.UserCRUD(user)
     tak_missionpkg = tak_helpers.MissionZip(localuser)
@@ -35,5 +34,8 @@ async def client_instruction_fragment(user: UserCRUDRequest) -> List[Dict[str, s
                 "filename": f"{user.callsign}_{file.name}",
             }
         )
-    await tak_missionpkg.helpers.remove_tmp_dir(str(tmp_folder))
+
+    # Remove/clear temp in background
+    background_tasks.add_task(tak_missionpkg.helpers.remove_tmp_dir, tmp_folder)
+
     return returnable

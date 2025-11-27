@@ -130,7 +130,7 @@ async def setup_tak_defaults() -> None:
                     file_path=tmp_template_file,
                 )
 
-                await tak_missionpkg.helpers.remove_tmp_dir(str(tmp_folder))
+                await tak_missionpkg.helpers.remove_tmp_dir(tmp_folder)
 
             else:
                 await t_rest_helper.tak_api_upload_file_to_profile(
@@ -148,7 +148,7 @@ async def setup_tak_defaults() -> None:
                 profile_name="Default-ATAK",
                 file_path=file,
             )
-        await tak_missionpkg.helpers.remove_tmp_dir(str(tmp_folder))
+        await tak_missionpkg.helpers.remove_tmp_dir(tmp_folder)
 
 
 async def get_tak_defaults() -> None:

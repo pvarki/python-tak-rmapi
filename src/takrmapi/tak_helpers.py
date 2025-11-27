@@ -198,6 +198,7 @@ class MissionZip:
         self, template_folders: list[Path], is_mission_package: bool = False
     ) -> Tuple[list[Path], Path]:
         """Create tak mission package packages to different app versions"""
+
         # TODO tmpfile in memory
         tmp_folder = Path(tempfile.mkdtemp(suffix=f"_{self.user.callsign}"))
 
@@ -360,10 +361,11 @@ class Helpers:
         """Helpers init"""
         self.user: UserCRUD = user
 
-    async def remove_tmp_dir(self, dirname: str = "") -> None:
+    async def remove_tmp_dir(self, dirname: Path) -> None:
         """Remove temporary folder"""
-        if os.path.exists(dirname):
+        if dirname.exists():
             shutil.rmtree(dirname)
+            LOGGER.debug("Temp directory cleanup done.")
 
     async def tak_mtls_client(self) -> aiohttp.ClientSession:
         """Return session to connect TAK"""
