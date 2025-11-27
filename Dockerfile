@@ -28,7 +28,6 @@ RUN export RESOLVED_VERSIONS=`pyenv_resolve $PYTHON_VERSIONS` \
 ######################
 FROM eclipse-temurin:${TEMURIN_VERSION}-jammy as builder_base
 #FROM python:3.11-bookworm as builder_base
-
 ENV \
   # locale
   LC_ALL=C.UTF-8 \
@@ -42,8 +41,6 @@ ENV \
   PIP_DEFAULT_TIMEOUT=100 \
   # poetry:
   POETRY_VERSION=2.0.1
-
-
 RUN apt-get update && apt-get install -y \
         curl \
         git \
@@ -66,10 +63,11 @@ RUN apt-get update && apt-get install -y \
     && echo 'export PATH="/root/.local/bin:$PATH"' >>/root/.profile \
     && export PATH="/root/.local/bin:$PATH" \
     && true
-
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs \
+    && corepack enable \
+    && corepack prepare pnpm@latest --activate
 SHELL ["/bin/bash", "-lc"]
-
-
 # Copy only requirements, to cache them in docker layer:
 WORKDIR /pysetup
 COPY ./poetry.lock ./pyproject.toml /pysetup/
@@ -91,6 +89,10 @@ FROM builder_base as production_build
 COPY ./docker/entrypoint.sh /docker-entrypoint.sh
 # Only files needed by production setup
 COPY ./poetry.lock ./pyproject.toml ./README.rst ./src /app/
+COPY ./ui /ui/
+WORKDIR /ui
+RUN CI=true pnpm install && pnpm build
+RUN mkdir -p /ui_build && cp -r dist/* /ui_build/
 WORKDIR /app
 # Build the wheel package with poetry and add it to the wheelhouse
 RUN --mount=type=ssh source /.venv/bin/activate \
@@ -105,6 +107,7 @@ RUN --mount=type=ssh source /.venv/bin/activate \
 #########################
 FROM eclipse-temurin:${TEMURIN_VERSION}-jammy as production
 COPY --from=production_build /tmp/wheelhouse /tmp/wheelhouse
+COPY --from=production_build /ui_build /ui_build
 COPY --from=production_build /docker-entrypoint.sh /docker-entrypoint.sh
 COPY --from=pvarki/kw_product_init:latest /kw_product_init /kw_product_init
 # FIXME: Figure out exactly which jars we need and copy only those
@@ -147,6 +150,9 @@ ENTRYPOINT ["/usr/bin/tini", "--", "/docker-entrypoint.sh"]
 FROM builder_base as devel_build
 # Install deps
 COPY . /app
+COPY ./ui /ui/
+WORKDIR /ui
+RUN CI=true pnpm install && pnpm build
 WORKDIR /app
 RUN --mount=type=ssh source /.venv/bin/activate \
     && poetry install --no-interaction --no-ansi \
@@ -157,7 +163,8 @@ RUN --mount=type=ssh source /.venv/bin/activate \
 # Run tests #
 #############
 FROM devel_build as test
-COPY . /app
+WORKDIR /ui
+RUN mkdir -p /ui_build && cp -r dist/* /ui_build/
 WORKDIR /app
 ENTRYPOINT ["/usr/bin/tini", "--", "docker/entrypoint-test.sh"]
 # Re run install to get the service itself installed
@@ -173,16 +180,14 @@ RUN --mount=type=ssh source /.venv/bin/activate \
 ###########
 FROM devel_build as devel_shell
 # Copy everything to the image
+WORKDIR /ui
 COPY --from=pvarki/kw_product_init:latest /kw_product_init /kw_product_init
-COPY . /app
+RUN mkdir -p /ui_build && cp -r dist/* /ui_build/
 WORKDIR /app
 RUN apt-get update && apt-get install -y zsh \
     && sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" \
     && echo "source /root/.profile" >>/root/.zshrc \
     && pip3 install git-up \
-    # Map the special names to docker host internal ip because 127.0.0.1 is *container* localhost on login
-    && echo "sed 's/.*localmaeher.*//g' /etc/hosts >/etc/hosts.new && cat /etc/hosts.new >/etc/hosts" >>/root/.profile \
-    && echo "echo \"\$(getent hosts host.docker.internal | awk '{ print $1 }') localmaeher.dev.pvarki.fi mtls.localmaeher.dev.pvarki.fi\" >>/etc/hosts" >>/root/.profile \
     && ln -s /app/docker/container-init.sh /container-init.sh \
     && curl https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh -o /usr/bin/wait-for-it.sh \
     && chmod a+x /usr/bin/wait-for-it.sh \

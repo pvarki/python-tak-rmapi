@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "takrmapi"
-version = "1.6.2"
+version = "1.6.3"
 description = "RASENMAEHER integration API for TAK server"
 authors = ["Eero af Heurlin <rambo@iki.fi>", "Ari Karhunen <FIXME@example.com>"]
 homepage = "https://github.com/pvarki/python-tak-rmapi"
@@ -49,6 +49,7 @@ max-parents = 10
 
 [tool.pylint.messages_control]
 disable=["fixme", "W1202", "C0209"]
+extension-pkg-whitelist = "pydantic"
 
 [tool.pylint.similarities]
 min-similarity-lines = 8

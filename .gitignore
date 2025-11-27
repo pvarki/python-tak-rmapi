@@ -24,7 +24,6 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
 lib64/
 parts/
 sdist/
@@ -141,3 +140,9 @@ dmypy.json
 
 # Allow MANIFEST under templates
 !src/takrmapi/templates/tak_missionpkg/*/*/MANIFEST
+
+# UI specific stuff
+!ui/lib
+ui/.__mf__temp
+ui/node_modules
+!ui/dist/*.md
