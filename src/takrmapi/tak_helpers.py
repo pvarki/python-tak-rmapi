@@ -279,6 +279,8 @@ class MissionZip:
         # FIXME: use Paths for everything
 
         tmp_zip_folder = tmp_base / walk_dir.name
+        if is_mission_package:
+            tmp_zip_folder = tmp_base / f"{config.TAK_SERVER_NAME}_{walk_dir.name}"
         tmp_zip_folder.mkdir(parents=True, exist_ok=True)
 
         LOGGER.debug("Moving files from '{}' to '{}' for bundling.".format(walk_dir, tmp_zip_folder))
