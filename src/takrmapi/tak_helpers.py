@@ -200,6 +200,8 @@ class UserTAKTemplateVars:
     mmtx_server_public_address: ClassVar[str] = config.MMTX_SERVER_FQDN
     mmtx_server_srt_port: ClassVar[int] = config.MMTX_SERVER_SRT_PORT
     mmtx_server_observer_port: ClassVar[int] = config.MMTX_SERVER_OBSERVER_PORT
+    mmtx_server_observer_proto: ClassVar[str] = config.MMTX_SERVER_OBSERVER_PROTO
+    mmtx_server_observer_net_proto: ClassVar[str] = config.MMTX_SERVER_OBSERVER_NET_PROTO
 
     @property
     def tak_userfile_uid(self) -> str:

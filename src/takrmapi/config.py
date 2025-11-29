@@ -89,6 +89,8 @@ TAKCL_CORECONFIG_PATH: Path = cfg("TAKCL_CORECONFIG_PATH", cast=Path, default=Pa
 MMTX_SERVER_FQDN: str = cfg("MMTX_SERVER_FQDN", cast=str, default="Not Available - ENV not set")
 MMTX_SERVER_SRT_PORT: int = cfg("MMTX_SERVER_SRT_PORT", cast=int, default=8890)
 MMTX_SERVER_OBSERVER_PORT: int = cfg("MMTX_SERVER_SRT_PORT", cast=int, default=8322)
+MMTX_SERVER_OBSERVER_PROTO: str = cfg("MMTX_SERVER_OBSERVER_PROTO", cast=str, default="rtsps")
+MMTX_SERVER_OBSERVER_NET_PROTO: str = cfg("MMTX_SERVER_OBSERVER_NET_PROTO", cast=str, default="tcp")
 TAK_SERVER_FQDN: str = cfg("TAK_SERVER_FQDN", cast=str, default=read_tak_fqdn())
 TAK_SERVER_NAME: str = cfg("TAK_SERVER_NAME", cast=str, default=read_deployment_name())
 TAK_SERVER_NETWORKMESH_KEY_FILE: Path = cfg(

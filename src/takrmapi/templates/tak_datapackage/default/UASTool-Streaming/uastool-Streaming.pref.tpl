@@ -15,7 +15,7 @@
     <!-- Set bitrate with broadcasta size, so there is enough bandwidht -->
     <entry key="uastool.pref_video_broadcast_bitrate" class="class java.lang.String">100000</entry>
     <entry key="uastool.pref_video_broadcast_destination" class="class java.lang.String">SRT (Video Management System)</entry>
-    <entry key="uastool.pref_video_observer_url" class="class java.lang.String">rtsps://{{ v.mmtx_server_public_address }}:{{ v.mmtx_server_observer_port }}/live/uas/{{ v.client_cert_name }}?tcp</entry>
+    <entry key="uastool.pref_video_observer_url" class="class java.lang.String">{{ v.mmtx_server_observer_proto }}://{{ v.mmtx_server_public_address }}:{{ v.mmtx_server_observer_port }}/live/uas/{{ v.client_cert_name }}?{{ v.mmtx_server_observer_net_proto }}</entry>
     <entry key="uastool.pref_srt_dest_host" class="class java.lang.String">{{ v.mmtx_server_public_address }}</entry>
     <entry key="uastool.pref_srt_dest_port" class="class java.lang.String">{{ v.mmtx_server_srt_port }}</entry>
     <entry key="uastool.pref_srt_stream_id" class="class java.lang.String">publish:live/uas/{{ v.client_cert_name }}:{{ v.client_mmtx_username }}:{{ v.client_mmtx_password }}</entry>
