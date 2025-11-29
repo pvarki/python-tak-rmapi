@@ -205,7 +205,7 @@ class UserTAKTemplateVars:
     def tak_userfile_uid(self) -> str:
         """Return UUID for users files"""
         return str(
-            uuid.uuid5(uuid.NAMESPACE_URL, f"{config.TAK_SERVER_FQDN}/{self.user.callsign}/{self.template_file.name}")
+            uuid.uuid5(uuid.NAMESPACE_URL, f"{config.TAK_SERVER_FQDN}/{self.user.callsign}/{self.template_file}")
         )
 
     @property
@@ -218,8 +218,8 @@ class UserTAKTemplateVars:
         """User pw mapping for cert in templates,"""
         return self.user.callsign
 
-    @classmethod
-    def tak_network_mesh_key(cls) -> str:
+    @property
+    def tak_network_mesh_key(self) -> str:
         """Mestastic key mapping. Same for whole deployment."""
         return str(hashlib.sha256(config.TAK_SERVER_NETWORKMESH_KEY_STR.encode("utf-8")).hexdigest())
 
