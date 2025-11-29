@@ -223,6 +223,16 @@ class UserTAKTemplateVars:
         """Mestastic key mapping. Same for whole deployment."""
         return str(hashlib.sha256(config.TAK_SERVER_NETWORKMESH_KEY_STR.encode("utf-8")).hexdigest())
 
+    @property
+    def client_mmtx_username(self) -> str:
+        """TODO Return users MMTX username"""
+        return "TODO-Username_Retrieve_Not_Implemented_Yet"
+
+    @property
+    def client_mmtx_password(self) -> str:
+        """TODO Return users MMTX username"""
+        return "TODO-PW-Retrieve-Not-Implemented-Yet"
+
 
 class MissionZip:
     """Mission package class"""
