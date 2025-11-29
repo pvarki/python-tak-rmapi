@@ -1,16 +1,17 @@
 """Helper functions to manage tak"""
 
-from typing import Any, Mapping, Union, Sequence, cast, Tuple, List, Dict
-import hashlib
+from typing import Any, Mapping, Union, Sequence, cast, Tuple, List, Dict, ClassVar
 import os
 import asyncio
 import shutil
 import logging
+import hashlib
 from pathlib import Path
 import uuid
 import tempfile
 import ssl
 import time
+from dataclasses import dataclass
 
 from glob import glob
 import urllib.parse
@@ -186,6 +187,43 @@ class UserCRUD:
         return False
 
 
+@dataclass
+class UserTAKTemplateVars:
+    """TAK Template variable mapping to user/environment values"""
+
+    user: UserCRUD
+    template_file: Path
+
+    # Deployment specific "static" var mapping for template files
+    tak_server_deployment_name: ClassVar[str] = config.TAK_SERVER_NAME
+    tak_server_public_address: ClassVar[str] = config.TAK_SERVER_FQDN
+    mmtx_server_public_address: ClassVar[str] = config.MMTX_SERVER_FQDN
+    mmtx_server_srt_port: ClassVar[int] = config.MMTX_SERVER_SRT_PORT
+    mmtx_server_observer_port: ClassVar[int] = config.MMTX_SERVER_OBSERVER_PORT
+
+    @property
+    def tak_userfile_uid(self) -> str:
+        """Return UUID for users files"""
+        return str(
+            uuid.uuid5(uuid.NAMESPACE_URL, f"{config.TAK_SERVER_FQDN}/{self.user.callsign}/{self.template_file.name}")
+        )
+
+    @property
+    def client_cert_name(self) -> str:
+        """User cert name mapping."""
+        return self.user.callsign
+
+    @property
+    def client_cert_password(self) -> str:
+        """User pw mapping for cert in templates,"""
+        return self.user.callsign
+
+    @classmethod
+    def tak_network_mesh_key(cls) -> str:
+        """Mestastic key mapping. Same for whole deployment."""
+        return str(hashlib.sha256(config.TAK_SERVER_NETWORKMESH_KEY_STR.encode("utf-8")).hexdigest())
+
+
 class MissionZip:
     """Mission package class"""
 
@@ -263,33 +301,18 @@ class MissionZip:
 
         return Path(f"{tmp_zip_folder}.zip")
 
-    async def create_tak_network_mesh_key(self) -> str:
-        """Return tak network mesh key"""
-        mesh_key_sha256: str = hashlib.sha256(config.TAK_SERVER_NETWORKMESH_KEY_STR.encode("utf-8")).hexdigest()
-        return mesh_key_sha256
-
     # async def render_tak_manifest_template(self, template_file: Path) -> Path:
     async def render_tak_manifest_template(self, template_file: Path) -> str:
         """Render tak manifest template"""
-        pkguid = uuid.uuid5(uuid.NAMESPACE_URL, f"{config.TAK_SERVER_FQDN}/{self.user.user.uuid}/{template_file.name}")
-        tak_network_mesh_key = await self.create_tak_network_mesh_key()
+
+        template_user_vars = UserTAKTemplateVars(user=self.user, template_file=template_file)
 
         with open(template_file, "r", encoding="utf-8") as filehandle:
             template = Template(filehandle.read())
 
         rendered_template_str: str = template.render(
-            tak_server_uid_name=str(pkguid),
-            tak_server_name=config.TAK_SERVER_NAME,
-            tak_server_address=config.TAK_SERVER_FQDN,
-            client_cert_name=self.user.callsign,
-            client_cert_password=self.user.callsign,
-            tak_network_mesh_key=tak_network_mesh_key,
+            v=template_user_vars,
         )
-
-        # tmp_template_file = Path(tempfile.gettempdir()) / template_file.name.replace(".tpl", "")
-
-        # with open(tmp_template_file, "w", encoding="utf-8") as filehandle:
-        #    filehandle.write(rendered_template_str)
 
         return rendered_template_str
 

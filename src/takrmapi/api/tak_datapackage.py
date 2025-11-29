@@ -27,9 +27,9 @@ async def return_datapackage_zip(package_path: str, request: Request, background
 
     folderpath = Path(TAK_DATAPACKAGE_TEMPLATES_FOLDER) / package_path
 
-    # Check if the folder exists
-    if not folderpath.is_dir():
-        raise HTTPException(status_code=404, detail="Requested datapackage path not found")
+    # Check if the folder exists and no trailing "/"
+    if not folderpath.is_dir() or package_path[-1] == "/":
+        raise HTTPException(status_code=404, detail="Requested datapackage not found in given path")
 
     zip_files, tmp_folder = await pkg_helper.create_zip_bundles(template_folders=[folderpath], is_mission_package=False)
 

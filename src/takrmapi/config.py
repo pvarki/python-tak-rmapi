@@ -51,6 +51,7 @@ TEMPLATES_PATH: Path = cfg("TEMPLATES_PATH", cast=Path, default=Path(__file__).p
 TAK_CERTS_FOLDER: Path = cfg("TAK_CERTS_FOLDER", cast=Path, default=Path("/opt/tak/data/certs/files"))
 RMAPI_PERSISTENT_FOLDER: Path = cfg("RMAPI_PERSISTENT_FOLDER", cast=Path, default=Path("/data/persistent"))
 
+
 # TAK mission package defaults. Available mission packages are defined here.
 TAK_MISSIONPKG_DEFAULT_MISSION: str = cfg("TAK_MISSIONPKG_DEFAULT_MISSION", cast=str, default="default")
 TAK_MISSIONPKG_TEMPLATES_FOLDER: Path = cfg(
@@ -85,9 +86,13 @@ TAK_MESSAGING_API_PORT: int = cfg("TAK_MESSAGING_API_PORT", cast=int, default=84
 TAKCL_CORECONFIG_PATH: Path = cfg("TAKCL_CORECONFIG_PATH", cast=Path, default=Path("/opt/tak/data/CoreConfig.xml"))
 
 # Used for mission pkgs
+MMTX_SERVER_FQDN: str = cfg("MMTX_SERVER_FQDN", cast=str, default="Not Available - ENV not set")
+MMTX_SERVER_SRT_PORT: int = cfg("MMTX_SERVER_SRT_PORT", cast=int, default=8890)
+MMTX_SERVER_OBSERVER_PORT: int = cfg("MMTX_SERVER_SRT_PORT", cast=int, default=8322)
 TAK_SERVER_FQDN: str = cfg("TAK_SERVER_FQDN", cast=str, default=read_tak_fqdn())
 TAK_SERVER_NAME: str = cfg("TAK_SERVER_NAME", cast=str, default=read_deployment_name())
 TAK_SERVER_NETWORKMESH_KEY_FILE: Path = cfg(
     "TAK_SERVER_NETWORKMESH_KEY_FILE", cast=Path, default=Path("/opt/tak/data/tak_server_networkmesh")
 )
-TAK_SERVER_NETWORKMESH_KEY_STR: str = ""
+
+TAK_SERVER_NETWORKMESH_KEY_STR: str = ""  # tak_init sets this variable
