@@ -220,7 +220,7 @@ class UserTAKTemplateVars:
 
     @property
     def tak_network_mesh_key(self) -> str:
-        """Mestastic key mapping. Same for whole deployment."""
+        """ATAK mesh key mapping. Same for whole deployment."""
         return str(hashlib.sha256(config.TAK_SERVER_NETWORKMESH_KEY_STR.encode("utf-8")).hexdigest())
 
     @property
