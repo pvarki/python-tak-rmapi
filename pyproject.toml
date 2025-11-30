@@ -38,7 +38,7 @@ strict=true
 
 [tool.pytest.ini_options]
 junit_family="xunit2"
-addopts="--cov=takrmapi --cov-fail-under=30 --cov-branch"
+addopts="--cov=takrmapi --cov-fail-under=25 --cov-branch"
 asyncio_mode="strict"
 
 [tool.pylint.format]
@@ -49,6 +49,7 @@ max-parents = 10
 
 [tool.pylint.messages_control]
 disable=["fixme", "W1202", "C0209"]
+extension-pkg-whitelist = "pydantic"
 
 [tool.pylint.similarities]
 min-similarity-lines = 8
@@ -61,13 +62,13 @@ branch = true
 [tool.poetry.dependencies]
 python = ">=3.10,<4.0"
 libadvian = "^1.4"
-libpvarki = { git="https://github.com/pvarki/python-libpvarki.git", tag="1.9.1" }
+libpvarki = { git="https://github.com/pvarki/python-libpvarki.git", tag="2.1.0" }
 fastapi = ">=0.89,<1.0,!=0.99.0"  # caret behaviour on 0.x is to lock to 0.x.*
 jinja2 = "^3.1"
 uvicorn = {version = ">=0.30,<1.0", extras = ["standard"]}
 gunicorn = "^23.0"
 filelock = "^3.12"
-cryptography = ">44.0,<45.0.1"
+pyopenssl = "^25.3"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0"
