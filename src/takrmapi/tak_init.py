@@ -11,6 +11,7 @@ from pathlib import Path
 from libpvarki.schemas.product import UserCRUDRequest
 from takrmapi import config
 from takrmapi import tak_helpers
+from takrmapi.tak_helpers import UserCRUD, RestHelpers, MissionZip
 
 LOGGER = logging.getLogger(__name__)
 
@@ -22,11 +23,9 @@ async def setup_tak_mgmt_conn() -> None:
     """Setup required credentials to manage TAK"""
     # FIXME: Refactor to separate helpers not requiring a dummy user
 
-    user: tak_helpers.UserCRUD = tak_helpers.UserCRUD(
-        UserCRUDRequest(uuid="not_needed", callsign="mtlsclient", x509cert="not_needed")
-    )
+    user: UserCRUD = UserCRUD(UserCRUDRequest(uuid="not_needed", callsign="mtlsclient", x509cert="not_needed"))
     t_helpers = tak_helpers.Helpers(user)
-    t_rest_helper = tak_helpers.RestHelpers(user)
+    t_rest_helper = RestHelpers(user)
 
     # Wait for the TAK API to start responding
     for _ in range(60):
@@ -59,18 +58,27 @@ async def setup_tak_mgmt_conn() -> None:
 
 async def setup_tak_defaults() -> None:
     """Set common required defaults to tak"""
-    user: tak_helpers.UserCRUD = tak_helpers.UserCRUD(
-        UserCRUDRequest(uuid="not_needed", callsign="mtlsclient", x509cert="not_needed")
-    )
-    t_rest_helper = tak_helpers.RestHelpers(user)
+    user: UserCRUD = UserCRUD(UserCRUDRequest(uuid="not_needed", callsign="mtlsclient", x509cert="not_needed"))
+    t_rest_helper = RestHelpers(user)
+    tak_missionpkg = MissionZip(user)
 
     LOGGER.info("Starting to set set TAK defaults")
+    await tak_setup_mesh_key()
+    await tak_setup_default_missions(t_rest_helper=t_rest_helper)
+    await tak_setup_default_profiles(t_rest_helper=t_rest_helper)
+    await tak_setup_profile_files(t_rest_helper=t_rest_helper, tak_missionpkg=tak_missionpkg)
 
+
+async def tak_setup_mesh_key() -> None:
+    """Create/load TAK network mesh key"""
     # Create environment specific networkMeshKey
     if not config.TAK_SERVER_NETWORKMESH_KEY_FILE.exists():
         mesh_str: str = "".join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(64))
         config.TAK_SERVER_NETWORKMESH_KEY_FILE.write_text(mesh_str, encoding="utf-8")
 
+
+async def tak_setup_default_missions(t_rest_helper: RestHelpers) -> None:
+    """Create default TAK missions if missing"""
     # Check that the "RECON" mission is available
     mission_recon_available = await t_rest_helper.tak_api_mission_get(groupname="RECON")
 
@@ -93,11 +101,13 @@ async def setup_tak_defaults() -> None:
     else:
         LOGGER.info("RECON mission already in place, no need to add again.")
 
+
+async def tak_setup_default_profiles(t_rest_helper: RestHelpers) -> None:
+    """Create default TAK profiles"""
     # Check that the "TAK-Defaults" profile is in place
     default_profile_available = await t_rest_helper.tak_api_get_device_profile(profile_name="Default-ATAK")
-    LOGGER.info(default_profile_available)
+    LOGGER.debug("Available TAK profiles: {}".format(default_profile_available))
     if "status" in default_profile_available["data"] and default_profile_available["data"]["status"] == "NOT_FOUND":
-        tak_missionpkg = tak_helpers.MissionZip(user)
         LOGGER.info("Default-ATAK profile missing. Adding profile.")
         await t_rest_helper.tak_api_add_device_profile(profile_name="Default-ATAK", groups=["default"])
         await t_rest_helper.tak_api_update_device_profile(
@@ -112,36 +122,54 @@ async def setup_tak_defaults() -> None:
             },
         )
 
-        # Upload default files to profile
 
-        for profile_file in config.TAK_DATAPACKAGE_DEFAULT_PROFILE_FILES:
-            if profile_file.name.endswith(".tpl"):
-                profile_file_str = await tak_missionpkg.render_tak_manifest_template(profile_file)
+async def tak_setup_profile_files(t_rest_helper: RestHelpers, tak_missionpkg: MissionZip) -> None:
+    """Upload default tak profile files and bundles to TAK"""
+    # Get current 'Default-ATAK' profile files
+    profile_files = await t_rest_helper.tak_api_get_device_profile_files(profile_name="Default-ATAK")
 
-                # TODO tmpfile in memory
-                tmp_folder = Path(tempfile.mkdtemp(suffix=f"_{user.callsign}"))
-                tmp_template_file = tmp_folder / profile_file.name.replace(".tpl", "")
+    # Upload default files to profile
+    for profile_file in config.TAK_DATAPACKAGE_DEFAULT_PROFILE_FILES:
+        # Skip already uploaded files
+        if await t_rest_helper.check_file_in_profile_files(
+            local_profile_file=profile_file, tak_profile_files=profile_files
+        ):
+            continue
 
-                with open(tmp_template_file, "w", encoding="utf-8") as filehandle:
-                    filehandle.write(profile_file_str)
+        if profile_file.name.endswith(".tpl"):
+            profile_file_str = await tak_missionpkg.render_tak_manifest_template(profile_file)
 
-                await t_rest_helper.tak_api_upload_file_to_profile(
-                    profile_name="Default-ATAK",
-                    file_path=tmp_template_file,
-                )
+            # TODO tmpfile in memory
+            tmp_folder = Path(tempfile.mkdtemp(suffix="_INIT_TEMP"))
+            tmp_template_file = tmp_folder / profile_file.name.replace(".tpl", "")
 
-                await tak_missionpkg.helpers.remove_tmp_dir(tmp_folder)
+            with open(tmp_template_file, "w", encoding="utf-8") as filehandle:
+                filehandle.write(profile_file_str)
 
-            else:
-                await t_rest_helper.tak_api_upload_file_to_profile(
-                    profile_name="Default-ATAK",
-                    file_path=profile_file,
-                )
+            await t_rest_helper.tak_api_upload_file_to_profile(
+                profile_name="Default-ATAK",
+                file_path=tmp_template_file,
+            )
 
-        # Create zip bundles and upload to profile
+            await tak_missionpkg.helpers.remove_tmp_dir(tmp_folder)
 
+        else:
+            await t_rest_helper.tak_api_upload_file_to_profile(
+                profile_name="Default-ATAK",
+                file_path=profile_file,
+            )
+
+    # Create zip bundles and upload to profile
+    # First check for bundles already uploaded
+    upload_bundles: list[Path] = []
+    for bundle in config.TAK_DATAPACKAGE_DEFAULT_PROFILE_ZIP_PACKAGES:
+        if await t_rest_helper.check_file_in_profile_files(local_profile_file=bundle, tak_profile_files=profile_files):
+            continue
+        upload_bundles.append(bundle)
+
+    if len(upload_bundles) > 0:
         zip_files, tmp_folder = await tak_missionpkg.create_zip_bundles(
-            template_folders=config.TAK_DATAPACKAGE_DEFAULT_PROFILE_ZIP_PACKAGES, is_mission_package=False
+            template_folders=upload_bundles, is_mission_package=False
         )
         for file in zip_files:
             await t_rest_helper.tak_api_upload_file_to_profile(

@@ -72,13 +72,18 @@ TAK_DATAPACKAGE_TEMPLATES_FOLDER: Path = cfg(
     cast=Path,
     default=TEMPLATES_PATH / "tak_datapackage" / TAK_DATAPACKAGE_DEFAULT_PROFILE,
 )
-TAK_DATAPACKAGE_DEFAULT_PROFILE_FILES: list[Path] = [
-    TAK_DATAPACKAGE_TEMPLATES_FOLDER / "ATAK-default-settings" / "TAK_defaults.pref",
-    TAK_DATAPACKAGE_TEMPLATES_FOLDER / "ATAK-Toolbar" / "TeamMember_Toolbar.pref",
-    TAK_DATAPACKAGE_TEMPLATES_FOLDER / "Update-Server" / "Update.pref.tpl",
-    TAK_DATAPACKAGE_TEMPLATES_FOLDER / "Mesh-Encryption" / "Mesh-Encryption-key.pref.tpl",
+
+# Single files that are added to TAK as profile files
+TAK_DATAPACKAGE_DEFAULT_PROFILE_FILES: list[Path] = []
+
+# Folders that are added to TAK as zip profile packages.
+TAK_DATAPACKAGE_DEFAULT_PROFILE_ZIP_PACKAGES: list[Path] = [
+    TAK_DATAPACKAGE_TEMPLATES_FOLDER / "Maps",
+    TAK_DATAPACKAGE_TEMPLATES_FOLDER / "ATAK-default-settings",
+    TAK_DATAPACKAGE_TEMPLATES_FOLDER / "ATAK-Toolbar",
+    TAK_DATAPACKAGE_TEMPLATES_FOLDER / "Update-Server",
+    TAK_DATAPACKAGE_TEMPLATES_FOLDER / "Mesh-Encryption",
 ]
-TAK_DATAPACKAGE_DEFAULT_PROFILE_ZIP_PACKAGES: list[Path] = [TAK_DATAPACKAGE_TEMPLATES_FOLDER / "Maps"]
 
 TAK_MESSAGING_API_HOST: str = cfg("TAK_MESSAGING_API_HOST", cast=str, default="https://127.0.0.1")  # We are in sidecar
 TAK_MESSAGING_API_PORT: int = cfg("TAK_MESSAGING_API_PORT", cast=int, default=8443)

@@ -753,6 +753,25 @@ allowGroupChange=false"
             except aiohttp.ClientError:
                 return {"success": False, "data": []}
 
+    async def check_file_in_profile_files(self, local_profile_file: Path, tak_profile_files: Mapping[str, Any]) -> bool:
+        """Check if file is in given profile file list from TAK"""
+        f: str = local_profile_file.name
+        if local_profile_file.is_dir():
+            f = local_profile_file.name + ".zip"
+        if f.endswith(".tpl"):
+            f = f.replace(".tpl", "")
+
+        if len(tak_profile_files["data"]["data"]) > 0:
+            for file in tak_profile_files["data"]["data"]:
+                if file["name"] == f:
+                    LOGGER.info(
+                        "File '{}' is already attached to profile. No need to add again.".format(
+                            local_profile_file.name
+                        )
+                    )
+                    return True
+        return False
+
     async def tak_api_upload_file_to_profile(self, profile_name: str, file_path: Path) -> Mapping[str, Any]:
         """Add file to device profile at TAK"""
 
@@ -760,13 +779,8 @@ allowGroupChange=false"
             profile_name=profile_name,
         )
 
-        if len(profile_files["data"]["data"]) > 0:
-            for file in profile_files["data"]["data"]:
-                if file["name"] == file_path.name:
-                    LOGGER.info(
-                        "File '{}' is already attached to profile. No need to add again.".format(file_path.name)
-                    )
-                    return {"success": True, "data": profile_files["data"]}
+        if await self.check_file_in_profile_files(local_profile_file=file_path, tak_profile_files=profile_files):
+            return {"success": True, "data": profile_files["data"]}
 
         async with await self.helpers.tak_mtls_client() as session:
             try:
