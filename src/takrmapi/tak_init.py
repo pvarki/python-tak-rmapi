@@ -107,7 +107,12 @@ async def tak_setup_default_profiles(t_rest_helper: RestHelpers) -> None:
     # Check that the "TAK-Defaults" profile is in place
     default_profile_available = await t_rest_helper.tak_api_get_device_profile(profile_name="Default-ATAK")
     LOGGER.debug("Available TAK profiles: {}".format(default_profile_available))
-    if "status" in default_profile_available["data"] and default_profile_available["data"]["status"] == "NOT_FOUND":
+    if (
+        default_profile_available
+        and "data" in default_profile_available
+        and "status" in default_profile_available["data"]
+        and default_profile_available["data"]["status"] == "NOT_FOUND"
+    ):
         LOGGER.info("Default-ATAK profile missing. Adding profile.")
         await t_rest_helper.tak_api_add_device_profile(profile_name="Default-ATAK", groups=["default"])
         await t_rest_helper.tak_api_update_device_profile(
