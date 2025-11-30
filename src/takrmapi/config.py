@@ -42,7 +42,7 @@ def read_deployment_name() -> str:
 
 
 cfg = Config(
-    env_prefix="TI"
+    env_prefix="TI_"
 )  # not supporting .env files anymore because https://github.com/encode/starlette/discussions/2446
 
 LOG_LEVEL: int = cfg("LOG_LEVEL", default=10, cast=int)
