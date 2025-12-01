@@ -5,6 +5,6 @@
       <Parameter name="onReceiveImport" value="true"/>
    </Configuration>
    <Contents>
-      <Content ignore="false" zipEntry="Update-Server.pref"/>
+      <Content ignore="false" zipEntry="TAK_defaults.pref"/>
    </Contents>
 </MissionPackageManifest>

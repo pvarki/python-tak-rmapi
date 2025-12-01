@@ -2,9 +2,8 @@
    <Configuration>
       <Parameter name="uid" value="{{ v.tak_userfile_uid }}"/>
       <Parameter name="onReceiveDelete" value="true"/>
-      <Parameter name="onReceiveImport" value="true"/>
    </Configuration>
    <Contents>
-      <Content ignore="false" zipEntry="Update-Server.pref"/>
+      <Content ignore="false" zipEntry="support/atak_splash.png"/>
    </Contents>
 </MissionPackageManifest>

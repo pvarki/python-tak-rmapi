@@ -1,6 +1,6 @@
 Packing APK to be compliant with Update Server format
 
-#get the files from assets\apks\ in your android folder.  // tak.gov civ release (sisältää plugineja)
+#get the files from assets\apks\ in your android folder.  // tak.gov civ release (including plugins)
 
 #zip up the .png file and .inf file and name it as product.infz
 
