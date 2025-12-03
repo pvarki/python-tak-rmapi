@@ -12,6 +12,7 @@ from .instructions import router as instructions_router
 from .tak_datapackage import router as takdatapackage_router
 
 from .description import router_v2 as description_router_v2
+from .description import router_v2_admin as description_admin_router
 from .userinfo import router as userinfo_router
 
 all_routers = APIRouter()
@@ -26,4 +27,5 @@ all_routers.include_router(takdatapackage_router, prefix="/tak-datapackages", ta
 
 all_routers_v2 = APIRouter()
 all_routers_v2.include_router(description_router_v2, prefix="/description", tags=["description"])
+all_routers_v2.include_router(description_admin_router, prefix="/admin/description", tags=["description"])
 all_routers_v2.include_router(userinfo_router, prefix="/clients", tags=["clients"])
