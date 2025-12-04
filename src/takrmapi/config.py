@@ -1,10 +1,10 @@
 """Configurations with .env support"""
 
-from typing import Dict, Any, cast
-from pathlib import Path
-import json
 import functools
+import json
 import logging
+from pathlib import Path
+from typing import Any, Dict, cast
 
 from starlette.config import Config
 
@@ -42,7 +42,7 @@ def read_deployment_name() -> str:
 
 
 cfg = Config(
-    env_prefix="TI"
+    env_prefix="TI_"
 )  # not supporting .env files anymore because https://github.com/encode/starlette/discussions/2446
 
 LOG_LEVEL: int = cfg("LOG_LEVEL", default=10, cast=int)
@@ -72,7 +72,7 @@ TAK_DATAPACKAGE_TEMPLATES_FOLDER: Path = cfg(
     default=TEMPLATES_PATH / "tak_datapackage" / TAK_DATAPACKAGE_DEFAULT_PROFILE,
 )
 TAK_DATAPACKAGE_DEFAULT_PROFILE_FILES: list[Path] = [
-    TAK_DATAPACKAGE_TEMPLATES_FOLDER / "ATAK-default-settings" / "TAK_defaults.pref",
+    TAK_DATAPACKAGE_TEMPLATES_FOLDER / "ATAK-default-settings" / "TAK_defaults.pref.tpl",
     TAK_DATAPACKAGE_TEMPLATES_FOLDER / "ATAK-Toolbar" / "TeamMember_Toolbar.pref",
     TAK_DATAPACKAGE_TEMPLATES_FOLDER / "Update-Server" / "Update.pref.tpl",
     TAK_DATAPACKAGE_TEMPLATES_FOLDER / "Mesh-Encryption" / "Mesh-Encryption-key.pref.tpl",
@@ -91,3 +91,5 @@ TAK_SERVER_NETWORKMESH_KEY_FILE: Path = cfg(
     "TAK_SERVER_NETWORKMESH_KEY_FILE", cast=Path, default=Path("/opt/tak/data/tak_server_networkmesh")
 )
 TAK_SERVER_NETWORKMESH_KEY_STR: str = ""
+
+AIRGUARDIAN_URL: str = cfg("AIRGUARDIAN_URL", cast=str, default="")

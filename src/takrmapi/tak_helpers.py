@@ -283,6 +283,7 @@ class MissionZip:
             client_cert_name=self.user.callsign,
             client_cert_password=self.user.callsign,
             tak_network_mesh_key=tak_network_mesh_key,
+            airguardian_url=config.AIRGUARDIAN_URL,
         )
 
         # tmp_template_file = Path(tempfile.gettempdir()) / template_file.name.replace(".tpl", "")
