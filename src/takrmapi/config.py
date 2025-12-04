@@ -115,3 +115,5 @@ TAK_SERVER_NETWORKMESH_KEY_FILE: Path = cfg(
 TAK_SERVER_NETWORKMESH_KEY_STR: str = ""  # tak_init sets this variable
 
 AIRGUARD_API: str = cfg("AIRGUARD_API", cast=str, default="Not Available - ENV not set")
+
+AIRGUARDIAN_URL: str = cfg("AIRGUARDIAN_URL", cast=str, default="")
