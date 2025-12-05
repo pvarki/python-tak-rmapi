@@ -51,6 +51,13 @@ TEMPLATES_PATH: Path = cfg("TEMPLATES_PATH", cast=Path, default=Path(__file__).p
 TAK_CERTS_FOLDER: Path = cfg("TAK_CERTS_FOLDER", cast=Path, default=Path("/opt/tak/data/certs/files"))
 RMAPI_PERSISTENT_FOLDER: Path = cfg("RMAPI_PERSISTENT_FOLDER", cast=Path, default=Path("/data/persistent"))
 
+# TAK vite asset graphical addons
+VITE_ASSET_SET: str = cfg("VITE_ASSET_SET", cast=str, default="not_used_by_default")
+VITE_ASSET_SET_TEMPLATES_FOLDER: Path = cfg(
+    "VITE_ASSET_SET_TEMPLATES_FOLDER",
+    cast=Path,
+    default=TEMPLATES_PATH / "tak_viteassets" / VITE_ASSET_SET,
+)
 
 # TAK mission package defaults. Available mission packages are defined here.
 TAK_MISSIONPKG_DEFAULT_MISSION: str = cfg("TAK_MISSIONPKG_DEFAULT_MISSION", cast=str, default="default")
