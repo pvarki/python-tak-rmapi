@@ -1,16 +1,17 @@
 """Helper functions to manage tak"""
 
-from typing import Any, Mapping, Union, Sequence, cast, Tuple, List, Dict
-import hashlib
+from typing import Any, Mapping, Union, Sequence, cast, Tuple, List, Dict, ClassVar
 import os
 import asyncio
 import shutil
 import logging
+import hashlib
 from pathlib import Path
 import uuid
 import tempfile
 import ssl
 import time
+from dataclasses import dataclass
 
 from glob import glob
 import urllib.parse
@@ -186,6 +187,55 @@ class UserCRUD:
         return False
 
 
+@dataclass
+class UserTAKTemplateVars:
+    """TAK Template variable mapping to user/environment values"""
+
+    user: UserCRUD
+    template_file: Path
+
+    # Deployment specific "static" var mapping for template files
+    tak_server_deployment_name: ClassVar[str] = config.TAK_SERVER_NAME
+    tak_server_public_address: ClassVar[str] = config.TAK_SERVER_FQDN
+    mmtx_server_public_address: ClassVar[str] = config.MMTX_SERVER_FQDN
+    mmtx_server_srt_port: ClassVar[int] = config.MMTX_SERVER_SRT_PORT
+    mmtx_server_observer_port: ClassVar[int] = config.MMTX_SERVER_OBSERVER_PORT
+    mmtx_server_observer_proto: ClassVar[str] = config.MMTX_SERVER_OBSERVER_PROTO
+    mmtx_server_observer_net_proto: ClassVar[str] = config.MMTX_SERVER_OBSERVER_NET_PROTO
+
+    @property
+    def tak_userfile_uid(self) -> str:
+        """Return UUID for users files"""
+        return str(
+            uuid.uuid5(uuid.NAMESPACE_URL, f"{config.TAK_SERVER_FQDN}/{self.user.callsign}/{self.template_file}")
+        )
+
+    @property
+    def client_cert_name(self) -> str:
+        """User cert name mapping."""
+        return self.user.callsign
+
+    @property
+    def client_cert_password(self) -> str:
+        """User pw mapping for cert in templates,"""
+        return self.user.callsign
+
+    @property
+    def tak_network_mesh_key(self) -> str:
+        """ATAK mesh key mapping. Same for whole deployment."""
+        return str(hashlib.sha256(config.TAK_SERVER_NETWORKMESH_KEY_STR.encode("utf-8")).hexdigest())
+
+    @property
+    def client_mmtx_username(self) -> str:
+        """TODO Return users MMTX username"""
+        return "TODO-Username_Retrieve_Not_Implemented_Yet"
+
+    @property
+    def client_mmtx_password(self) -> str:
+        """TODO Return users MMTX username"""
+        return "TODO-PW-Retrieve-Not-Implemented-Yet"
+
+
 class MissionZip:
     """Mission package class"""
 
@@ -198,6 +248,7 @@ class MissionZip:
         self, template_folders: list[Path], is_mission_package: bool = False
     ) -> Tuple[list[Path], Path]:
         """Create tak mission package packages to different app versions"""
+
         # TODO tmpfile in memory
         tmp_folder = Path(tempfile.mkdtemp(suffix=f"_{self.user.callsign}"))
 
@@ -228,6 +279,8 @@ class MissionZip:
         # FIXME: use Paths for everything
 
         tmp_zip_folder = tmp_base / walk_dir.name
+        if is_mission_package:
+            tmp_zip_folder = tmp_base / f"{config.TAK_SERVER_NAME}_{walk_dir.name}"
         tmp_zip_folder.mkdir(parents=True, exist_ok=True)
 
         LOGGER.debug("Moving files from '{}' to '{}' for bundling.".format(walk_dir, tmp_zip_folder))
@@ -262,33 +315,18 @@ class MissionZip:
 
         return Path(f"{tmp_zip_folder}.zip")
 
-    async def create_tak_network_mesh_key(self) -> str:
-        """Return tak network mesh key"""
-        mesh_key_sha256: str = hashlib.sha256(config.TAK_SERVER_NETWORKMESH_KEY_STR.encode("utf-8")).hexdigest()
-        return mesh_key_sha256
-
     # async def render_tak_manifest_template(self, template_file: Path) -> Path:
     async def render_tak_manifest_template(self, template_file: Path) -> str:
         """Render tak manifest template"""
-        pkguid = uuid.uuid5(uuid.NAMESPACE_URL, f"{config.TAK_SERVER_FQDN}/{self.user.user.uuid}/{template_file.name}")
-        tak_network_mesh_key = await self.create_tak_network_mesh_key()
+
+        template_user_vars = UserTAKTemplateVars(user=self.user, template_file=template_file)
 
         with open(template_file, "r", encoding="utf-8") as filehandle:
             template = Template(filehandle.read())
 
         rendered_template_str: str = template.render(
-            tak_server_uid_name=str(pkguid),
-            tak_server_name=config.TAK_SERVER_NAME,
-            tak_server_address=config.TAK_SERVER_FQDN,
-            client_cert_name=self.user.callsign,
-            client_cert_password=self.user.callsign,
-            tak_network_mesh_key=tak_network_mesh_key,
+            v=template_user_vars,
         )
-
-        # tmp_template_file = Path(tempfile.gettempdir()) / template_file.name.replace(".tpl", "")
-
-        # with open(tmp_template_file, "w", encoding="utf-8") as filehandle:
-        #    filehandle.write(rendered_template_str)
 
         return rendered_template_str
 
@@ -360,10 +398,11 @@ class Helpers:
         """Helpers init"""
         self.user: UserCRUD = user
 
-    async def remove_tmp_dir(self, dirname: str = "") -> None:
+    async def remove_tmp_dir(self, dirname: Path) -> None:
         """Remove temporary folder"""
-        if os.path.exists(dirname):
+        if dirname.exists():
             shutil.rmtree(dirname)
+            LOGGER.debug("Temp directory cleanup done.")
 
     async def tak_mtls_client(self) -> aiohttp.ClientSession:
         """Return session to connect TAK"""
@@ -714,6 +753,25 @@ allowGroupChange=false"
             except aiohttp.ClientError:
                 return {"success": False, "data": []}
 
+    async def check_file_in_profile_files(self, local_profile_file: Path, tak_profile_files: Mapping[str, Any]) -> bool:
+        """Check if file is in given profile file list from TAK"""
+        f: str = local_profile_file.name
+        if local_profile_file.is_dir():
+            f = local_profile_file.name + ".zip"
+        if f.endswith(".tpl"):
+            f = f.replace(".tpl", "")
+
+        if len(tak_profile_files["data"]["data"]) > 0:
+            for file in tak_profile_files["data"]["data"]:
+                if file["name"] == f:
+                    LOGGER.info(
+                        "File '{}' is already attached to profile. No need to add again.".format(
+                            local_profile_file.name
+                        )
+                    )
+                    return True
+        return False
+
     async def tak_api_upload_file_to_profile(self, profile_name: str, file_path: Path) -> Mapping[str, Any]:
         """Add file to device profile at TAK"""
 
@@ -721,13 +779,8 @@ allowGroupChange=false"
             profile_name=profile_name,
         )
 
-        if len(profile_files["data"]["data"]) > 0:
-            for file in profile_files["data"]["data"]:
-                if file["name"] == file_path.name:
-                    LOGGER.info(
-                        "File '{}' is already attached to profile. No need to add again.".format(file_path.name)
-                    )
-                    return {"success": True, "data": profile_files["data"]}
+        if await self.check_file_in_profile_files(local_profile_file=file_path, tak_profile_files=profile_files):
+            return {"success": True, "data": profile_files["data"]}
 
         async with await self.helpers.tak_mtls_client() as session:
             try:

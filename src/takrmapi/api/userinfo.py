@@ -35,6 +35,6 @@ async def client_instruction_fragment(user: UserCRUDRequest) -> ClientInstructio
             )
         )
 
-    await tak_missionpkg.helpers.remove_tmp_dir(str(tmp_folder))
+    await tak_missionpkg.helpers.remove_tmp_dir(tmp_folder)
 
     return ClientInstructionResponse(data=ClientInstructionData(tak_zips=tak_zips))
