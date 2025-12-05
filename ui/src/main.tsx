@@ -3,24 +3,70 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import './i18n';
 
+import {
+  Outlet,
+  RouterProvider,
+  createRouter,
+  createRootRoute,
+  createRoute,
+  redirect,
+} from '@tanstack/react-router';
+
+const rootRoute = createRootRoute({
+  component: () => (
+    <>
+      <Outlet />
+    </>
+  ),
+});
+
+const mtxRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "product/tak/$",
+  component: () => {
+    const SAMPLE_DATA = {
+      data: {
+
+      }
+    }
+
+    // @ts-ignore
+    return <App data={SAMPLE_DATA.data} />;
+  },
+});
+
+
+const indexRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/',
+  beforeLoad: () => {
+    throw redirect({
+      //@ts-ignore
+      to: '/product/tak',
+    });
+  },
+  component: () => <h1>Redirecting...</h1>,
+});
+
+const routeTree = rootRoute.addChildren([
+  mtxRoute,
+  indexRoute,
+]);
+
+const router = createRouter({ routeTree });
+
+declare module '@tanstack/react-router' {
+  interface Register {
+    router: typeof router;
+  }
+}
+
 if (__USE_GLOBAL_CSS__ == true) {
   import("./index.css");
 }
 
-// Replace entire thing with response from the actual API
-const SAMPLE_DATA = {
-  "data": {
-
-  }
-}
-
-
-
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
-    <div className="dark m-4">
-      {/* @ts-ignore - we cant either way type check with the real ui */}
-      <App data={SAMPLE_DATA.data} />
-    </div>
-  </React.StrictMode>,
+    <RouterProvider router={router} />
+  </React.StrictMode>
 );

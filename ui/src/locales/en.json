@@ -16,10 +16,94 @@
   },
   "tabs": {
     "android": {
+      "instructions_short": "Need help importing the package?",
+      "open_instructions": "Open instructions",
+      "phase1": {
+        "step1_desc_civ": "Download the ATAK-CIV app from the Play Store and install it:",
+        "step1_desc_sync": "Download the ATAK Data Sync-plugin and install it:",
+        "step1_title": "Download the applications",
+        "step2_desc_error": "If the application gives an error message, select \"Wait\".",
+        "step2_desc_permissions": "Open the app and grant all requested permissions.",
+        "step2_title": "Open the ATAK app and grant permissions"
+      },
+      "phase2": {
+        "step1_desc_1": "When opening the TAK app for the first time, the TAK Device Setup appears.",
+        "step1_desc_2": "Select <bold>Data Package</bold> to proceed.",
+        "step1_desc_3": "The Select Data Package menu will open.",
+        "step1_title": "1. Open the Select Data Package menu",
+        "step2_desc_1": "Locate the folder where you downloaded your Client Package file <bold>'Name.zip'</bold>.",
+        "step2_desc_2": "Tip: Press <bold>Date</bold> to see the most recently downloaded file, likely your client package.",
+        "step2_desc_3": "Select the file to continue.",
+        "step2_title": "2. Find and select the message base zip",
+        "step3_desc_1": "Press <bold>Done</bold>.",
+        "step3_desc_2": "You will receive several notifications about the loading of configuration files.",
+        "step3_desc_3": "The initial configuration is complete.",
+        "step3_desc_4": "Check the bottom right corner to confirm your server connection is activated (green light).",
+        "step3_title": "3. Press Done - settings will load"
+      },
+      "phase3": {
+        "step1_desc_1": "Press the three lines (hamburger icon) in the top right corner.",
+        "step1_desc_2": "Scroll to the bottom of the menu and select <bold>Settings</bold>.",
+        "step1_title": "1. Open Settings",
+        "step2_desc_1": "Select <bold>My Team</bold> and choose the color you were instructed to use.",
+        "step2_desc_2": "Select <bold>My Role</bold>. Unless otherwise specified by your superiors, all command post users should use the <bold>Team Member</bold> role.",
+        "step2_desc_3": "Your role and team are now set.",
+        "step2_title": "2. Set Team and Role"
+      },
+      "phase4": {
+        "step1_desc_1": "a. In the main view, open the hamburger menu and find <bold>Plugins</bold>. (You must have the Data Sync plugin installed from Google Play.)",
+        "step1_desc_2": "b. The Plugins menu opens. Press on the line for <bold>Data Sync</bold> where it says <bold>\"Status: Not loaded.\"</bold>",
+        "step1_desc_3": "c. The app asks if you want to load Data Sync. Press <bold>Load</bold>.",
+        "step1_desc_4": "d. The status of Data Sync changes to <bold>Loaded</bold>.",
+        "step1_desc_5": "Ready! You can exit the menu.",
+        "step1_title": "1. Open the Data Sync menu",
+        "step2_desc_1": "In the main view, open the hamburger menu and select <bold>Data Sync</bold>.",
+        "step2_desc_2": "Opening the Data Sync menu reveals feeds available from the server.",
+        "step2_desc_3": "Select the feed(s) you've been instructed to subscribe to (example: <bold>RECON</bold>).",
+        "step2_desc_4": "From the popup window, select <bold>Download & Sync</bold>.",
+        "step2_desc_5": "Recon Feed is now enabled. You will receive markers on your map from the command post.",
+        "step2_title": "2. Enable Recon Feed & other Feeds",
+        "step3_desc_1": "Ensure <bold>Auto Download</bold> is on. Return to the main view and open the hamburger menu.",
+        "step3_desc_2": "Find <bold>Settings</bold>.",
+        "step3_desc_3": "Find the <bold>Auto Download Updates</bold> setting and ensure it is turned on.",
+        "step3_desc_4": "This ensures ATAK automatically downloads updates for your subscribed feeds.",
+        "step3_title": "3. Turn Auto Download on"
+      },
+      "phase5": {
+        "step1_desc_1": "To select a map base, open <bold>Maps</bold> from the toolbar (top right corner).",
+        "step1_desc_2": "Acknowledge a few notifications by pressing <bold>OK</bold>.",
+        "step1_desc_3": "Choose the <bold>Mobile</bold> tab and activate the <bold>02 Google Hybrid</bold> map base.",
+        "step1_desc_4": "Exit the menu by pressing the <bold>Back</bold> button a few times.",
+        "step1_title": "1. Select your preferred map base",
+        "step2_desc_1": "In ATAK, unit settings are usually preconfigured by your installed Client Package. Check or adjust them as follows:",
+        "step2_desc_2_1": "Return to the <bold>Settings</bold> main menu.",
+        "step2_desc_2_2": "Select <italic>Display Preferences</italic>.",
+        "step2_desc_2_3": "Select <italic>Basic Display Preferences</italic>.",
+        "step2_desc_2_4": "Select <italic>Unit Display Format Preferences</italic>.",
+        "step2_desc_2_5": "Choose <bold>Altitude Units</bold> and set to <bold>Meters (m)</bold>.",
+        "step2_desc_2_6": "Select <bold>Speed Units</bold> and choose <bold>KM per Hour (kmph)</bold>.",
+        "step2_desc_2_7": "Scroll to <bold>UNIT THRESHOLD</bold>, select <bold>Meters to Kilometers</bold>, set to <bold>1000</bold>, and press <bold>OK</bold>.",
+        "step2_desc_3": "Units are now set. Exit the menu by pressing the back button several times.",
+        "step2_title": "2. Check units if necessary",
+        "step3_desc_1": "Your callsign is usually set by your installed Client Package. To change it:",
+        "step3_desc_2_1": "Select <bold>Callsign and Device Preferences</bold>.",
+        "step3_desc_2_2": "Select <bold>Callsign Preferences</bold>.",
+        "step3_desc_2_3": "Select <bold>My Callsign</bold>.",
+        "step3_desc_2_4": "Enter your assigned callsign (example: <bold>Rambo</bold>).",
+        "step3_desc_2_5": "Press <bold>OK</bold>.",
+        "step3_title": "3. Check and change the Callsign if necessary"
+      },
       "step1_download": "Download the zip package:",
       "step2_install": "Import the package.",
       "step3_done": "Done, ATAK is ready to use.",
-      "title": "ATAK Package Installation"
+      "title": "ATAK Package Installation",
+      "wizard_title": {
+        "phase1": "Install Android Apps",
+        "phase2": "Import Data Package",
+        "phase3": "Adjust Settings",
+        "phase4": "Data Sync",
+        "phase5": "Finalize Setup"
+      }
     },
     "ios": {
       "step1_download": "Download the zip package:",
@@ -40,5 +124,11 @@
       "step3_done": "Done, WinTAK is ready to use.",
       "title": "WinTAK Package Installation"
     }
+  },
+  "wizard": {
+    "complete": "Complete",
+    "next": "Next",
+    "previous": "Previous",
+    "step_counter": "Step {{current}} of {{total}}"
   }
 }

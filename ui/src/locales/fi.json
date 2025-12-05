@@ -16,10 +16,94 @@
   },
   "tabs": {
     "android": {
+      "instructions_short": "Tarvitsetko apua paketin tuonnissa?",
+      "open_instructions": "Avaa ohjeet",
+      "phase1": {
+        "step1_desc_civ": "Lataa ATAK-CIV -sovellus Play Kaupasta ja asenna se:",
+        "step1_desc_sync": "Lataa ATAK Data Sync -Laajennus ja asenna se:",
+        "step1_title": "Lataa sovellukset",
+        "step2_desc_error": "Jos sovellus antaa virheilmoituksen, valitse \"Wait\" (Odota).",
+        "step2_desc_permissions": "Avaa sovellus ja my\u00f6nn\u00e4 kaikki pyydetyt k\u00e4ytt\u00f6oikeudet.",
+        "step2_title": "Avaa ATAK-sovellus ja my\u00f6nn\u00e4 luvat"
+      },
+      "phase2": {
+        "step1_desc_1": "Kun avaat TAK-sovelluksen ensimm\u00e4ist\u00e4 kertaa, TAK Device Setup (Laitteen asennus) aukeaa.",
+        "step1_desc_2": "Valitse <bold>Data Package</bold> (Datapaketti) jatkaaksesi.",
+        "step1_desc_3": "Valitse Datapaketti -valikko aukeaa.",
+        "step1_title": "1. Avaa Datapaketti-valikko",
+        "step2_desc_1": "Etsi kansio, johon latasit asiakas-pakettitiedoston <bold>'Nimi.zip'</bold>.",
+        "step2_desc_2": "Vinkki: Paina <bold>Date</bold> (P\u00e4iv\u00e4m\u00e4\u00e4r\u00e4) n\u00e4hd\u00e4ksesi viimeisimm\u00e4n ladatun tiedoston; se on todenn\u00e4k\u00f6isesti pakettisi.",
+        "step2_desc_3": "Valitse tiedosto jatkaaksesi.",
+        "step2_title": "2. Etsi ja valitse zip-tiedosto",
+        "step3_desc_1": "Paina <bold>Done</bold> (Valmis).",
+        "step3_desc_2": "Saat useita ilmoituksia asetustiedostojen latautumisesta.",
+        "step3_desc_3": "Alustava konfigurointi on valmis.",
+        "step3_desc_4": "Tarkista oikeasta alakulmasta, ett\u00e4 palvelinyhteytesi on aktiivinen (vihre\u00e4 valo).",
+        "step3_title": "3. Paina Done - asetukset latautuvat"
+      },
+      "phase3": {
+        "step1_desc_1": "Paina kolmea viivaa (hampurilaiskuvake) oikeassa yl\u00e4kulmassa.",
+        "step1_desc_2": "Vierit\u00e4 valikon alaosaan ja valitse <bold>Settings</bold> (Asetukset).",
+        "step1_title": "1. Avaa Asetukset",
+        "step2_desc_1": "Valitse <bold>My Team</bold> (Oma tiimi) ja valitse v\u00e4ri, jota sinua on ohjeistettu k\u00e4ytt\u00e4m\u00e4\u00e4n.",
+        "step2_desc_2": "Valitse <bold>My Role</bold> (Oma rooli). Ellei esimiehesi toisin m\u00e4\u00e4r\u00e4\u00e4, kaikkien komentopaikkak\u00e4ytt\u00e4jien tulisi k\u00e4ytt\u00e4\u00e4 roolia <bold>Team Member</bold> (Tiimin j\u00e4sen).",
+        "step2_desc_3": "Roolisi ja tiimisi on nyt asetettu.",
+        "step2_title": "2. Aseta Tiimi ja Rooli"
+      },
+      "phase4": {
+        "step1_desc_1": "a. Avaa p\u00e4\u00e4n\u00e4kym\u00e4ss\u00e4 hampurilaisvalikko ja etsi <bold>Plugins</bold> (Laajennukset). (Sinulla on oltava Data Sync -laajennus asennettuna Google Playsta.)",
+        "step1_desc_2": "b. Laajennukset-valikko aukeaa. Paina rivi\u00e4 <bold>Data Sync</bold>, kohdasta jossa lukee <bold>\"Status: Not loaded.\"</bold>",
+        "step1_desc_3": "c. Sovellus kysyy, haluatko ladata Data Syncin. Paina <bold>Load</bold> (Lataa).",
+        "step1_desc_4": "d. Data Syncin tilaksi vaihtuu <bold>Loaded</bold> (Ladattu).",
+        "step1_desc_5": "Valmis! Voit poistua valikosta.",
+        "step1_title": "1. Avaa Data Sync -valikko",
+        "step2_desc_1": "Avaa p\u00e4\u00e4n\u00e4kym\u00e4ss\u00e4 hampurilaisvalikko ja valitse <bold>Data Sync</bold>.",
+        "step2_desc_2": "Data Sync -valikon avaaminen paljastaa palvelimelta saatavilla olevat sy\u00f6tteet.",
+        "step2_desc_3": "Valitse sy\u00f6te/sy\u00f6tteet, jotka sinua on ohjeistettu tilaamaan (esimerkki: <bold>RECON</bold>).",
+        "step2_desc_4": "Valitse ponnahdusikkunasta <bold>Download & Sync</bold> (Lataa & Synkronoi).",
+        "step2_desc_5": "Tiedustelusy\u00f6te (Recon) on nyt k\u00e4yt\u00f6ss\u00e4. Saat kartallesi merkint\u00f6j\u00e4 komentopaikalta.",
+        "step2_title": "2. Ota k\u00e4ytt\u00f6\u00f6n Tiedustelusy\u00f6te & muut sy\u00f6tteet",
+        "step3_desc_1": "Varmista, ett\u00e4 <bold>Auto Download</bold> on p\u00e4\u00e4ll\u00e4. Palaa p\u00e4\u00e4n\u00e4kym\u00e4\u00e4n ja avaa hampurilaisvalikko.",
+        "step3_desc_2": "Etsi <bold>Settings</bold> (Asetukset).",
+        "step3_desc_3": "Etsi asetus <bold>Auto Download Updates</bold> ja varmista, ett\u00e4 se on kytketty p\u00e4\u00e4lle.",
+        "step3_desc_4": "T\u00e4m\u00e4 varmistaa, ett\u00e4 ATAK lataa p\u00e4ivitykset tilaamiisi sy\u00f6tteisiin automaattisesti.",
+        "step3_title": "3. Kytke automaattinen lataus p\u00e4\u00e4lle"
+      },
+      "phase5": {
+        "step1_desc_1": "Valitaksesi karttapohjan, avaa <bold>Maps</bold> (Kartat) ty\u00f6kalurivilt\u00e4 (oikea yl\u00e4kulma).",
+        "step1_desc_2": "Kuittaa mahdolliset ilmoitukset painamalla <bold>OK</bold>.",
+        "step1_desc_3": "Valitse <bold>Mobile</bold> -v\u00e4lilehti ja aktivoi <bold>02 Google Hybrid</bold> -karttapohja.",
+        "step1_desc_4": "Poistu valikosta painamalla <bold>Back</bold> (Takaisin) -painiketta muutaman kerran.",
+        "step1_title": "1. Valitse haluamasi karttapohja",
+        "step2_desc_1": "ATAKissa yksikk\u00f6asetukset on yleens\u00e4 esikonfiguroitu asentamassasi asiakaspaketissa. Tarkista tai s\u00e4\u00e4d\u00e4 niit\u00e4 seuraavasti:",
+        "step2_desc_2_1": "Palaa <bold>Settings</bold> (Asetukset) -p\u00e4\u00e4valikkoon.",
+        "step2_desc_2_2": "Valitse <italic>Display Preferences</italic> (N\u00e4ytt\u00f6asetukset).",
+        "step2_desc_2_3": "Valitse <italic>Basic Display Preferences</italic> (Perusn\u00e4ytt\u00f6asetukset).",
+        "step2_desc_2_4": "Valitse <italic>Unit Display Format Preferences</italic> (Yksik\u00f6iden n\u00e4ytt\u00f6muotoasetukset).",
+        "step2_desc_2_5": "Valitse <bold>Altitude Units</bold> (Korkeusyksik\u00f6t) ja aseta arvoksi <bold>Meters (m)</bold>.",
+        "step2_desc_2_6": "Valitse <bold>Speed Units</bold> (Nopeusyksik\u00f6t) ja valitse <bold>KM per Hour (kmph)</bold>.",
+        "step2_desc_2_7": "Vierit\u00e4 kohtaan <bold>UNIT THRESHOLD</bold>, valitse <bold>Meters to Kilometers</bold>, aseta arvoksi <bold>1000</bold>, ja paina <bold>OK</bold>.",
+        "step2_desc_3": "Yksik\u00f6t on nyt asetettu. Poistu valikosta painamalla takaisin-painiketta useita kertoja.",
+        "step2_title": "2. Tarkista yksik\u00f6t tarvittaessa",
+        "step3_desc_1": "Kutsumanimesi on yleens\u00e4 asetettu asentamassasi asiakaspaketissa. Vaihtaaksesi sen:",
+        "step3_desc_2_1": "Valitse <bold>Callsign and Device Preferences</bold> (Kutsumanimi- ja laiteasetukset).",
+        "step3_desc_2_2": "Valitse <bold>Callsign Preferences</bold> (Kutsuminimiasetukset).",
+        "step3_desc_2_3": "Valitse <bold>My Callsign</bold> (Oma kutsumanimi).",
+        "step3_desc_2_4": "Sy\u00f6t\u00e4 sinulle m\u00e4\u00e4r\u00e4tty kutsumanimi (esimerkki: <bold>Rambo</bold>).",
+        "step3_desc_2_5": "Paina <bold>OK</bold>.",
+        "step3_title": "3. Tarkista ja vaihda kutsumanimi tarvittaessa"
+      },
       "step1_download": "Lataa zip-paketti:",
       "step2_install": "Tuo paketti sovellukseen.",
       "step3_done": "ATAK on k\u00e4ytt\u00f6valmis.",
-      "title": "ATAK-paketin asennus"
+      "title": "ATAK-paketin asennus",
+      "wizard_title": {
+        "phase1": "Asenna Android-sovellukset",
+        "phase2": "Tuo datapaketti",
+        "phase3": "S\u00e4\u00e4d\u00e4 asetukset",
+        "phase4": "Data Sync",
+        "phase5": "Viimeistely"
+      }
     },
     "ios": {
       "step1_download": "Lataa zip-paketti:",
@@ -40,5 +124,11 @@
       "step3_done": "WinTAK on k\u00e4ytt\u00f6valmis.",
       "title": "WinTAK-paketin asennus"
     }
+  },
+  "wizard": {
+    "complete": "Valmis",
+    "next": "Seuraava",
+    "previous": "Edellinen",
+    "step_counter": "Vaihe {{current}} / {{total}}"
   }
 }

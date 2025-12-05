@@ -36,7 +36,7 @@ export default defineConfig(({ mode }) => {
         remotes: {},
         shared: {
           react: {
-            requiredVersion: "19.1.1",
+            requiredVersion: "18.3.1",
             singleton: true,
           },
           i18next: {
@@ -45,6 +45,10 @@ export default defineConfig(({ mode }) => {
           },
           "react-i18next": {
             requiredVersion: "16.3.3",
+            singleton: true
+          },
+          "@tanstack/react-router": {
+            requiredVersion: "1.135.2",
             singleton: true
           }
         },
