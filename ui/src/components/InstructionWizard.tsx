@@ -34,8 +34,7 @@ export const InstructionsWizard: React.FC<InstructionsWizardProps> = ({
 
   const currentPhaseIndex = phases.findIndex((p) => p.id === phaseId);
   const currentPhase = phases[currentPhaseIndex] || phases[0];
-  const progressPercentage =
-    ((currentPhaseIndex + 1) / phases.length) * 100;
+  const progressPercentage = ((currentPhaseIndex + 1) / phases.length) * 100;
 
   const handleNext = () => {
     if (currentPhaseIndex < phases.length - 1) {
@@ -56,16 +55,16 @@ export const InstructionsWizard: React.FC<InstructionsWizardProps> = ({
   };
 
   return (
-    <div className="min-h-screen flex flex-col gap-6 p-6">
+   <div className="flex flex-col h-screen">
       {/* Top bar */}
-      <div className="space-y-2">
+      <div className="px-6 pt-6 pb-4 space-y-2">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold">
             {showPhaseNumbers && (
               <span className="text-sm text-muted-foreground">
                 {t("wizard.step_counter", {
                   current: currentPhaseIndex + 1,
-                  total: phases.length
+                  total: phases.length,
                 })}
               </span>
             )}
@@ -73,47 +72,54 @@ export const InstructionsWizard: React.FC<InstructionsWizardProps> = ({
         </div>
         <Progress value={progressPercentage} />
       </div>
-      <h1 className="text-2xl font-bold">{currentPhase.title}</h1>
 
-      {/* Content */}
-      <div className="flex-1 overflow-auto">
+      <h1 className="text-2xl font-bold px-6">{currentPhase.title}</h1>
+
+      <div className="px-6 py-6">
         <Outlet />
       </div>
 
-      {/* Navigation */}
-      <div className="bg-background border-t p-6 flex items-center justify-between gap-4">
+      {/* Navigation  */}
+      <div className="w-full bg-background border-t p-4 md:p-6 flex items-center justify-between gap-2">
         <Button
           variant="outline"
           onClick={handlePrevious}
           disabled={currentPhaseIndex <= 0}
-          className="gap-2"
+          className="gap-2 px-4 py-2 md:py-3 shrink-0"
         >
           <ChevronLeft className="w-4 h-4" />
-          {t("wizard.previous")}
+          <span className="hidden md:inline">{t("wizard.previous")}</span>
         </Button>
 
-        <div className="flex gap-2">
+        {/* Phase dots */}
+        <div className="flex flex-1 justify-center gap-2">
           {phases.map((_, index) => (
             <button
               key={index}
               onClick={() => handlePhaseClick(index)}
-              className={`h-2 rounded-full transition-all ${
+              className={`rounded-full transition-all ${
                 index === currentPhaseIndex
-                  ? "bg-primary w-8"
-                  : "bg-secondary w-2 hover:bg-secondary/70"
+                  ? "bg-primary w-6 h-2 md:w-8 md:h-2"
+                  : "bg-secondary w-2 h-2 md:w-2 md:h-2 hover:bg-secondary/70"
               }`}
               aria-label={`Go to phase ${index + 1}`}
             />
           ))}
         </div>
 
-        <Button onClick={handleNext} className="gap-2">
-          {currentPhaseIndex === phases.length - 1
-            ? t("wizard.complete")
-            : t("wizard.next")}
+        <Button
+          onClick={handleNext}
+          className="gap-2 px-4 py-2 md:py-3 shrink-0"
+        >
+          <span className="hidden md:inline">
+            {currentPhaseIndex === phases.length - 1
+              ? t("wizard.complete")
+              : t("wizard.next")}
+          </span>
           <ChevronRight className="w-4 h-4" />
         </Button>
       </div>
     </div>
+
   );
 };
