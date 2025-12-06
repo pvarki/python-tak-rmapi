@@ -73,7 +73,7 @@ TAK_MISSIONPKG_ENABLED_PACKAGES: list[Path] = [
 ]
 
 # TAK datapackage defaults. Default files and zip-folders are defined here and will be added to "Default-ATAK" profile
-TAK_DATAPACKAGE_DEFAULT_PROFILE: str = cfg("TAK_DATAPACKAGE_DEFAULT_PROFILE", cast=str, default="default")
+TAK_DATAPACKAGE_EXTRA_PROFILE: str = cfg("TAK_DATAPACKAGE_EXTRA_PROFILE", cast=str, default="default")
 TAK_DATAPACKAGE_TEMPLATES_FOLDER: Path = cfg(
     "TAK_DATAPACKAGE_TEMPLATES_FOLDER",
     cast=Path,
@@ -81,13 +81,13 @@ TAK_DATAPACKAGE_TEMPLATES_FOLDER: Path = cfg(
 )
 
 # Single files that are added to TAK as profile files
-TAK_DATAPACKAGE_DEFAULT_PROFILE_FILES: list[Path] = [
+TAK_DATAPACKAGE_EXTRA_PROFILE_FILES: list[Path] = [
     Path("Maps/Google_Hybrid.xml"),
     Path("Mesh-Encryption/Mesh-Encryption-key.pref.tpl"),
 ]
 
 # Folders that are added to TAK as zip profile packages.
-TAK_DATAPACKAGE_DEFAULT_PROFILE_ZIP_PACKAGES: list[Path] = [
+TAK_DATAPACKAGE_EXTRA_PROFILE_ZIP_PACKAGES: list[Path] = [
     Path("Maps"),
     Path("ATAK-default-settings"),
     Path("Update-Server"),

@@ -21,13 +21,13 @@ class TAKDataPackageSiteVars:
         Path(config.TAK_DATAPACKAGE_TEMPLATES_FOLDER) / "default" / "client-packages"
     )
     client_pkg_extra_folder: ClassVar[Path] = (
-        Path(config.TAK_DATAPACKAGE_TEMPLATES_FOLDER) / config.TAK_DATAPACKAGE_DEFAULT_PROFILE / "client-packages"
+        Path(config.TAK_DATAPACKAGE_TEMPLATES_FOLDER) / config.TAK_DATAPACKAGE_EXTRA_PROFILE / "client-packages"
     )
     env_pkg_default_folder: ClassVar[Path] = (
         Path(config.TAK_DATAPACKAGE_TEMPLATES_FOLDER) / "default" / "environment-packages"
     )
     env_pkg_extra_folder: ClassVar[Path] = (
-        Path(config.TAK_DATAPACKAGE_TEMPLATES_FOLDER) / config.TAK_DATAPACKAGE_DEFAULT_PROFILE / "environment-packages"
+        Path(config.TAK_DATAPACKAGE_TEMPLATES_FOLDER) / config.TAK_DATAPACKAGE_EXTRA_PROFILE / "environment-packages"
     )
     missionpkg_default_folder: ClassVar[Path] = Path(config.TAK_MISSIONPKG_TEMPLATES_FOLDER) / "default"
     missionpkg_extra_folder: ClassVar[Path] = (
@@ -38,7 +38,7 @@ class TAKDataPackageSiteVars:
 
     def __post_init__(self) -> None:
         """Template variables post init"""
-        if config.TAK_DATAPACKAGE_DEFAULT_PROFILE != "default":
+        if config.TAK_DATAPACKAGE_EXTRA_PROFILE != "default":
             TAKDataPackageSiteVars.extra_pkg_enabled = True
 
         if config.TAK_MISSIONPKG_DEFAULT_MISSION != "default":
