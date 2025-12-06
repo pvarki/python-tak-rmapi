@@ -9,55 +9,57 @@ from fastapi.responses import FileResponse, Response
 from libpvarki.middleware.mtlsheader import MTLSHeader, DNDict
 from libpvarki.schemas.product import UserCRUDRequest
 
-from takrmapi import tak_helpers
-from ..config import TAK_DATAPACKAGE_TEMPLATES_FOLDER
+from takrmapi.taktools import tak_helpers
+from takrmapi.taktools.tak_pkg_helpers import TAKDataPackage, MissionZip
 
 LOGGER = logging.getLogger(__name__)
 
 router = APIRouter(dependencies=[Depends(MTLSHeader(auto_error=True))])
 
 
-@router.get("/package/{package_path:path}")
-async def return_datapackage_zip(package_path: str, request: Request, background_tasks: BackgroundTasks) -> Response:
+@router.get("/client-package/{package_path:path}")
+async def return_datapackage_zip(package_path: Path, request: Request, background_tasks: BackgroundTasks) -> Response:
     """Return zip package from folder contents under requested path, use folder name as package name"""
     payload = cast(DNDict, request.state.mtlsdn)
     callsign: str = payload["CN"]
     user: tak_helpers.UserCRUD = tak_helpers.UserCRUD(UserCRUDRequest(uuid="NA", callsign=callsign, x509cert=""))
-    pkg_helper = tak_helpers.MissionZip(user)
+    pkg_helper = MissionZip(user)
 
-    folderpath = Path(TAK_DATAPACKAGE_TEMPLATES_FOLDER) / package_path
+    client_package = TAKDataPackage(template_path=package_path, template_type="client")
 
-    # Check if the folder exists and no trailing "/"
-    if not folderpath.is_dir() or package_path[-1] == "/":
+    # Check if the default or specific folder is found.
+    if not client_package.path_found:
         raise HTTPException(status_code=404, detail="Requested datapackage not found in given path")
 
-    zip_files, tmp_folder = await pkg_helper.create_zip_bundles(template_folders=[folderpath], is_mission_package=False)
+    await pkg_helper.create_zip_bundles(datapackages=[client_package])
 
     # Remove/clear temp in background
-    background_tasks.add_task(pkg_helper.helpers.remove_tmp_dir, tmp_folder)
+    background_tasks.add_task(pkg_helper.helpers.remove_tmp_dir, client_package.zip_tmp_folder)
 
-    return FileResponse(zip_files[0])
+    return FileResponse(client_package.zip_path)
 
 
 @router.get("/file/{file_path:path}")
-async def return_datapackage_file(file_path: str, request: Request) -> Response:
+async def return_datapackage_file(file_path: Path, request: Request) -> Response:
     """Return file from tak_datapackages. If file ends with .tpl, return rendered file"""
     payload = cast(DNDict, request.state.mtlsdn)
     callsign: str = payload["CN"]
     user: tak_helpers.UserCRUD = tak_helpers.UserCRUD(UserCRUDRequest(uuid="NA", callsign=callsign, x509cert=""))
 
-    tak_missionpkg = tak_helpers.MissionZip(user)
+    tak_missionpkg = MissionZip(user)
 
-    filepath = Path(TAK_DATAPACKAGE_TEMPLATES_FOLDER) / file_path
+    client_file = TAKDataPackage(template_path=file_path, template_type="client")
 
     # Check if the file exists
-    if not filepath.is_file():
+    if not client_file.path_found:
         raise HTTPException(status_code=404, detail="Requested datapackage file not found")
 
-    filename = file_path.split("/")[-1]
-    if filename.endswith(".tpl"):
-        tak_missionpkg = tak_helpers.MissionZip(user)
-        rendered_file_str = await tak_missionpkg.render_tak_manifest_template(Path(filepath))
-        return Response(rendered_file_str.encode(encoding="utf-8"), media_type="text/plain")
+    if client_file.is_folder:
+        raise HTTPException(status_code=400, detail="Requested datapackage is not servicable file")
 
-    return FileResponse(filepath)
+    if client_file.package_name.endswith(".tpl"):
+        tak_missionpkg = MissionZip(user)
+        await tak_missionpkg.render_tak_manifest_template(client_file)
+        return Response(client_file.template_str.encode(encoding="utf-8"), media_type="text/plain")
+
+    return FileResponse(client_file.package_single_file_path)

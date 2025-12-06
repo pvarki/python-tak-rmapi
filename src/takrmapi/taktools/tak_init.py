@@ -5,13 +5,14 @@ import logging
 import shutil
 import secrets
 import string
-import tempfile
-from pathlib import Path
 
 from libpvarki.schemas.product import UserCRUDRequest
 from takrmapi import config
-from takrmapi import tak_helpers
-from takrmapi.tak_helpers import UserCRUD, RestHelpers, MissionZip
+from takrmapi.taktools import tak_helpers
+from takrmapi.taktools.tak_helpers import UserCRUD
+from takrmapi.taktools.tak_rest_helpers import RestHelpers
+from takrmapi.taktools.tak_pkg_helpers import MissionZip, TAKDataPackage
+
 
 LOGGER = logging.getLogger(__name__)
 
@@ -133,55 +134,40 @@ async def tak_setup_profile_files(t_rest_helper: RestHelpers, tak_missionpkg: Mi
     # Get current 'Default-ATAK' profile files
     profile_files = await t_rest_helper.tak_api_get_device_profile_files(profile_name="Default-ATAK")
 
-    # Upload default files to profile
+    # Check dst default profile files before uploading
+    local_profile_files: list[TAKDataPackage] = []
     for profile_file in config.TAK_DATAPACKAGE_DEFAULT_PROFILE_FILES:
+        p_file: TAKDataPackage = TAKDataPackage(template_path=profile_file, template_type="environment")
         # Skip already uploaded files
-        if await t_rest_helper.check_file_in_profile_files(
-            local_profile_file=profile_file, tak_profile_files=profile_files
-        ):
+        if await t_rest_helper.check_file_in_profile_files(datapackage=p_file, tak_profile_files=profile_files):
             continue
+        local_profile_files.append(p_file)
 
-        if profile_file.name.endswith(".tpl"):
-            profile_file_str = await tak_missionpkg.render_tak_manifest_template(profile_file)
+    # Upload default files to profile
+    for pf in local_profile_files:
+        if pf.is_template_file:
+            await tak_missionpkg.render_tak_manifest_template(pf)
 
-            # TODO tmpfile in memory
-            tmp_folder = Path(tempfile.mkdtemp(suffix="_INIT_TEMP"))
-            tmp_template_file = tmp_folder / profile_file.name.replace(".tpl", "")
-
-            with open(tmp_template_file, "w", encoding="utf-8") as filehandle:
-                filehandle.write(profile_file_str)
-
-            await t_rest_helper.tak_api_upload_file_to_profile(
-                profile_name="Default-ATAK",
-                file_path=tmp_template_file,
-            )
-
-            await tak_missionpkg.helpers.remove_tmp_dir(tmp_folder)
-
-        else:
-            await t_rest_helper.tak_api_upload_file_to_profile(
-                profile_name="Default-ATAK",
-                file_path=profile_file,
-            )
+        await t_rest_helper.tak_api_upload_file_to_profile(
+            profile_name="Default-ATAK",
+            datapackage=pf,
+        )
 
     # Create zip bundles and upload to profile
     # First check for bundles already uploaded
-    upload_bundles: list[Path] = []
+    upload_bundles: list[TAKDataPackage] = []
     for bundle in config.TAK_DATAPACKAGE_DEFAULT_PROFILE_ZIP_PACKAGES:
-        if await t_rest_helper.check_file_in_profile_files(local_profile_file=bundle, tak_profile_files=profile_files):
+        b_package: TAKDataPackage = TAKDataPackage(template_path=bundle, template_type="environment")
+        if await t_rest_helper.check_file_in_profile_files(datapackage=b_package, tak_profile_files=profile_files):
             continue
-        upload_bundles.append(bundle)
+        upload_bundles.append(b_package)
 
     if len(upload_bundles) > 0:
-        zip_files, tmp_folder = await tak_missionpkg.create_zip_bundles(
-            template_folders=upload_bundles, is_mission_package=False
-        )
-        for file in zip_files:
-            await t_rest_helper.tak_api_upload_file_to_profile(
-                profile_name="Default-ATAK",
-                file_path=file,
-            )
-        await tak_missionpkg.helpers.remove_tmp_dir(tmp_folder)
+        await tak_missionpkg.create_zip_bundles(datapackages=upload_bundles)
+        for dp in upload_bundles:
+
+            await t_rest_helper.tak_api_upload_file_to_profile(profile_name="Default-ATAK", datapackage=dp)
+            await tak_missionpkg.helpers.remove_tmp_dir(dp.zip_tmp_folder)
 
 
 async def get_tak_defaults() -> None:

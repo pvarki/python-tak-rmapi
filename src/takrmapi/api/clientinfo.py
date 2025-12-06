@@ -7,8 +7,10 @@ from fastapi import APIRouter, Depends, BackgroundTasks
 from libpvarki.middleware import MTLSHeader
 from libpvarki.schemas.product import UserCRUDRequest
 
-from takrmapi import tak_helpers
+from takrmapi.taktools import tak_helpers
+from takrmapi.taktools.tak_pkg_helpers import TAKDataPackage, MissionZip
 from ..config import TAK_MISSIONPKG_ENABLED_PACKAGES
+
 
 LOGGER = logging.getLogger(__name__)
 
@@ -19,23 +21,26 @@ router = APIRouter(dependencies=[Depends(MTLSHeader(auto_error=True))])
 async def client_instruction_fragment(user: UserCRUDRequest, background_tasks: BackgroundTasks) -> List[Dict[str, str]]:
     """Return zip package containing client config and certificates"""
     localuser = tak_helpers.UserCRUD(user)
-    tak_missionpkg = tak_helpers.MissionZip(localuser)
-    zip_files, tmp_folder = await tak_missionpkg.create_zip_bundles(
-        template_folders=TAK_MISSIONPKG_ENABLED_PACKAGES, is_mission_package=True
-    )
+    tak_missionpkg = MissionZip(localuser)
+
+    mp_list: list[TAKDataPackage] = []
+    for mp in TAK_MISSIONPKG_ENABLED_PACKAGES:
+        mp_list.append(TAKDataPackage(template_path=mp, template_type="mission"))
+
+    await tak_missionpkg.create_zip_bundles(datapackages=mp_list)
+
     returnable: List[Dict[str, str]] = []
 
-    for file in zip_files:
-        contents = file.read_bytes()
+    for pkg in mp_list:
+        contents = pkg.zip_path.read_bytes()
         returnable.append(
             {
-                "title": file.name,
+                "title": pkg.zip_path.name,
                 "data": f"data:application/zip;base64,{base64.b64encode(contents).decode('ascii')}",
-                "filename": f"{user.callsign}_{file.name}",
+                "filename": f"{localuser.callsign}_{pkg.zip_path.name}",
             }
         )
-
-    # Remove/clear temp in background
-    background_tasks.add_task(tak_missionpkg.helpers.remove_tmp_dir, tmp_folder)
+        # Remove/clear temp in background
+        background_tasks.add_task(tak_missionpkg.helpers.remove_tmp_dir, pkg.zip_tmp_folder)
 
     return returnable

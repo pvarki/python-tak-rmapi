@@ -14,7 +14,7 @@ takrmapi = "takrmapi.console:takrmapi_cli"
 
 [tool.black]
 line-length = 120
-target-version = ['py38']
+target-version = ['py310']
 exclude = '''
 (
   /(
@@ -75,7 +75,7 @@ pytest = "^8.0"
 coverage = "^7.4"
 pytest-cov = "^4.1"
 pylint = "^3.0"
-black = "^24.1"
+black = "^25.11"
 bandit = "^1.7"
 mypy = "^1.8"
 pre-commit = "^3.6"

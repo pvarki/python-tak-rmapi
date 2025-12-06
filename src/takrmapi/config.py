@@ -64,12 +64,12 @@ TAK_MISSIONPKG_DEFAULT_MISSION: str = cfg("TAK_MISSIONPKG_DEFAULT_MISSION", cast
 TAK_MISSIONPKG_TEMPLATES_FOLDER: Path = cfg(
     "TAK_MISSIONPKG_TEMPLATES_FOLDER",
     cast=Path,
-    default=TEMPLATES_PATH / "tak_missionpkg" / TAK_MISSIONPKG_DEFAULT_MISSION,
+    default=TEMPLATES_PATH / "tak_missionpkg",
 )
 TAK_MISSIONPKG_ENABLED_PACKAGES: list[Path] = [
-    TAK_MISSIONPKG_TEMPLATES_FOLDER / "atak",
-    TAK_MISSIONPKG_TEMPLATES_FOLDER / "itak",
-    TAK_MISSIONPKG_TEMPLATES_FOLDER / "tak-tracker",
+    Path("atak"),
+    Path("itak"),
+    Path("tak-tracker"),
 ]
 
 # TAK datapackage defaults. Default files and zip-folders are defined here and will be added to "Default-ATAK" profile
@@ -77,20 +77,23 @@ TAK_DATAPACKAGE_DEFAULT_PROFILE: str = cfg("TAK_DATAPACKAGE_DEFAULT_PROFILE", ca
 TAK_DATAPACKAGE_TEMPLATES_FOLDER: Path = cfg(
     "TAK_DATAPACKAGE_TEMPLATES_FOLDER",
     cast=Path,
-    default=TEMPLATES_PATH / "tak_datapackage" / TAK_DATAPACKAGE_DEFAULT_PROFILE,
+    default=TEMPLATES_PATH / "tak_datapackage",
 )
 
 # Single files that are added to TAK as profile files
-TAK_DATAPACKAGE_DEFAULT_PROFILE_FILES: list[Path] = []
+TAK_DATAPACKAGE_DEFAULT_PROFILE_FILES: list[Path] = [
+    Path("Maps/Google_Hybrid.xml"),
+    Path("Mesh-Encryption/Mesh-Encryption-key.pref.tpl"),
+]
 
 # Folders that are added to TAK as zip profile packages.
 TAK_DATAPACKAGE_DEFAULT_PROFILE_ZIP_PACKAGES: list[Path] = [
-    TAK_DATAPACKAGE_TEMPLATES_FOLDER / "Maps",
-    TAK_DATAPACKAGE_TEMPLATES_FOLDER / "ATAK-default-settings",
-    TAK_DATAPACKAGE_TEMPLATES_FOLDER / "ATAK-Toolbar",
-    TAK_DATAPACKAGE_TEMPLATES_FOLDER / "Update-Server",
-    TAK_DATAPACKAGE_TEMPLATES_FOLDER / "Mesh-Encryption",
+    Path("Maps"),
+    Path("ATAK-default-settings"),
+    Path("Update-Server"),
+    Path("Mesh-Encryption"),
 ]
+# "ATAK-Toolbar",
 
 TAK_MESSAGING_API_HOST: str = cfg("TAK_MESSAGING_API_HOST", cast=str, default="https://127.0.0.1")  # We are in sidecar
 TAK_MESSAGING_API_PORT: int = cfg("TAK_MESSAGING_API_PORT", cast=int, default=8443)
