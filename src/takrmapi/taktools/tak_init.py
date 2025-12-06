@@ -136,7 +136,7 @@ async def tak_setup_profile_files(t_rest_helper: RestHelpers, tak_missionpkg: Mi
 
     # Check dst default profile files before uploading
     local_profile_files: list[TAKDataPackage] = []
-    for profile_file in config.TAK_DATAPACKAGE_EXTRA_PROFILE_FILES:
+    for profile_file in config.TAK_DATAPACKAGE_ADDON_FOLDER_FILES:
         p_file: TAKDataPackage = TAKDataPackage(template_path=profile_file, template_type="environment")
         # Skip already uploaded files
         if await t_rest_helper.check_file_in_profile_files(datapackage=p_file, tak_profile_files=profile_files):
@@ -156,7 +156,7 @@ async def tak_setup_profile_files(t_rest_helper: RestHelpers, tak_missionpkg: Mi
     # Create zip bundles and upload to profile
     # First check for bundles already uploaded
     upload_bundles: list[TAKDataPackage] = []
-    for bundle in config.TAK_DATAPACKAGE_EXTRA_PROFILE_ZIP_PACKAGES:
+    for bundle in config.TAK_DATAPACKAGE_ADDON_FOLDER_ZIP_PACKAGES:
         b_package: TAKDataPackage = TAKDataPackage(template_path=bundle, template_type="environment")
         if await t_rest_helper.check_file_in_profile_files(datapackage=b_package, tak_profile_files=profile_files):
             continue

@@ -264,7 +264,7 @@ class MissionZip:
         # FIXME: use Paths for everything
 
         # TODO Check for extra template content
-        # if config.TAK_DATAPACKAGE_EXTRA_PROFILE != "default"
+        # if config.TAK_DATAPACKAGE_ADDON_FOLDER != "default"
         walk_dir = datapackage.default_path
         tmp_zip_folder = datapackage.zip_tmp_folder / walk_dir.name
         if datapackage.is_mission_package:
