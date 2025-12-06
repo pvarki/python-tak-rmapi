@@ -24,11 +24,11 @@ class UserTAKTemplateVars:
     # Deployment specific "static" var mapping for template files
     tak_server_deployment_name: ClassVar[str] = config.TAK_SERVER_NAME
     tak_server_public_address: ClassVar[str] = config.TAK_SERVER_FQDN
-    mmtx_server_public_address: ClassVar[str] = config.MMTX_SERVER_FQDN
-    mmtx_server_srt_port: ClassVar[int] = config.MMTX_SERVER_SRT_PORT
-    mmtx_server_observer_port: ClassVar[int] = config.MMTX_SERVER_OBSERVER_PORT
-    mmtx_server_observer_proto: ClassVar[str] = config.MMTX_SERVER_OBSERVER_PROTO
-    mmtx_server_observer_net_proto: ClassVar[str] = config.MMTX_SERVER_OBSERVER_NET_PROTO
+    mtx_server_public_address: ClassVar[str] = config.MTX_SERVER_FQDN
+    mtx_server_srt_port: ClassVar[int] = config.MTX_SERVER_SRT_PORT
+    mtx_server_observer_port: ClassVar[int] = config.MTX_SERVER_OBSERVER_PORT
+    mtx_server_observer_proto: ClassVar[str] = config.MTX_SERVER_OBSERVER_PROTO
+    mtx_server_observer_net_proto: ClassVar[str] = config.MTX_SERVER_OBSERVER_NET_PROTO
 
     @property
     def tak_userfile_uid(self) -> str:
@@ -53,11 +53,11 @@ class UserTAKTemplateVars:
         return str(hashlib.sha256(config.TAK_SERVER_NETWORKMESH_KEY_STR.encode("utf-8")).hexdigest())
 
     @property
-    def client_mmtx_username(self) -> str:
-        """TODO Return users MMTX username"""
+    def client_mtx_username(self) -> str:
+        """TODO Return users MTX username"""
         return "TODO-Username_Retrieve_Not_Implemented_Yet"
 
     @property
-    def client_mmtx_password(self) -> str:
-        """TODO Return users MMTX username"""
+    def client_mtx_password(self) -> str:
+        """TODO Return users MTX username"""
         return "TODO-PW-Retrieve-Not-Implemented-Yet"

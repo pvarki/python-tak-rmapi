@@ -101,11 +101,11 @@ TAK_MESSAGING_API_PORT: int = cfg("TAK_MESSAGING_API_PORT", cast=int, default=84
 TAKCL_CORECONFIG_PATH: Path = cfg("TAKCL_CORECONFIG_PATH", cast=Path, default=Path("/opt/tak/data/CoreConfig.xml"))
 
 # Used for mission pkgs
-MMTX_SERVER_FQDN: str = cfg("MMTX_SERVER_FQDN", cast=str, default="Not Available - ENV not set")
-MMTX_SERVER_SRT_PORT: int = cfg("MMTX_SERVER_SRT_PORT", cast=int, default=8890)
-MMTX_SERVER_OBSERVER_PORT: int = cfg("MMTX_SERVER_SRT_PORT", cast=int, default=8322)
-MMTX_SERVER_OBSERVER_PROTO: str = cfg("MMTX_SERVER_OBSERVER_PROTO", cast=str, default="rtsps")
-MMTX_SERVER_OBSERVER_NET_PROTO: str = cfg("MMTX_SERVER_OBSERVER_NET_PROTO", cast=str, default="tcp")
+MTX_SERVER_FQDN: str = cfg("MTX_SERVER_FQDN", cast=str, default="Not Available - ENV not set")
+MTX_SERVER_SRT_PORT: int = cfg("MTX_SERVER_SRT_PORT", cast=int, default=8890)
+MTX_SERVER_OBSERVER_PORT: int = cfg("MTX_SERVER_SRT_PORT", cast=int, default=8322)
+MTX_SERVER_OBSERVER_PROTO: str = cfg("MTX_SERVER_OBSERVER_PROTO", cast=str, default="rtsps")
+MTX_SERVER_OBSERVER_NET_PROTO: str = cfg("MTX_SERVER_OBSERVER_NET_PROTO", cast=str, default="tcp")
 TAK_SERVER_FQDN: str = cfg("TAK_SERVER_FQDN", cast=str, default=read_tak_fqdn())
 TAK_SERVER_NAME: str = cfg("TAK_SERVER_NAME", cast=str, default=read_deployment_name())
 TAK_SERVER_NETWORKMESH_KEY_FILE: Path = cfg(
