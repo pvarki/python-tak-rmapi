@@ -3,10 +3,13 @@
 from typing import Dict, Any
 from dataclasses import dataclass
 from pathlib import Path
+import logging
 
 from takrmapi import config
 from takrmapi.taktools.tak_helpers import UserCRUD
 from takrmapi.taktools.tak_pkg_sitevars import TAKDataPackageSiteVars
+
+LOGGER = logging.getLogger(__name__)
 
 
 @dataclass

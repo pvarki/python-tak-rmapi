@@ -15,7 +15,7 @@ from libpvarki.mtlshelp.pkcs12 import convert_pem_to_pkcs12
 from takrmapi import config
 from takrmapi.taktools.tak_template_helpers import UserTAKTemplateVars
 from takrmapi.taktools.tak_helpers import UserCRUD, Helpers
-from takrmapi.taktools.tak_pkg_sitevars import TAKDataPackageSiteVars
+from takrmapi.taktools.tak_pkg_sitevars import TAKDataPackageSiteVars, TAKViteAssetVars
 
 
 LOGGER = logging.getLogger(__name__)
@@ -65,6 +65,10 @@ class TAKDataPackage:
                 __package_default_path = Path(TAKDataPackageSiteVars.missionpkg_default_folder) / self.template_path
                 __package_extra_path = Path(TAKDataPackageSiteVars.missionpkg_extra_folder) / self.template_path
                 __is_mission_package = True
+            case "vite":
+                __package_default_path = Path(TAKViteAssetVars.vite_asset_default_folder) / self.template_path
+                __package_extra_path = Path("not-used-in-vite")
+                __is_mission_package = False
 
         self._pkgvars = PkgVars(
             package_default_path=__package_default_path,

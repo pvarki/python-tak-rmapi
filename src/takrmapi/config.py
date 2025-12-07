@@ -56,7 +56,7 @@ VITE_ASSET_SET: str = cfg("VITE_ASSET_SET", cast=str, default="not_used_by_defau
 VITE_ASSET_SET_TEMPLATES_FOLDER: Path = cfg(
     "VITE_ASSET_SET_TEMPLATES_FOLDER",
     cast=Path,
-    default=TEMPLATES_PATH / "tak_viteassets" / VITE_ASSET_SET,
+    default=TEMPLATES_PATH / "tak_viteassets",
 )
 
 # TAK mission package defaults. Available mission packages are defined here.

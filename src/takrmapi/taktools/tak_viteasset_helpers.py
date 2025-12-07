@@ -1,0 +1,49 @@
+"""Helper functions to manage tak data packages"""
+
+from typing import List, ClassVar
+import logging
+from dataclasses import dataclass
+from pathlib import Path
+
+
+from takrmapi.taktools.tak_pkg_sitevars import TAKViteAssetVars
+
+
+LOGGER = logging.getLogger(__name__)
+
+
+@dataclass
+class TAKViteAsset:
+    """TAK Datapackage helper"""
+
+    _vite: ClassVar[TAKViteAssetVars] = TAKViteAssetVars()
+
+    @staticmethod
+    def is_vite_enabled() -> bool:
+        """Check if Vite Assets are enabled"""
+        return TAKViteAssetVars.vite_asset_enabled
+
+    @staticmethod
+    def get_vite_folder() -> Path:
+        """Return Vite Assets package path"""
+        return TAKViteAssetVars.vite_asset_default_folder
+
+    @staticmethod
+    def vite_folder_exists() -> bool:
+        """Return Vite Assets package path"""
+        return TAKViteAssetVars.vite_asset_default_folder.exists()
+
+    @staticmethod
+    def get_vite_packages() -> List[Path]:
+        """Return list of available Vite packages"""
+        if not TAKViteAsset.vite_folder_exists():
+            LOGGER.warning(
+                "Vite asset folder '{}' missing. Unable to list content!".format(
+                    TAKViteAssetVars.vite_asset_default_folder
+                )
+            )
+            return []
+        vite_packages: List[Path] = []
+        for item in TAKViteAsset.get_vite_folder().iterdir():
+            vite_packages.append(item)
+        return vite_packages

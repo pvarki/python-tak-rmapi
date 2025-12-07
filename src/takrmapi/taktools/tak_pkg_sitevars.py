@@ -43,3 +43,19 @@ class TAKDataPackageSiteVars:
 
         if config.TAK_MISSIONPKG_ADDON_FOLDER != "default":
             TAKDataPackageSiteVars.extra_mission_enabled = True
+
+
+@dataclass
+class TAKViteAssetVars:
+    """TAK ViteAsset vars"""
+
+    # Viteasset internal variables
+    vite_asset_default_folder: ClassVar[Path] = Path(config.VITE_ASSET_SET_TEMPLATES_FOLDER) / config.VITE_ASSET_SET
+    vite_asset_enabled: ClassVar[bool] = False
+
+    def __post_init__(self) -> None:
+        """Template variables post init"""
+        if config.VITE_ASSET_SET != "not_used_by_default":
+            TAKViteAssetVars.vite_asset_enabled = True
+            if not self.vite_asset_default_folder.exists():
+                LOGGER.warning("Vite asset folder '{}' missing. Unable to add!".format(self.vite_asset_default_folder))

@@ -12,7 +12,7 @@ from takrmapi.taktools import tak_helpers
 from takrmapi.taktools.tak_helpers import UserCRUD
 from takrmapi.taktools.tak_rest_helpers import RestHelpers
 from takrmapi.taktools.tak_pkg_helpers import MissionZip, TAKDataPackage
-
+from takrmapi.taktools.tak_viteasset_helpers import TAKViteAsset
 
 LOGGER = logging.getLogger(__name__)
 
@@ -153,15 +153,25 @@ async def tak_setup_profile_files(t_rest_helper: RestHelpers, tak_missionpkg: Mi
             datapackage=pf,
         )
 
-    # Create zip bundles and upload to profile
-    # First check for bundles already uploaded
+    # Check for already uploaded bundles
     upload_bundles: list[TAKDataPackage] = []
+
+    if TAKViteAsset.is_vite_enabled():
+
+        for v in TAKViteAsset.get_vite_packages():
+            v_package: TAKDataPackage = TAKDataPackage(template_path=v, template_type="vite")
+            if await t_rest_helper.check_file_in_profile_files(datapackage=v_package, tak_profile_files=profile_files):
+                continue
+
+            upload_bundles.append(v_package)
+
     for bundle in config.TAK_DATAPACKAGE_ADDON_FOLDER_ZIP_PACKAGES:
         b_package: TAKDataPackage = TAKDataPackage(template_path=bundle, template_type="environment")
         if await t_rest_helper.check_file_in_profile_files(datapackage=b_package, tak_profile_files=profile_files):
             continue
         upload_bundles.append(b_package)
 
+    # Create zip bundles and upload to profile from those missing in dst
     if len(upload_bundles) > 0:
         await tak_missionpkg.create_zip_bundles(datapackages=upload_bundles)
         for dp in upload_bundles:
