@@ -13,9 +13,9 @@ from jinja2 import Template
 
 from libpvarki.mtlshelp.pkcs12 import convert_pem_to_pkcs12
 from takrmapi import config
-from takrmapi.taktools.tak_template_helpers import UserTAKTemplateVars
-from takrmapi.taktools.tak_helpers import UserCRUD, Helpers
-from takrmapi.taktools.tak_pkg_sitevars import TAKDataPackageSiteVars, TAKViteAssetVars
+from takrmapi.takutils.tak_template_helpers import UserTAKTemplateVars
+from takrmapi.takutils.tak_helpers import UserCRUD, Helpers
+from takrmapi.takutils.tak_pkg_sitevars import TAKDataPackageSiteVars, TAKViteAssetVars
 
 
 LOGGER = logging.getLogger(__name__)

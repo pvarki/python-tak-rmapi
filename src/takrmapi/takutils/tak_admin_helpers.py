@@ -6,8 +6,8 @@ from pathlib import Path
 import logging
 
 from takrmapi import config
-from takrmapi.taktools.tak_helpers import UserCRUD
-from takrmapi.taktools.tak_pkg_sitevars import TAKDataPackageSiteVars
+from takrmapi.takutils.tak_helpers import UserCRUD
+from takrmapi.takutils.tak_pkg_sitevars import TAKDataPackageSiteVars
 
 LOGGER = logging.getLogger(__name__)
 
@@ -32,15 +32,13 @@ class TAKAdminHelper:
         if TAKDataPackageSiteVars.extra_pkg_enabled:
             dir_content["extra"] = self.get_dir_content(TAKDataPackageSiteVars.env_pkg_extra_folder)
 
-        dir_content["others"] = self.get_dir_content(Path(config.TAK_DATAPACKAGE_TEMPLATES_FOLDER) / "others")
+        # Get the "type" folders from /general. Packages are located under all of these
+        tf: Dict[str, Any] = self.get_dir_content(Path(config.TAK_DATAPACKAGE_TEMPLATES_FOLDER) / "general")
 
-        # And then the "special" ones
-        dir_content["Role-Packages"] = self.get_dir_content(
-            Path(config.TAK_DATAPACKAGE_TEMPLATES_FOLDER) / "others" / "Role-Colour-Packages" / "Roles"
-        )
-        dir_content["Colours-Packages"] = self.get_dir_content(
-            Path(config.TAK_DATAPACKAGE_TEMPLATES_FOLDER) / "others" / "Role-Colour-Packages" / "Colours"
-        )
+        for f in tf:
+            dir_content[f"general_{f}"] = self.get_dir_content(
+                Path(config.TAK_DATAPACKAGE_TEMPLATES_FOLDER) / "general" / f
+            )
 
         return dir_content
 

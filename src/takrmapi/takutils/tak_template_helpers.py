@@ -8,7 +8,7 @@ import uuid
 from dataclasses import dataclass
 
 from takrmapi import config
-from takrmapi.taktools.tak_helpers import UserCRUD
+from takrmapi.takutils.tak_helpers import UserCRUD
 
 
 LOGGER = logging.getLogger(__name__)

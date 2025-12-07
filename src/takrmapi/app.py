@@ -12,7 +12,7 @@ from libpvarki.logging import init_logging
 
 from takrmapi import __version__
 from takrmapi import config
-from takrmapi.taktools import tak_init
+from takrmapi.takutils import tak_init
 from .config import LOG_LEVEL
 from .api import all_routers, all_routers_v2
 

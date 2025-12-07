@@ -9,8 +9,8 @@ import aiohttp
 
 from libpvarki.schemas.product import UserCRUDRequest
 
-from takrmapi.taktools.tak_helpers import UserCRUD, Helpers
-from takrmapi.taktools.tak_pkg_helpers import TAKDataPackage
+from takrmapi.takutils.tak_helpers import UserCRUD, Helpers
+from takrmapi.takutils.tak_pkg_helpers import TAKDataPackage
 
 
 LOGGER = logging.getLogger(__name__)

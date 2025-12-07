@@ -81,17 +81,15 @@ TAK_DATAPACKAGE_TEMPLATES_FOLDER: Path = cfg(
 )
 
 # Single files that are added to TAK as profile files
-TAK_DATAPACKAGE_ADDON_FOLDER_FILES: list[Path] = [
-    Path("Maps/Google_Hybrid.xml"),
-    Path("Mesh-Encryption/Mesh-Encryption-key.pref.tpl"),
-]
+TAK_DATAPACKAGE_ADDON_FOLDER_FILES: list[Path] = []
 
 # Folders that are added to TAK as zip profile packages.
 TAK_DATAPACKAGE_ADDON_FOLDER_ZIP_PACKAGES: list[Path] = [
-    Path("Maps"),
     Path("ATAK-default-settings"),
-    Path("Update-Server"),
+    Path("ATAK-TeamMember_Toolbar"),
+    Path("Maps"),
     Path("Mesh-Encryption"),
+    Path("Update-Server"),
 ]
 # "ATAK-Toolbar",
 

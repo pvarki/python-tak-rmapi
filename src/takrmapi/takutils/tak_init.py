@@ -8,11 +8,11 @@ import string
 
 from libpvarki.schemas.product import UserCRUDRequest
 from takrmapi import config
-from takrmapi.taktools import tak_helpers
-from takrmapi.taktools.tak_helpers import UserCRUD
-from takrmapi.taktools.tak_rest_helpers import RestHelpers
-from takrmapi.taktools.tak_pkg_helpers import MissionZip, TAKDataPackage
-from takrmapi.taktools.tak_viteasset_helpers import TAKViteAsset
+from takrmapi.takutils import tak_helpers
+from takrmapi.takutils.tak_helpers import UserCRUD
+from takrmapi.takutils.tak_rest_helpers import RestHelpers
+from takrmapi.takutils.tak_pkg_helpers import MissionZip, TAKDataPackage
+from takrmapi.takutils.tak_viteasset_helpers import TAKViteAsset
 
 LOGGER = logging.getLogger(__name__)
 

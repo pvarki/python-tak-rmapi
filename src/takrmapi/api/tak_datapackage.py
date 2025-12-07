@@ -9,9 +9,9 @@ from fastapi.responses import FileResponse, Response
 from libpvarki.middleware.mtlsheader import MTLSHeader, DNDict
 from libpvarki.schemas.product import UserCRUDRequest
 
-from takrmapi.taktools import tak_helpers
-from takrmapi.taktools.tak_pkg_helpers import TAKDataPackage, MissionZip
-from takrmapi.taktools.tak_admin_helpers import TAKAdminHelper
+from takrmapi.takutils import tak_helpers
+from takrmapi.takutils.tak_pkg_helpers import TAKDataPackage, MissionZip
+from takrmapi.takutils.tak_admin_helpers import TAKAdminHelper
 
 from .schemas import TAKAdminPackageListResponse
 

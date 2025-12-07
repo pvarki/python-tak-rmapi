@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 
-from takrmapi.taktools.tak_pkg_sitevars import TAKViteAssetVars
+from takrmapi.takutils.tak_pkg_sitevars import TAKViteAssetVars
 
 
 LOGGER = logging.getLogger(__name__)

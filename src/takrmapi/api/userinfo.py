@@ -5,8 +5,8 @@ import base64
 from fastapi import APIRouter, Depends, BackgroundTasks
 from libpvarki.middleware import MTLSHeader
 from libpvarki.schemas.product import UserCRUDRequest
-from takrmapi.taktools import tak_helpers
-from takrmapi.taktools.tak_pkg_helpers import TAKDataPackage, MissionZip
+from takrmapi.takutils import tak_helpers
+from takrmapi.takutils.tak_pkg_helpers import TAKDataPackage, MissionZip
 from .schemas import TakZipFile, ClientInstructionData, ClientInstructionResponse
 
 from ..config import TAK_MISSIONPKG_ENABLED_PACKAGES
