@@ -11,6 +11,9 @@ from libpvarki.schemas.product import UserCRUDRequest
 
 from takrmapi.taktools import tak_helpers
 from takrmapi.taktools.tak_pkg_helpers import TAKDataPackage, MissionZip
+from takrmapi.taktools.tak_admin_helpers import TAKAdminHelper
+
+from .schemas import TAKAdminPackageListResponse
 
 LOGGER = logging.getLogger(__name__)
 
@@ -37,6 +40,19 @@ async def return_datapackage_zip(package_path: Path, request: Request, backgroun
     background_tasks.add_task(pkg_helper.helpers.remove_tmp_dir, client_package.zip_tmp_folder)
 
     return FileResponse(client_package.zip_path)
+
+
+@router.get("/package-list")
+async def return_available_datapackages(request: Request) -> TAKAdminPackageListResponse:
+    """Return available datapackages from default and others folder"""
+    # TODO check if user has elevated privileges
+    # TODO callsign
+    payload = cast(DNDict, request.state.mtlsdn)
+    callsign: str = payload["CN"]
+    user: tak_helpers.UserCRUD = tak_helpers.UserCRUD(UserCRUDRequest(uuid="NA", callsign=callsign, x509cert=""))
+    adm_helper = TAKAdminHelper(user)
+
+    return TAKAdminPackageListResponse(data=adm_helper.get_available_datapackages)
 
 
 @router.get("/file/{file_path:path}")

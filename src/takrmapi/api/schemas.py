@@ -1,6 +1,6 @@
 """Schemas for userinfo.py, including client instructions and mission ZIP files."""
 
-from typing import List
+from typing import List, Dict, Any
 from pydantic import BaseModel, Field, Extra
 
 
@@ -34,6 +34,17 @@ class ClientInstructionResponse(BaseModel):  # pylint: disable=too-few-public-me
     """Response schema for returning client mission instructions."""
 
     data: ClientInstructionData = Field(description="Container object for returned data.")
+
+    class Config:  # pylint: disable=too-few-public-methods
+        """Pydantic configs"""
+
+        extra = Extra.forbid
+
+
+class TAKAdminPackageListResponse(BaseModel):  # pylint: disable=too-few-public-methods
+    """Response schema for returning available TAK datapackages."""
+
+    data: Dict[str, Any] = Field(description="Response dict containing available packages")
 
     class Config:  # pylint: disable=too-few-public-methods
         """Pydantic configs"""
