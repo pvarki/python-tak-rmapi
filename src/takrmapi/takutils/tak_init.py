@@ -1,5 +1,6 @@
 """Init TAK management connection capability"""
 
+from typing import List
 import asyncio
 import logging
 import shutil
@@ -13,6 +14,7 @@ from takrmapi.takutils.tak_helpers import UserCRUD
 from takrmapi.takutils.tak_rest_helpers import RestHelpers
 from takrmapi.takutils.tak_pkg_helpers import MissionZip, TAKDataPackage
 from takrmapi.takutils.tak_viteasset_helpers import TAKViteAsset
+from takrmapi.takutils.tak_pkg_dynpkg import TAKDynPkgHelper
 
 LOGGER = logging.getLogger(__name__)
 
@@ -135,7 +137,7 @@ async def tak_setup_profile_files(t_rest_helper: RestHelpers, tak_missionpkg: Mi
     profile_files = await t_rest_helper.tak_api_get_device_profile_files(profile_name="Default-ATAK")
 
     # Check dst default profile files before uploading
-    local_profile_files: list[TAKDataPackage] = []
+    local_profile_files: List[TAKDataPackage] = []
     for profile_file in config.TAK_DATAPACKAGE_ADDON_FOLDER_FILES:
         p_file: TAKDataPackage = TAKDataPackage(template_path=profile_file, template_type="environment")
         # Skip already uploaded files
@@ -154,16 +156,17 @@ async def tak_setup_profile_files(t_rest_helper: RestHelpers, tak_missionpkg: Mi
         )
 
     # Check for already uploaded bundles
-    upload_bundles: list[TAKDataPackage] = []
-
+    tmp_bundles: List[TAKDataPackage] = []
     if TAKViteAsset.is_vite_enabled():
+        tmp_bundles.extend(TAKViteAsset.get_vite_packages())
+    if TAKDynPkgHelper.dynpackages_available:
+        tmp_bundles.extend(TAKDynPkgHelper.get_dyn_packages())
 
-        for v in TAKViteAsset.get_vite_packages():
-            v_package: TAKDataPackage = TAKDataPackage(template_path=v, template_type="vite")
-            if await t_rest_helper.check_file_in_profile_files(datapackage=v_package, tak_profile_files=profile_files):
-                continue
-
-            upload_bundles.append(v_package)
+    upload_bundles: List[TAKDataPackage] = []
+    for b in tmp_bundles:
+        if await t_rest_helper.check_file_in_profile_files(datapackage=b, tak_profile_files=profile_files):
+            continue
+        upload_bundles.append(b)
 
     for bundle in config.TAK_DATAPACKAGE_ADDON_FOLDER_ZIP_PACKAGES:
         b_package: TAKDataPackage = TAKDataPackage(template_path=bundle, template_type="environment")

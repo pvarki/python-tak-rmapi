@@ -24,7 +24,7 @@ KEYPAIR_TIMEOUT = 5.0
 
 
 @dataclass
-class PkgVars:
+class TAKPkgVars:
     """TAK datapackage variables"""
 
     package_default_path: Path
@@ -43,7 +43,7 @@ class TAKDataPackage:
     template_path: Path
     template_type: str
 
-    _pkgvars: PkgVars = field(init=False)
+    _pkgvars: TAKPkgVars = field(init=False)
 
     # TODO savolaiset muuttujat
     # _zip_path: Path = field(init=False)
@@ -70,7 +70,7 @@ class TAKDataPackage:
                 __package_extra_path = Path("not-used-in-vite")
                 __is_mission_package = False
 
-        self._pkgvars = PkgVars(
+        self._pkgvars = TAKPkgVars(
             package_default_path=__package_default_path,
             package_extra_path=__package_extra_path,
             is_mission_package=__is_mission_package,

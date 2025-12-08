@@ -1,4 +1,4 @@
-"""Helper functions to manage tak data packages"""
+"""Tak data package vars"""
 
 from typing import ClassVar
 import logging
@@ -47,7 +47,7 @@ class TAKDataPackageSiteVars:
 
 @dataclass
 class TAKViteAssetVars:
-    """TAK ViteAsset vars"""
+    """TAK Vite Assets vars"""
 
     # Viteasset internal variables
     vite_asset_default_folder: ClassVar[Path] = Path(config.VITE_ASSET_SET_TEMPLATES_FOLDER) / config.VITE_ASSET_SET

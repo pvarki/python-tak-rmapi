@@ -1,4 +1,4 @@
-"""Helper functions to manage tak"""
+"""Helper functions to manage tak datapackage templates"""
 
 from typing import ClassVar
 import logging
