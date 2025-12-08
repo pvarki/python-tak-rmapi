@@ -13,7 +13,7 @@ from takrmapi.takutils import tak_helpers
 from takrmapi.takutils.tak_helpers import UserCRUD
 from takrmapi.takutils.tak_rest_helpers import RestHelpers
 from takrmapi.takutils.tak_pkg_helpers import MissionZip, TAKDataPackage
-from takrmapi.takutils.tak_viteasset_helpers import TAKViteAsset
+from takrmapi.takutils.tak_pkg_viteasset import TAKViteAsset
 from takrmapi.takutils.tak_pkg_dynpkg import TAKDynPkgHelper
 
 LOGGER = logging.getLogger(__name__)
