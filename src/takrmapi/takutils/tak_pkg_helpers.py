@@ -1,6 +1,6 @@
 """Helper functions to manage tak data packages"""
 
-from typing import List, Any
+from typing import List, Any, Dict
 import logging
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -97,40 +97,62 @@ class TAKDataPackage:
 
     @property
     def path_found(self) -> bool:
-        """Path is found"""
+        """Check if datapackage source folder is found"""
         if self.default_path_found or self.extra_path_found:
             return True
         return False
 
     @property
     def default_path_found(self) -> bool:
-        """Default path is found"""
+        """Data package default path is found"""
         return self._pkgvars.package_default_path.exists()
 
     @property
     def extra_path_found(self) -> bool:
-        """Extra path is found"""
+        """Data package extra/override path is found"""
+        if self._pkgvars.package_extra_path == self._pkgvars.package_default_path:
+            return False
         return self._pkgvars.package_extra_path.exists()
 
     @property
     def default_path(self) -> Path:
-        """Defaut path"""
+        """Return default datapackage path"""
         return self._pkgvars.package_default_path
 
     @property
     def extra_path(self) -> Path:
-        """Extra path"""
+        """Return data package extra/override path"""
         return self._pkgvars.package_extra_path
 
     @property
-    def path_list(self) -> List[Path]:
-        """Return found paths as list, used to combine default and extra"""
-        p_list: List[Path] = []
-        if self.default_path_found:
-            p_list.append(self.default_path)
+    def get_package_files(self) -> List[Path]:
+        """Return combined default+extra file list. Content from extra overrides default"""
+        # Extra package files
+        pkg_extra_files: Dict[str, Any] = {}
         if self.extra_path_found:
-            p_list.append(self.extra_path)
-        return p_list
+            LOGGER.debug("Extra content found for data package from path {}".format(self._pkgvars.package_extra_path))
+            for root, _, files in os.walk(self._pkgvars.package_extra_path):
+                for name in files:
+                    pkg_extra_files[name] = Path(root) / name
+
+        # Default package files, override using extras
+        pkg_files: List[Path] = []
+
+        for root, _, files in os.walk(self._pkgvars.package_default_path):
+            for name in files:
+                if name in pkg_extra_files:
+                    pkg_files.append(pkg_extra_files[name])
+                    pkg_extra_files.pop(name)
+                else:
+                    pkg_files.append(Path(root) / name)
+
+        # Add extra files if there are some left.
+        if pkg_extra_files:
+            LOGGER.debug("Additional files are added to data package from {}".format(self._pkgvars.package_extra_path))
+            for _, extra_file in pkg_extra_files.items():
+                pkg_files.append(extra_file)
+
+        return pkg_files
 
     @property
     def is_mission_package(self) -> bool:
@@ -221,8 +243,8 @@ class TAKDataPackage:
         self._pkgvars.template_file_render_str = template_content
 
 
-class MissionZip:
-    """Mission package class"""
+class TAKPackageZip:
+    """TAK data package class"""
 
     def __init__(self, user: UserCRUD):
         self.user: UserCRUD = user
@@ -250,7 +272,7 @@ class MissionZip:
             LOGGER.info("Added {} to background tasks".format(dp.package_name))
 
             if dp.is_folder:
-                tasks.append(asyncio.create_task(self.create_mission_zip(datapackage=dp)))
+                tasks.append(asyncio.create_task(self.create_datapackage_zip(datapackage=dp)))
             else:
                 raise ValueError(
                     "'{}' is file. create_zip_bundles works only with directories.".format(dp.default_path)
@@ -260,14 +282,11 @@ class MissionZip:
         await asyncio.gather(*tasks)
         LOGGER.info("Background zipping tasks done")
 
-    async def create_mission_zip(self, datapackage: TAKDataPackage) -> None:  # pylint: disable=too-many-locals
+    async def create_datapackage_zip(self, datapackage: TAKDataPackage) -> None:  # pylint: disable=too-many-locals
         """Loop through files in missionpkg templates folder"""
         # TODO maybe in memory fs for tmp files...
 
         # FIXME: use Paths for everything
-
-        # TODO Check for extra template content
-        # if config.TAK_DATAPACKAGE_ADDON_FOLDER != "default"
         walk_dir = datapackage.default_path
         tmp_zip_folder = datapackage.zip_tmp_folder / walk_dir.name
         if datapackage.is_mission_package:
@@ -275,33 +294,34 @@ class MissionZip:
         tmp_zip_folder.mkdir(parents=True, exist_ok=True)
 
         LOGGER.debug("Moving files from '{}' to '{}' for bundling.".format(walk_dir, tmp_zip_folder))
-        for root, _, files in os.walk(walk_dir):
 
-            for name in files:
-                org_file = Path(root) / name
-                zip_file_path = Path(str(org_file).replace(str(walk_dir) + "/", ""))
+        package_files: List[Path] = datapackage.get_package_files
 
-                dst_file = tmp_zip_folder / zip_file_path
-                dst_file.parent.mkdir(parents=True, exist_ok=True)
+        for org_file in package_files:
+            zip_file_path = Path(str(org_file).replace(str(walk_dir) + "/", ""))
 
-                LOGGER.debug("org_file={} dst_file={}".format(org_file, dst_file))
-                if dst_file.name.endswith(".tpl"):
-                    template_f = TAKDataPackage(template_path=org_file, template_type=datapackage.template_type)
-                    await self.render_tak_manifest_template(template_f)
+            dst_file = tmp_zip_folder / zip_file_path
+            dst_file.parent.mkdir(parents=True, exist_ok=True)
 
-                    dst_template_file = dst_file.parent / template_f.package_upload_dst_fname
+            LOGGER.debug("org_file={} dst_file={}".format(org_file, dst_file))
 
-                    LOGGER.debug("Handling template file -> '{}' for bundling.".format(dst_template_file))
-                    with open(dst_template_file, "w", encoding="utf-8") as filehandle:
-                        filehandle.write(template_f.template_str)
+            if dst_file.name.endswith(".tpl"):
+                template_f = TAKDataPackage(template_path=org_file, template_type=datapackage.template_type)
+                await self.render_tak_manifest_template(template_f)
 
-                    # Missionpackage zip specific peculiarities here
-                    if datapackage.is_mission_package:
-                        if dst_template_file.name == "manifest.xml":
-                            await self.tak_missionpackage_extras(dst_template_file, tmp_zip_folder)
+                dst_template_file = dst_file.parent / template_f.package_upload_dst_fname
 
-                else:
-                    shutil.copy(org_file, dst_file)
+                LOGGER.debug("Handling template file -> '{}' for bundling.".format(dst_template_file))
+                with open(dst_template_file, "w", encoding="utf-8") as filehandle:
+                    filehandle.write(template_f.template_str)
+
+                # Missionpackage zip specific peculiarities here
+                if datapackage.is_mission_package:
+                    if dst_template_file.name == "manifest.xml":
+                        await self.tak_missionpackage_extras(dst_template_file, tmp_zip_folder)
+
+            else:
+                shutil.copy(org_file, dst_file)
 
         await self.zip_folder_content(str(tmp_zip_folder), str(tmp_zip_folder))
 

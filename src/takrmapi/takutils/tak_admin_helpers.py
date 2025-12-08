@@ -29,7 +29,7 @@ class TAKAdminHelper:
     def get_available_datapackages(self) -> Dict[str, Any]:
         """Return available packages and files"""
         dir_content: Dict[str, Any] = {"default": self.get_dir_content(TAKDataPackagePathVars.env_pkg_default_folder)}
-        if TAKDataPackagePathVars.extra_pkg_enabled:
+        if TAKDataPackagePathVars.extra_pkg_available:
             dir_content["extra"] = self.get_dir_content(TAKDataPackagePathVars.env_pkg_extra_folder)
 
         # Get the "type" folders from /general. Packages are located under all of these

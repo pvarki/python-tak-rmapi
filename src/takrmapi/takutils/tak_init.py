@@ -12,7 +12,7 @@ from takrmapi import config
 from takrmapi.takutils import tak_helpers
 from takrmapi.takutils.tak_helpers import UserCRUD
 from takrmapi.takutils.tak_rest_helpers import RestHelpers
-from takrmapi.takutils.tak_pkg_helpers import MissionZip, TAKDataPackage
+from takrmapi.takutils.tak_pkg_helpers import TAKPackageZip, TAKDataPackage
 from takrmapi.takutils.tak_pkg_viteasset import TAKViteAsset
 from takrmapi.takutils.tak_pkg_dynpkg import TAKDynPkgHelper
 
@@ -63,7 +63,7 @@ async def setup_tak_defaults() -> None:
     """Set common required defaults to tak"""
     user: UserCRUD = UserCRUD(UserCRUDRequest(uuid="not_needed", callsign="mtlsclient", x509cert="not_needed"))
     t_rest_helper = RestHelpers(user)
-    tak_missionpkg = MissionZip(user)
+    tak_missionpkg = TAKPackageZip(user)
 
     LOGGER.info("Starting to set set TAK defaults")
     await tak_setup_mesh_key()
@@ -131,7 +131,7 @@ async def tak_setup_default_profiles(t_rest_helper: RestHelpers) -> None:
         )
 
 
-async def tak_setup_profile_files(t_rest_helper: RestHelpers, tak_missionpkg: MissionZip) -> None:
+async def tak_setup_profile_files(t_rest_helper: RestHelpers, tak_missionpkg: TAKPackageZip) -> None:
     """Upload default tak profile files and bundles to TAK"""
     # Get current 'Default-ATAK' profile files
     profile_files = await t_rest_helper.tak_api_get_device_profile_files(profile_name="Default-ATAK")

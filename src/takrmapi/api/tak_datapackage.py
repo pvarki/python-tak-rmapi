@@ -10,7 +10,7 @@ from libpvarki.middleware.mtlsheader import MTLSHeader, DNDict
 from libpvarki.schemas.product import UserCRUDRequest
 
 from takrmapi.takutils import tak_helpers
-from takrmapi.takutils.tak_pkg_helpers import TAKDataPackage, MissionZip
+from takrmapi.takutils.tak_pkg_helpers import TAKDataPackage, TAKPackageZip
 from takrmapi.takutils.tak_admin_helpers import TAKAdminHelper
 
 from .schemas import TAKAdminPackageListResponse
@@ -26,7 +26,7 @@ async def return_datapackage_zip(package_path: Path, request: Request, backgroun
     payload = cast(DNDict, request.state.mtlsdn)
     callsign: str = payload["CN"]
     user: tak_helpers.UserCRUD = tak_helpers.UserCRUD(UserCRUDRequest(uuid="NA", callsign=callsign, x509cert=""))
-    pkg_helper = MissionZip(user)
+    pkg_helper = TAKPackageZip(user)
 
     client_package = TAKDataPackage(template_path=package_path, template_type="client")
 
@@ -62,7 +62,7 @@ async def return_datapackage_file(file_path: Path, request: Request) -> Response
     callsign: str = payload["CN"]
     user: tak_helpers.UserCRUD = tak_helpers.UserCRUD(UserCRUDRequest(uuid="NA", callsign=callsign, x509cert=""))
 
-    tak_missionpkg = MissionZip(user)
+    tak_missionpkg = TAKPackageZip(user)
 
     client_file = TAKDataPackage(template_path=file_path, template_type="client")
 
@@ -74,7 +74,7 @@ async def return_datapackage_file(file_path: Path, request: Request) -> Response
         raise HTTPException(status_code=400, detail="Requested datapackage is not servicable file")
 
     if client_file.package_name.endswith(".tpl"):
-        tak_missionpkg = MissionZip(user)
+        tak_missionpkg = TAKPackageZip(user)
         await tak_missionpkg.render_tak_manifest_template(client_file)
         return Response(client_file.template_str.encode(encoding="utf-8"), media_type="text/plain")
 

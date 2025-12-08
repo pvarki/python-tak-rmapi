@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, BackgroundTasks
 from libpvarki.middleware import MTLSHeader
 from libpvarki.schemas.product import UserCRUDRequest
 from takrmapi.takutils import tak_helpers
-from takrmapi.takutils.tak_pkg_helpers import TAKDataPackage, MissionZip
+from takrmapi.takutils.tak_pkg_helpers import TAKDataPackage, TAKPackageZip
 from .schemas import TakZipFile, ClientInstructionData, ClientInstructionResponse
 
 from ..config import TAK_MISSIONPKG_ENABLED_PACKAGES
@@ -23,7 +23,7 @@ async def client_instruction_fragment(
 ) -> ClientInstructionResponse:
     """Return zip package containing client config and certificates"""
     localuser = tak_helpers.UserCRUD(user)
-    tak_missionpkg = MissionZip(localuser)
+    tak_missionpkg = TAKPackageZip(localuser)
 
     mp_list: list[TAKDataPackage] = []
     for m in TAK_MISSIONPKG_ENABLED_PACKAGES:

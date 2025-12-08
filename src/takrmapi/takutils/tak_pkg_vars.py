@@ -68,8 +68,7 @@ class UserTAKTemplateVars:
 class TAKDataPackagePathVars:
     """TAK Datapackage site vars"""
 
-    extra_pkg_enabled: ClassVar[bool] = False
-    extra_mission_enabled: ClassVar[bool] = False
+    extra_pkg_available: ClassVar[bool] = False
 
     # Templating internal variables
     client_pkg_default_folder: ClassVar[Path] = (
@@ -91,11 +90,11 @@ class TAKDataPackagePathVars:
 
     def __post_init__(self) -> None:
         """Template variables post init"""
-        if config.TAK_DATAPACKAGE_ADDON_FOLDER != "default":
-            TAKDataPackagePathVars.extra_pkg_enabled = True
+        if config.TAK_DATAPACKAGE_ADDON_FOLDER not in ("default", "na"):
+            TAKDataPackagePathVars.extra_pkg_available = True
 
-        if config.TAK_MISSIONPKG_ADDON_FOLDER != "default":
-            TAKDataPackagePathVars.extra_mission_enabled = True
+        if config.TAK_MISSIONPKG_ADDON_FOLDER not in ("default", "na"):
+            TAKDataPackagePathVars.extra_pkg_available = True
 
 
 @dataclass

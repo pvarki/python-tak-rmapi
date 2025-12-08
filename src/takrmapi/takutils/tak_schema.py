@@ -4,7 +4,7 @@ from pydantic import Field, Extra
 from pydantic.main import BaseModel  # pylint: disable=E0611 # false positive
 
 
-class UserMissionZipRequest(BaseModel):  # pylint: disable=too-few-public-methods
+class UserTAKPackageZipRequest(BaseModel):  # pylint: disable=too-few-public-methods
     """Request to get user mission zip"""
 
     uuid: str = Field(description="RASENMAEHER UUID for this user")
