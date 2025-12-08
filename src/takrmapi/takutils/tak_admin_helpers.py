@@ -7,7 +7,7 @@ import logging
 
 from takrmapi import config
 from takrmapi.takutils.tak_helpers import UserCRUD
-from takrmapi.takutils.tak_pkg_sitevars import TAKDataPackageSiteVars
+from takrmapi.takutils.tak_pkg_vars import TAKDataPackagePathVars
 
 LOGGER = logging.getLogger(__name__)
 
@@ -28,9 +28,9 @@ class TAKAdminHelper:
     @property
     def get_available_datapackages(self) -> Dict[str, Any]:
         """Return available packages and files"""
-        dir_content: Dict[str, Any] = {"default": self.get_dir_content(TAKDataPackageSiteVars.env_pkg_default_folder)}
-        if TAKDataPackageSiteVars.extra_pkg_enabled:
-            dir_content["extra"] = self.get_dir_content(TAKDataPackageSiteVars.env_pkg_extra_folder)
+        dir_content: Dict[str, Any] = {"default": self.get_dir_content(TAKDataPackagePathVars.env_pkg_default_folder)}
+        if TAKDataPackagePathVars.extra_pkg_enabled:
+            dir_content["extra"] = self.get_dir_content(TAKDataPackagePathVars.env_pkg_extra_folder)
 
         # Get the "type" folders from /general. Packages are located under all of these
         tf: Dict[str, Any] = self.get_dir_content(Path(config.TAK_DATAPACKAGE_TEMPLATES_FOLDER) / "general")

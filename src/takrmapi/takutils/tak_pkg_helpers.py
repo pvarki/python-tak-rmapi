@@ -13,9 +13,8 @@ from jinja2 import Template
 
 from libpvarki.mtlshelp.pkcs12 import convert_pem_to_pkcs12
 from takrmapi import config
-from takrmapi.takutils.tak_template_helpers import UserTAKTemplateVars
 from takrmapi.takutils.tak_helpers import UserCRUD, Helpers
-from takrmapi.takutils.tak_pkg_sitevars import TAKDataPackageSiteVars, TAKViteAssetVars
+from takrmapi.takutils.tak_pkg_vars import TAKDataPackagePathVars, TAKViteAssetVars, UserTAKTemplateVars
 
 
 LOGGER = logging.getLogger(__name__)
@@ -54,16 +53,16 @@ class TAKDataPackage:
 
         match self.template_type:
             case "client":
-                __package_default_path = Path(TAKDataPackageSiteVars.client_pkg_default_folder) / self.template_path
-                __package_extra_path = Path(TAKDataPackageSiteVars.client_pkg_extra_folder) / self.template_path
+                __package_default_path = Path(TAKDataPackagePathVars.client_pkg_default_folder) / self.template_path
+                __package_extra_path = Path(TAKDataPackagePathVars.client_pkg_extra_folder) / self.template_path
                 __is_mission_package = False
             case "environment":
-                __package_default_path = Path(TAKDataPackageSiteVars.env_pkg_default_folder) / self.template_path
-                __package_extra_path = Path(TAKDataPackageSiteVars.env_pkg_extra_folder) / self.template_path
+                __package_default_path = Path(TAKDataPackagePathVars.env_pkg_default_folder) / self.template_path
+                __package_extra_path = Path(TAKDataPackagePathVars.env_pkg_extra_folder) / self.template_path
                 __is_mission_package = False
             case "mission":
-                __package_default_path = Path(TAKDataPackageSiteVars.missionpkg_default_folder) / self.template_path
-                __package_extra_path = Path(TAKDataPackageSiteVars.missionpkg_extra_folder) / self.template_path
+                __package_default_path = Path(TAKDataPackagePathVars.missionpkg_default_folder) / self.template_path
+                __package_extra_path = Path(TAKDataPackagePathVars.missionpkg_extra_folder) / self.template_path
                 __is_mission_package = True
             case "vite":
                 __package_default_path = Path(TAKViteAssetVars.vite_asset_default_folder) / self.template_path
