@@ -125,7 +125,7 @@ class TAKDataPackage:
         return self._pkgvars.package_extra_path
 
     @property
-    def get_package_files(self) -> List[Path]:
+    def get_package_files(self) -> Dict[str, Path]:
         """Return combined default+extra file list. Content from extra overrides default"""
         # Extra package files
         pkg_extra_files: Dict[str, Any] = {}
@@ -136,21 +136,23 @@ class TAKDataPackage:
                     pkg_extra_files[name] = Path(root) / name
 
         # Default package files, override using extras
-        pkg_files: List[Path] = []
+        pkg_files: Dict[str, Any] = {}
 
         for root, _, files in os.walk(self._pkgvars.package_default_path):
             for name in files:
                 if name in pkg_extra_files:
-                    pkg_files.append(pkg_extra_files[name])
+                    pkg_files[name] = Path(root) / pkg_extra_files[name]
+                    LOGGER.debug("Package file {} overridden with {}".format(name, pkg_extra_files[name]))
                     pkg_extra_files.pop(name)
                 else:
-                    pkg_files.append(Path(root) / name)
+                    pkg_files[name] = Path(root) / name
 
         # Add extra files if there are some left.
         if pkg_extra_files:
             LOGGER.debug("Additional files are added to data package from {}".format(self._pkgvars.package_extra_path))
-            for _, extra_file in pkg_extra_files.items():
-                pkg_files.append(extra_file)
+            for e_name, e_path in pkg_extra_files.items():
+                pkg_files[e_name] = e_path
+                # pkg_files.append(extra_file)
 
         return pkg_files
 
@@ -295,18 +297,25 @@ class TAKPackageZip:
 
         LOGGER.debug("Moving files from '{}' to '{}' for bundling.".format(walk_dir, tmp_zip_folder))
 
-        package_files: List[Path] = datapackage.get_package_files
+        package_files: Dict[str, Any] = datapackage.get_package_files
 
-        for org_file in package_files:
-            zip_file_path = Path(str(org_file).replace(str(walk_dir) + "/", ""))
+        for pkg_file_path, org_full_path in package_files.items():
+            #
 
-            dst_file = tmp_zip_folder / zip_file_path
+            print(tmp_zip_folder)
+            print(tmp_zip_folder)
+            print("#############################")
+            print(pkg_file_path)
+            print(pkg_file_path)
+            print(pkg_file_path)
+            print(pkg_file_path)
+            dst_file = tmp_zip_folder / pkg_file_path
             dst_file.parent.mkdir(parents=True, exist_ok=True)
 
-            LOGGER.debug("org_file={} dst_file={}".format(org_file, dst_file))
+            LOGGER.debug("org_full_path={} dst_file={}".format(org_full_path, dst_file))
 
             if dst_file.name.endswith(".tpl"):
-                template_f = TAKDataPackage(template_path=org_file, template_type=datapackage.template_type)
+                template_f = TAKDataPackage(template_path=org_full_path, template_type=datapackage.template_type)
                 await self.render_tak_manifest_template(template_f)
 
                 dst_template_file = dst_file.parent / template_f.package_upload_dst_fname
@@ -321,7 +330,7 @@ class TAKPackageZip:
                         await self.tak_missionpackage_extras(dst_template_file, tmp_zip_folder)
 
             else:
-                shutil.copy(org_file, dst_file)
+                shutil.copy(org_full_path, dst_file)
 
         await self.zip_folder_content(str(tmp_zip_folder), str(tmp_zip_folder))
 
