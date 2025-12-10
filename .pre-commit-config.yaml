@@ -68,7 +68,6 @@ repos:
     rev: v1.4.0
     hooks:
     -   id: detect-secrets
-        entry: poetry run detect-secrets-hook
         language: system
         exclude: "poetry\\.lock|tests/data/.*|ui/pnpm-lock\\.yaml"
         # args: ['--baseline', '.secrets.baseline']
