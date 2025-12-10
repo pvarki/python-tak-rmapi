@@ -68,7 +68,6 @@ repos:
     rev: v1.4.0
     hooks:
     -   id: detect-secrets
-        language: system
         exclude: "poetry\\.lock|tests/data/.*|ui/pnpm-lock\\.yaml"
         # args: ['--baseline', '.secrets.baseline']
 -   repo: https://github.com/shellcheck-py/shellcheck-py
@@ -81,3 +80,25 @@ repos:
     hooks:
     -   id: poetry-check
     -   id: poetry-lock
+-   repo: https://github.com/python-poetry/poetry
+    rev: "2.0.1"
+    hooks:
+    -   id: poetry-check
+    -   id: poetry-lock
+-   repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v3.0.3
+    hooks:
+    -   id: prettier
+        files: ^ui/
+-   repo: https://github.com/pre-commit/mirrors-eslint
+    rev: v8.50.0
+    hooks:
+    -   id: eslint
+        files: ^ui/
+        types_or: [javascript, jsx, ts, tsx]
+        additional_dependencies:
+          - "eslint@8.50.0"
+          - "@typescript-eslint/parser"
+          - "@typescript-eslint/eslint-plugin"
+          - "eslint-plugin-react-hooks"
+          - "eslint-plugin-react-refresh"
