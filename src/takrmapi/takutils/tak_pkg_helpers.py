@@ -133,7 +133,9 @@ class TAKDataPackage:
             LOGGER.debug("Extra content found for data package from path {}".format(self._pkgvars.package_extra_path))
             for root, _, files in os.walk(self._pkgvars.package_extra_path):
                 for name in files:
-                    pkg_extra_files[name] = Path(root) / name
+                    f_src_path = Path(root) / name
+                    f_pkg_str = str(f_src_path).replace(str(self._pkgvars.package_extra_path) + "/", "")
+                    pkg_extra_files[f_pkg_str] = f_src_path
 
         # Default package files, override using extras
         pkg_files: Dict[str, Any] = {}
@@ -141,11 +143,13 @@ class TAKDataPackage:
         for root, _, files in os.walk(self._pkgvars.package_default_path):
             for name in files:
                 if name in pkg_extra_files:
-                    pkg_files[name] = Path(root) / pkg_extra_files[name]
+                    pkg_files[name] = pkg_extra_files[name]
                     LOGGER.debug("Package file {} overridden with {}".format(name, pkg_extra_files[name]))
                     pkg_extra_files.pop(name)
                 else:
-                    pkg_files[name] = Path(root) / name
+                    f_src_path = Path(root) / name
+                    f_pkg_str = str(f_src_path).replace(str(self._pkgvars.package_extra_path) + "/", "")
+                    pkg_files[f_pkg_str] = f_src_path
 
         # Add extra files if there are some left.
         if pkg_extra_files:
@@ -300,15 +304,6 @@ class TAKPackageZip:
         package_files: Dict[str, Any] = datapackage.get_package_files
 
         for pkg_file_path, org_full_path in package_files.items():
-            #
-
-            print(tmp_zip_folder)
-            print(tmp_zip_folder)
-            print("#############################")
-            print(pkg_file_path)
-            print(pkg_file_path)
-            print(pkg_file_path)
-            print(pkg_file_path)
             dst_file = tmp_zip_folder / pkg_file_path
             dst_file.parent.mkdir(parents=True, exist_ok=True)
 
