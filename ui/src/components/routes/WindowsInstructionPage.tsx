@@ -11,10 +11,5 @@ export const WindowsInstructionPage = () => {
     { id: 4, title: t("tabs.windows.wizard_title.phase4") },
   ];
 
-  return (
-    <InstructionsWizard
-      phases={WINDOWS_PHASES}
-      basePath="/windows"
-    />
-  );
+  return <InstructionsWizard phases={WINDOWS_PHASES} basePath="/windows" />;
 };

@@ -1,5 +1,10 @@
 import { useTranslation } from "react-i18next";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Card, CardContent } from "@/components/ui/card";
 
 export const WindowsPhase4 = () => {
@@ -7,8 +12,12 @@ export const WindowsPhase4 = () => {
 
   return (
     <div className="space-y-4">
-      <Accordion type="single" collapsible defaultValue="step1" className="space-y-2">
-
+      <Accordion
+        type="single"
+        collapsible
+        defaultValue="step1"
+        className="space-y-2"
+      >
         {/* Step 1: Check Unit Settings */}
         <AccordionItem value="step1">
           <Card className="p-2">
@@ -18,15 +27,35 @@ export const WindowsPhase4 = () => {
             <AccordionContent>
               <CardContent className="p-2 space-y-4 text-sm">
                 <p>{t("tabs.windows.phase4.step1_desc_1")}</p>
-                <img src="/ui/tak/wintak/Kuva28.png" className="mx-auto pr-12 w-[200px] " alt="Hamburger Menu" />
+                <img
+                  src="/ui/tak/wintak/Kuva28.png"
+                  className="mx-auto pr-12 w-[200px] "
+                  alt="Hamburger Menu"
+                />
                 <p>{t("tabs.windows.phase4.step1_desc_2")}</p>
-                <img src="/ui/tak/wintak/Kuva29.png" className="mx-auto pr-5 w-[300px] " alt="Select Settings" />
+                <img
+                  src="/ui/tak/wintak/Kuva29.png"
+                  className="mx-auto pr-5 w-[300px] "
+                  alt="Select Settings"
+                />
                 <p>{t("tabs.windows.phase4.step1_desc_3")}</p>
-                <img src="/ui/tak/wintak/Kuva29.png" className="mx-auto pr-5 w-[300px] " alt="Select Display Preferences" />
+                <img
+                  src="/ui/tak/wintak/Kuva29.png"
+                  className="mx-auto pr-5 w-[300px] "
+                  alt="Select Display Preferences"
+                />
                 <p>{t("tabs.windows.phase4.step1_desc_4")}</p>
-                <img src="/ui/tak/wintak/Kuva30.png" className="mx-auto pr-5 w-[300px] " alt="Unit Display Preferences" />
+                <img
+                  src="/ui/tak/wintak/Kuva30.png"
+                  className="mx-auto pr-5 w-[300px] "
+                  alt="Unit Display Preferences"
+                />
                 <p>{t("tabs.windows.phase4.step1_desc_5")}</p>
-                <img src="/ui/tak/wintak/Kuva31.png" className="mx-auto pr-5 w-[300px] " alt="Check Settings" />
+                <img
+                  src="/ui/tak/wintak/Kuva31.png"
+                  className="mx-auto pr-5 w-[300px] "
+                  alt="Check Settings"
+                />
                 <p>{t("tabs.windows.phase4.step1_desc_6")}</p>
               </CardContent>
             </AccordionContent>
@@ -46,7 +75,6 @@ export const WindowsPhase4 = () => {
             </AccordionContent>
           </Card>
         </AccordionItem>
-
       </Accordion>
     </div>
   );

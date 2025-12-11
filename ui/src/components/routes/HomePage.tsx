@@ -2,7 +2,13 @@ import { detectPlatform, Platform } from "@/lib/detectPlatform";
 import { TAK_Zip } from "@/lib/interfaces";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 import { AndroidTab } from "../tabs/AndroidTab";
 import { TrackerTab } from "../tabs/TrackerTab";
 import { Spinner } from "../ui/spinner";
@@ -21,18 +27,20 @@ const platformToIndex: Record<Platform, number> = {
   [Platform.Tracker]: 2, // Tracker
 };
 
-const PRODUCT_SHORTNAME = "tak"
+const PRODUCT_SHORTNAME = "tak";
 
 export const HomePage = () => {
   //@ts-ignore
-  const router = useRouter()
+  const router = useRouter();
 
   const defaultPlatform = detectPlatform();
   const [platform, setPlatform] = useState<Platform>(defaultPlatform);
 
   const { t, i18n } = useTranslation(PRODUCT_SHORTNAME);
 
-  const data = router.options.context ? (router.options.context as Data) : undefined;
+  const data = router.options.context
+    ? (router.options.context as Data)
+    : undefined;
 
   return (
     <div className="max-w-3xl mx-auto p-4">
@@ -77,14 +85,22 @@ export const HomePage = () => {
 
             <div className="mt-4">
               {platform === Platform.Android && (
-                <AndroidTab zip={data.tak_zips[platformToIndex[Platform.Android]]} />
+                <AndroidTab
+                  zip={data.tak_zips[platformToIndex[Platform.Android]]}
+                />
               )}
-              {platform === Platform.iOS && <IosTab zip={data.tak_zips[platformToIndex[Platform.iOS]]} />}
+              {platform === Platform.iOS && (
+                <IosTab zip={data.tak_zips[platformToIndex[Platform.iOS]]} />
+              )}
               {platform === Platform.Windows && (
-                <WindowsTab zip={data.tak_zips[platformToIndex[Platform.Windows]]} />
+                <WindowsTab
+                  zip={data.tak_zips[platformToIndex[Platform.Windows]]}
+                />
               )}
               {platform === Platform.Tracker && (
-                <TrackerTab zip={data.tak_zips[platformToIndex[Platform.Tracker]]} />
+                <TrackerTab
+                  zip={data.tak_zips[platformToIndex[Platform.Tracker]]}
+                />
               )}
             </div>
           </div>

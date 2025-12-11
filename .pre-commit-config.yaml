@@ -81,16 +81,12 @@ repos:
     hooks:
     -   id: poetry-check
     -   id: poetry-lock
--   repo: https://github.com/python-poetry/poetry
-    rev: "2.0.1"
-    hooks:
-    -   id: poetry-check
-    -   id: poetry-lock
 -   repo: https://github.com/pre-commit/mirrors-prettier
     rev: v3.0.3
     hooks:
     -   id: prettier
         files: ^ui/
+        exclude: \.json$
 -   repo: https://github.com/pre-commit/mirrors-eslint
     rev: v8.50.0
     hooks:

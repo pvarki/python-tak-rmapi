@@ -1,14 +1,23 @@
-import { useTranslation, Trans } from "react-i18next"
-import { Card, CardContent } from "@/components/ui/card"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { useTranslation, Trans } from "react-i18next";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 export const IosPhase4 = () => {
-  const { t } = useTranslation("tak")
+  const { t } = useTranslation("tak");
 
   return (
     <div className="space-y-4">
-      <Accordion type="single" collapsible defaultValue="step1" className="space-y-2">
-
+      <Accordion
+        type="single"
+        collapsible
+        defaultValue="step1"
+        className="space-y-2"
+      >
         {/* Step 1 */}
         <AccordionItem value="step1">
           <Card className="p-2">
@@ -18,10 +27,20 @@ export const IosPhase4 = () => {
             <AccordionContent>
               <CardContent className="p-2 space-y-4 text-sm">
                 <div className="pl-4 space-y-2">
-                  <p className="font-medium">{t("tabs.ios.phase4.step1_desc_1")}</p>
-                  <img src="/ui/tak/itak/itakquickstart21.png" className="mx-auto w-[300px] p-4 cursor-pointer" alt={t("tabs.ios.phase4.step1_title")} />
+                  <p className="font-medium">
+                    {t("tabs.ios.phase4.step1_desc_1")}
+                  </p>
+                  <img
+                    src="/ui/tak/itak/itakquickstart21.png"
+                    className="mx-auto w-[300px] p-4 cursor-pointer"
+                    alt={t("tabs.ios.phase4.step1_title")}
+                  />
                   <p>{t("tabs.ios.phase4.step1_desc_2")}</p>
-                  <img src="/ui/tak/itak/itakquickstart22.png" className="mx-auto w-[300px] p-4 cursor-pointer" alt={t("tabs.ios.phase4.step1_title")} />
+                  <img
+                    src="/ui/tak/itak/itakquickstart22.png"
+                    className="mx-auto w-[300px] p-4 cursor-pointer"
+                    alt={t("tabs.ios.phase4.step1_title")}
+                  />
                   <p>{t("tabs.ios.phase4.step1_desc_3")}</p>
                 </div>
               </CardContent>
@@ -38,8 +57,14 @@ export const IosPhase4 = () => {
             <AccordionContent>
               <CardContent className="p-2 space-y-4 text-sm">
                 <div className="pl-4 space-y-2">
-                  <p className="font-medium">{t("tabs.ios.phase4.step2_desc_1")}</p>
-                  <img src="/ui/tak/itak/itakquickstart23.png" className="mx-auto w-[300px] p-4 cursor-pointer" alt={t("tabs.ios.phase4.step2_title")} />
+                  <p className="font-medium">
+                    {t("tabs.ios.phase4.step2_desc_1")}
+                  </p>
+                  <img
+                    src="/ui/tak/itak/itakquickstart23.png"
+                    className="mx-auto w-[300px] p-4 cursor-pointer"
+                    alt={t("tabs.ios.phase4.step2_title")}
+                  />
                   <p>{t("tabs.ios.phase4.step2_desc_2")}</p>
                 </div>
               </CardContent>
@@ -56,18 +81,27 @@ export const IosPhase4 = () => {
             <AccordionContent>
               <CardContent className="p-2 space-y-4 text-sm">
                 <div className="pl-4 space-y-2">
-                  <p className="font-medium">{t("tabs.ios.phase4.step3_desc_1")}</p>
-                  <img src="/ui/tak/itak/itakquickstart21.png" className="mx-auto w-[300px] p-4 cursor-pointer" alt={t("tabs.ios.phase4.step3_title")} />
+                  <p className="font-medium">
+                    {t("tabs.ios.phase4.step3_desc_1")}
+                  </p>
+                  <img
+                    src="/ui/tak/itak/itakquickstart21.png"
+                    className="mx-auto w-[300px] p-4 cursor-pointer"
+                    alt={t("tabs.ios.phase4.step3_title")}
+                  />
                   <p>{t("tabs.ios.phase4.step3_desc_2")}</p>
-                  <img src="/ui/tak/itak/itakqucikstart22.png" className="mx-auto w-[300px] p-4 cursor-pointer" alt={t("tabs.ios.phase4.step3_title")} />
+                  <img
+                    src="/ui/tak/itak/itakqucikstart22.png"
+                    className="mx-auto w-[300px] p-4 cursor-pointer"
+                    alt={t("tabs.ios.phase4.step3_title")}
+                  />
                   <p>{t("tabs.ios.phase4.step3_desc_3")}</p>
                 </div>
               </CardContent>
             </AccordionContent>
           </Card>
         </AccordionItem>
-
       </Accordion>
     </div>
-  )
-}
+  );
+};

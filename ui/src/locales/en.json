@@ -109,76 +109,67 @@
       "instructions_short": "Need help importing the package?",
       "open_instructions": "Open instructions",
       "phase1": {
-        "step1_title": "1. Download the Applications",
-        "step1_desc_title": "Download iTAK",
+        "download_client_package": "Download your Client Package",
         "step1_desc_1": "Download the iTAK app from the App Store and install it.",
         "step1_desc_2": "Press the button below to get the app.",
-
-        "step2_title": "2. Download your Client Package",
-        "step2_desc_title": "Download your Client Package",
+        "step1_desc_title": "Download iTAK",
+        "step1_title": "1. Download the Applications",
         "step2_desc_1": "Download your client package by pressing the green button below.",
         "step2_desc_2": "You can also find the same button on the front page.",
-        "download_client_package": "Download your Client Package",
+        "step2_desc_title": "Download your Client Package",
+        "step2_title": "2. Download your Client Package",
         "zip_file_warning": "NOTE! The zip file does not need to be extracted!"
       },
       "phase2": {
-        "step1_title": "Start the application",
         "step1_desc_1": "Open the iTAK application.",
         "step1_desc_2": "When the application asks: \"iTAK wants to find and connect to devices on your local network...\", choose Don't Allow.",
-        
-        "step2_title": "Enter your Callsign",
+        "step1_title": "Start the application",
         "step2_desc_1": "Fill in the Profile Settings:",
         "step2_desc_2": "Enter your alias in the Callsign field, for example, Rambo. Do not fill the Phone field. Finally, press Next.",
-        
-        "step3_title": "Set Team Settings",
+        "step2_title": "Enter your Callsign",
         "step3_desc_1": "Fill in the Team Settings:",
         "step3_desc_2": "In the Select Team field, choose your team's (as you should have been ordered to) color from the dropdown menu. In the Select Team Role field, choose the role Team Member, unless otherwise instructed.\nCommand post users will set their role to HQ.\nFinally, press Next.",
-        
-        "step4_title": "Grant the necessary permissions to the application",
+        "step3_title": "Set Team Settings",
         "step4_desc_1": "a. Set Privacy Settings to allow notifications and location services.",
         "step4_desc_2": "iOS will then ask if you allow iTAK to send you notifications and use your location. Choose Allow for notifications.",
         "step4_desc_3": "Choose Allow While Using the App for location.",
-        "step4_desc_4": "After this, move on to establish the server connection with your Client Package."
+        "step4_desc_4": "After this, move on to establish the server connection with your Client Package.",
+        "step4_title": "Grant the necessary permissions to the application"
       },
       "phase3": {
-        "step1_title": "Open the Packages menu",
         "step1_desc_1": "a. Go to the map view and scroll the toolbar to the right until you find the Package icon.",
         "step1_important": "Important! Do not attempt to install the Client Package via iTAK Settings->Network->Server!. That won't work.",
-        
-        "step2_title": "Add your message template package to iTAK",
+        "step1_title": "Open the Packages menu",
         "step2_desc_1": "b. The Packages menu opens, it will be empty. Press the plus icon in the bottom right to add your message template package.",
         "step2_desc_2": "c. Choose Local Device.",
         "step2_desc_3": "d. Select your package. It will be a zip file named YourCallsign.zip.",
         "step2_desc_4": "e. As a sign of success, the Packages menu list will show the server's callsign and a green light. Return to the map view.",
-        "step2_desc_5": "The server connection is now established. As a sign, the bottom right of the map will display in green Connected."
+        "step2_desc_5": "The server connection is now established. As a sign, the bottom right of the map will display in green Connected.",
+        "step2_title": "Add your message template package to iTAK"
       },
       "phase4": {
-        "step1_title": "Open settings",
         "step1_desc_1": "a. Open Settings again from the gear icon in the top left corner.",
         "step1_desc_2": "b. Select Preferences from the main Settings menu.",
         "step1_desc_3": "Prepare to set the correct units of measure and coordinate system.",
-        
-        "step2_title": "Set units",
+        "step1_title": "Open settings",
         "step2_desc_1": "Choose Units of Measure:",
         "step2_desc_2": "Select MGRS for Coordinate Format and Meters for Distance Format.",
-        
-        "step3_title": "Optionally change the map source",
+        "step2_title": "Set units",
         "step3_desc_1": "a. If you want to change the map source, select Map Source from the main Settings menu.",
         "step3_desc_2": "b. Choose your desired map source. Note! Availability may vary.",
-        "step3_desc_3": "Great! You have now set up iTAK for use.\nIf you need to edit your callsign, you can do so from the Settings menu by clicking your callsign."
+        "step3_desc_3": "Great! You have now set up iTAK for use.\nIf you need to edit your callsign, you can do so from the Settings menu by clicking your callsign.",
+        "step3_title": "Optionally change the map source"
       },
       "phase5": {
-        "step1_title": "Open Data Sync menu",
         "step1_desc_1": "In the main view, open the tool menu (at the bottom) and scroll to the right to find the Data Sync menu.",
-        
-        "step2_title": "Subscribe to feed",
+        "step1_title": "Open Data Sync menu",
         "step2_desc_1": "In the Data Sync menu, press the Subscribe button.",
         "step2_desc_2": "Select the available server (Your deployment's name should appear, such as 'positive-beetle.').",
         "step2_desc_3": "In the upcoming view, select the RECON feed & any other Feed you've been ordered to subscribe.",
-        
-        "step3_title": "Feed at your disposal",
+        "step2_title": "Subscribe to feed",
         "step3_desc_1": "Starting from now, the Recon Feed created and updated by your Command Post users is at your disposal.",
-        "step3_desc_2": "The feed will appear in your Data Sync menu. Instructions for using the feed are in the Using in the group instructions."
+        "step3_desc_2": "The feed will appear in your Data Sync menu. Instructions for using the feed are in the Using in the group instructions.",
+        "step3_title": "Feed at your disposal"
       },
       "step1_download": "Download the zip package:",
       "step2_install": "Import the package.",
@@ -201,88 +192,76 @@
     "windows": {
       "instructions_short": "Need help importing the package?",
       "open_instructions": "Open instructions",
-      "step1_download": "Download the zip package:",
-      "step1_note": "WinTAK uses the same package as ATAK",
-      "step2_install": "Import the package.",
-      "step3_done": "Done, WinTAK is ready to use.",
-      "title": "WinTAK Package Installation",
-
       "phase1": {
-        "step1_title": "1. Set your Region to United States",
         "step1_desc_1": "WinTAK requires the workstation's language to be English and the region setting United States.",
         "step1_desc_2": "Before installing the application, search for Time and Language from the search bar (bottom left).",
         "step1_desc_3": "First, let's change the region setting. Select Region from the sidebar in Time and Language menu.",
         "step1_desc_4": "Select United States for the country or region. Ensure that the regional format is also set to English (United States).",
-        
-        "step2_title": "2. Set Language to English (US)",
+        "step1_title": "1. Set your Region to United States",
         "step2_desc_1": "From the sidebar in the Time and Language menu, select Language.",
         "step2_desc_2": "Set the Windows display language to English (United States).",
         "step2_desc_3": "Finalize changing the display language by signing out and signing back in.",
-        
-        "step3_title": "3. If Necessary, Add Language Pack (English)",
+        "step2_title": "2. Set Language to English (US)",
         "step3_desc_1": "If English is not available in the display language options, press Add a language and search for it.",
         "step3_desc_2": "Press Install language pack. Wait for the language pack to install.",
         "step3_desc_3": "Afterward, you can select English as the display language as described in step 2.",
-        "step3_desc_4": "The language settings are now complete."
+        "step3_desc_4": "The language settings are now complete.",
+        "step3_title": "3. If Necessary, Add Language Pack (English)"
       },
-       "phase2": {
-        "step1_title": "1. Download WinTAK",
+      "phase2": {
         "step1_desc_1": "Download the WinTAK application from the Defense Forces' designated location.",
         "step1_desc_2": "Important! Only download Windows applications from the instructed location.",
-        
-        "step3_title": "2. Open the Installer",
+        "step1_title": "1. Download WinTAK",
         "step3_desc_1": "Find the downloaded zip and extract it. Locate the .msi installation file inside the zip's Products folder.",
         "step3_desc_2": "Double-click the .msi file to open the installer.",
-        
-        "step4_title": "3. Install Using the Installer",
+        "step3_title": "2. Open the Installer",
         "step4_desc_1": "Install WinTAK using the Setup Wizard.",
         "step4_desc_2": "Press Next. Choose the application installation folder.",
         "step4_desc_3": "Optionally change the installation folder via the Browse button. Press Next.",
         "step4_desc_4": "Select the components to install in the Setup Wizard. Select at least the following component: Data Sync.",
-        "step4_desc_5": "Press Next. The Wizard is ready to start the installation, press Install."
+        "step4_desc_5": "Press Next. The Wizard is ready to start the installation, press Install.",
+        "step4_title": "3. Install Using the Installer"
       },
       "phase3": {
-        "step1_title": "1. Open the Application",
         "step1_desc": "Open the WinTAK application from the desktop.",
-        
-        "step2_title": "2. Accept the EULA",
+        "step1_title": "1. Open the Application",
         "step2_desc_1": "After a moment, the Device Setup Wizard will open.",
         "step2_desc_2": "As its first step, accept the EULA.",
-        
-        "step3_title": "3. Establish Server Connection",
+        "step2_title": "2. Accept the EULA",
         "step3_desc_1": "Next, establish a server connection.",
         "step3_desc_2": "a. The application will ask if you want to import a data package.",
         "step3_desc_3": "b. Select 'Yes'. Point to the Client Package.",
         "step3_desc_4": "Once you have chosen the package and pressed Open, the Select Import Strategy window will open.",
         "step3_desc_5": "c. Select 'UserPreferenceImportStrategy', and press OK.",
-        
-        "step4_title": "4. Choose a Map Base",
+        "step3_title": "3. Establish Server Connection",
         "step4_desc_1": "With the message foundation package, various map bases may come.",
-        
-        "step5_title": "5. Set Callsign",
+        "step4_title": "4. Choose a Map Base",
         "step5_desc_1": "The Device Setup Wizard will ask if you want to define your callsign.",
         "step5_desc_2": "These are not needed, clear the boxes and press OK.",
-        
-        "step6_title": "6. Set Plugins",
+        "step5_title": "5. Set Callsign",
         "step6_desc_1": "The application will ask if plugins should be installed.",
         "step6_desc_2": "Next, the application will ask if DTED-0 elevation models should be downloaded automatically.",
-        
-        "step7_title": "7. Review Settings",
+        "step6_title": "6. Set Plugins",
         "step7_desc_1": "Now the basic settings of WinTAK have been made. Let's check 'My Preferences.'",
-        "step7_desc_2": "Also, check the TAK Network Status. A green cloud means the server connection is OK, red means it is disconnected."
+        "step7_desc_2": "Also, check the TAK Network Status. A green cloud means the server connection is OK, red means it is disconnected.",
+        "step7_title": "7. Review Settings"
       },
       "phase4": {
-        "step1_title": "1. Check Unit Settings",
         "step1_desc_1": "Check WinTAK's unit settings.",
         "step1_desc_2": "Press the three stacked lines, the hamburger menu, in the top left corner.",
         "step1_desc_3": "Select Settings.",
         "step1_desc_4": "Select Display Preferences.",
         "step1_desc_5": "The Display Preferences menu opens. Select Unit Display Format Preferences.",
         "step1_desc_6": "Check that the settings are as shown in the picture. Change if necessary.",
-        
-        "step2_title": "2. Troubleshooting",
-        "step2_desc": "TBD: TroubleShoot."
+        "step1_title": "1. Check Unit Settings",
+        "step2_desc": "TBD: TroubleShoot.",
+        "step2_title": "2. Troubleshooting"
       },
+      "step1_download": "Download the zip package:",
+      "step1_note": "WinTAK uses the same package as ATAK",
+      "step2_install": "Import the package.",
+      "step3_done": "Done, WinTAK is ready to use.",
+      "title": "WinTAK Package Installation",
       "wizard_title": {
         "phase1": "Set your Windows PC's Language to English",
         "phase2": "Download and Install WinTAK",
