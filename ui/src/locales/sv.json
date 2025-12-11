@@ -106,24 +106,169 @@
       }
     },
     "ios": {
+      "instructions_short": "Behöver du hjälp med att importera paketet?",
+      "open_instructions": "Öppna instruktioner",
+      "phase1": {
+        "step1_title": "1. Ladda ner applikationerna",
+        "step1_desc_title": "Ladda ner iTAK",
+        "step1_desc_1": "Ladda ner iTAK-appen från App Store och installera den.",
+        "step1_desc_2": "Tryck på knappen nedan för att hämta appen.",
+        "step2_title": "2. Ladda ner ditt klientpaket",
+        "step2_desc_title": "Ladda ner ditt klientpaket",
+        "step2_desc_1": "Ladda ner ditt klientpaket genom att trycka på den gröna knappen nedan.",
+        "step2_desc_2": "Du kan även hitta samma knapp på framsidan.",
+        "download_client_package": "Ladda ner ditt klientpaket",
+        "zip_file_warning": "OBS! Zip-filen behöver inte extraheras!"
+      },
+      "phase2": {
+        "step1_title": "Starta applikationen",
+        "step1_desc_1": "Öppna iTAK-appen.",
+        "step1_desc_2": "När appen frågar: \"iTAK vill hitta och ansluta till enheter på ditt lokala nätverk...\", välj Inte tillåt.",
+        "step2_title": "Ange ditt callsign",
+        "step2_desc_1": "Fyll i profilinställningarna:",
+        "step2_desc_2": "Ange ditt alias i fältet Callsign, till exempel, Rambo. Fyll inte i telefonfältet. Tryck sedan på Nästa.",
+        "step3_title": "Ställ in teaminställningar",
+        "step3_desc_1": "Fyll i teaminställningarna:",
+        "step3_desc_2": "I fältet Välj team, välj din teams färg från rullgardinsmenyn (som du bör ha blivit instruerad att välja). I fältet Välj teamroll, välj rollen Teammedlem, om inte annat instruerats.\nAnvändare av kommandopost kommer att sätta sin roll till HQ.\nTryck sedan på Nästa.",
+        "step4_title": "Ge appen de nödvändiga behörigheterna",
+        "step4_desc_1": "a. Ställ in integritetsinställningarna för att tillåta aviseringar och platsinformation.",
+        "step4_desc_2": "iOS kommer sedan att fråga om du tillåter iTAK att skicka aviseringar och använda din plats. Välj Tillåt för aviseringar.",
+        "step4_desc_3": "Välj Tillåt medan appen används för platsinformation.",
+        "step4_desc_4": "Efter detta, gå vidare för att etablera serveranslutningen med ditt klientpaket."
+      },
+      "phase3": {
+        "step1_title": "Öppna Pakethanteraren",
+        "step1_desc_1": "a. Gå till kartvyn och scrolla verktygsfältet åt höger tills du hittar Paketikonen.",
+        "step1_important": "Viktigt! Försök inte installera klientpaketet via iTAK Inställningar->Nätverk->Server!. Det kommer inte att fungera.",
+        "step2_title": "Lägg till ditt meddelandemallpaket till iTAK",
+        "step2_desc_1": "b. Pakethanteraren öppnas, den kommer att vara tom. Tryck på plusikonen längst ner till höger för att lägga till ditt meddelandemallpaket.",
+        "step2_desc_2": "c. Välj Lokal enhet.",
+        "step2_desc_3": "d. Välj ditt paket. Det kommer att vara en zip-fil som heter DittCallsign.zip.",
+        "step2_desc_4": "e. Som en bekräftelse på att det lyckades, kommer listan i Pakethanteraren att visa serverns callsign och ett grönt ljus. Återgå till kartvyn.",
+        "step2_desc_5": "Serveranslutningen är nu etablerad. Som en bekräftelse kommer längst ner till höger på kartan att visas grönt \"Ansluten\"."
+      },
+      "phase4": {
+        "step1_title": "Öppna inställningar",
+        "step1_desc_1": "a. Öppna inställningar igen från kugghjulsikonen uppe till vänster.",
+        "step1_desc_2": "b. Välj Preferenser från huvudinställningsmenyn.",
+        "step1_desc_3": "Förbered för att ställa in korrekta måttenheter och koordinatsystem.",
+        "step2_title": "Ställ in enheter",
+        "step2_desc_1": "Välj Enheter:",
+        "step2_desc_2": "Välj MGRS för koordinatformat och Meter för avståndsformat.",
+        "step3_title": "Ändra eventuellt kartkälla",
+        "step3_desc_1": "a. Om du vill ändra kartkälla, välj Kartkälla från huvudinställningsmenyn.",
+        "step3_desc_2": "b. Välj den kartkälla du önskar. Observera! Tillgänglighet kan variera.",
+        "step3_desc_3": "Bra! Du har nu ställt in iTAK för användning.\nOm du behöver redigera ditt callsign kan du göra det från inställningsmenyn genom att klicka på ditt callsign."
+      },
+      "phase5": {
+        "step1_title": "Öppna Data Synkronisering-menyn",
+        "step1_desc_1": "I huvudvyn, öppna verktygsmenyn (längst ner) och scrolla till höger för att hitta Data Synkronisering-menyn.",
+        "step2_title": "Prenumerera på flödet",
+        "step2_desc_1": "I Data Synkronisering-menyn, tryck på Prenumerera-knappen.",
+        "step2_desc_2": "Välj den tillgängliga servern (namnet på din insats bör dyka upp, t.ex. 'positive-beetle.').",
+        "step2_desc_3": "I den kommande vyn, välj RECON-flödet och eventuellt något annat flöde du blivit instruerad att prenumerera på.",
+        "step3_title": "Flödet är tillgängligt",
+        "step3_desc_1": "Från och med nu är Recon-flödet, som skapats och uppdaterats av användarna på kommandoposten, tillgängligt för dig.",
+        "step3_desc_2": "Flödet kommer att visas i din Data Synkronisering-meny. Instruktioner för att använda flödet finns i gruppinstruktionerna."
+      },
       "step1_download": "Ladda ner zip-paketet:",
-      "step2_install": "Importera paketet till appen.",
-      "step3_done": "iTAK \u00e4r redo att anv\u00e4ndas.",
-      "title": "Installation av iTAK-paket"
+      "step2_install": "Importera paketet.",
+      "step3_done": "Klart, iTAK är redo att användas.",
+      "title": "iTAK Paketinstallation",
+      "wizard_title": {
+        "phase1": "Installera iOS-appar",
+        "phase2": "Gör de grundläggande inställningarna",
+        "phase3": "Anslut till servern",
+        "phase4": "Ställ in enheter",
+        "phase5": "Aktivera Data Synkronisering"
+      }
     },
     "tracker": {
       "step1_download": "Ladda ner zip-paketet:",
-      "step2_install": "Importera paketet till appen.",
-      "step3_done": "TAK Tracker \u00e4r redo att anv\u00e4ndas.",
-      "title": "Installation av TAK Tracker-paket"
+      "step2_install": "Importera paketet.",
+      "step3_done": "Klart, TAK Tracker är redo att användas.",
+      "title": "TAK Tracker Paketinstallation"
     },
     "windows": {
+      "instructions_short": "Behöver du hjälp med att importera paketet?",
+      "open_instructions": "Öppna instruktioner",
       "step1_download": "Ladda ner zip-paketet:",
-      "step1_note": "WinTAK anv\u00e4nder samma paket som ATAK",
-      "step2_install": "Importera paketet till appen.",
-      "step3_done": "WinTAK \u00e4r redo att anv\u00e4ndas.",
-      "title": "Installation av WinTAK-paket"
-    }
+      "step1_note": "WinTAK använder samma paket som ATAK",
+      "step2_install": "Importera paketet.",
+      "step3_done": "Klart, WinTAK är redo att användas.",
+      "title": "WinTAK Paketinstallation",
+      "phase1": {
+        "step1_title": "1. Ställ in din region till USA",
+        "step1_desc_1": "WinTAK kräver att arbetsstationens språk är engelska och regioninställningen är USA.",
+        "step1_desc_2": "Innan du installerar applikationen, sök efter Tid och Språk från sökfältet (nere till vänster).",
+        "step1_desc_3": "Först, låt oss ändra regioninställningen. Välj Region från sidomenyn i Tid och Språk.",
+        "step1_desc_4": "Välj USA för land eller region. Se till att regionalformatet också är inställt på Engelska (USA).",
+        "step2_title": "2. Ställ in språk till Engelska (US)",
+        "step2_desc_1": "Från sidomenyn i Tid och Språk-menyn, välj Språk.",
+        "step2_desc_2": "Ställ in Windows visningsspråk till Engelska (USA).",
+        "step2_desc_3": "Slutför ändringen av visningsspråket genom att logga ut och logga in igen.",
+        "step3_title": "3. Om nödvändigt, lägg till språkpaket (Engelska)",
+        "step3_desc_1": "Om engelska inte finns tillgängligt i visningsspråkalternativen, tryck på Lägg till ett språk och sök efter det.",
+        "step3_desc_2": "Tryck på Installera språkpaket. Vänta på att språkpaketet installeras.",
+        "step3_desc_3": "Därefter kan du välja Engelska som visningsspråk enligt steg 2.",
+        "step3_desc_4": "Språkinställningarna är nu klara."
+      },
+      "phase2": {
+        "step1_title": "1. Ladda ner WinTAK",
+        "step1_desc_1": "Ladda ner WinTAK-applikationen från Försvarsmaktens angivna plats.",
+        "step1_desc_2": "Viktigt! Ladda bara ner Windows-applikationer från den angivna platsen.",
+        "step3_title": "2. Öppna Installationsprogrammet",
+        "step3_desc_1": "Hitta den nedladdade zip-filen och extrahera den. Lokalisera .msi installationsfilen i zip:ens Produkter-mapp.",
+        "step3_desc_2": "Dubbelklicka på .msi-filen för att öppna installationsprogrammet.",
+        "step4_title": "3. Installera med Installationsprogrammet",
+        "step4_desc_1": "Installera WinTAK med Hjälpmedelsguiden.",
+        "step4_desc_2": "Tryck på Nästa. Välj installationsmapp för applikationen.",
+        "step4_desc_3": "Valfritt, ändra installationsmappen via knappen Bläddra. Tryck på Nästa.",
+        "step4_desc_4": "Välj komponenter som ska installeras i Hjälpmedelsguiden. Välj åtminstone följande komponent: Data Synk.",
+        "step4_desc_5": "Tryck på Nästa. Guiden är redo att börja installationen, tryck på Installera."
+      },
+      "phase3": {
+        "step1_title": "1. Öppna applikationen",
+        "step1_desc": "Öppna WinTAK-applikationen från skrivbordet.",
+        "step2_title": "2. Acceptera EULA",
+        "step2_desc_1": "Efter en stund kommer Enhetsinställningsguiden att öppnas.",
+        "step2_desc_2": "Som första steg, acceptera EULA.",
+        "step3_title": "3. Etablera serveranslutning",
+        "step3_desc_1": "Nästa, etablera serveranslutning.",
+        "step3_desc_2": "a. Applikationen kommer att fråga om du vill importera ett datapaket.",
+        "step3_desc_3": "b. Välj 'Ja'. Peka på Klientpaketet.",
+        "step3_desc_4": "När du har valt paketet och tryckt på Öppna, kommer fönstret Välj importstrategi att öppnas.",
+        "step3_desc_5": "c. Välj 'UserPreferenceImportStrategy', och tryck på OK.",
+        "step4_title": "4. Välj kartbakgrund",
+        "step4_desc_1": "Med meddelandepaketet kan olika kartbakgrunder komma.",
+        "step5_title": "5. Ställ in callsign",
+        "step5_desc_1": "Enhetsinställningsguiden kommer att fråga om du vill definiera ditt callsign.",
+        "step5_desc_2": "Dessa behövs inte, rensa rutorna och tryck på OK.",
+        "step6_title": "6. Ställ in Plugins",
+        "step6_desc_1": "Applikationen kommer att fråga om plugins ska installeras.",
+        "step6_desc_2": "Nästa, kommer applikationen att fråga om DTED-0 höjdsmodeller ska laddas ner automatiskt.",
+        "step7_title": "7. Granska inställningar",
+        "step7_desc_1": "Nu har WinTAK:s grundläggande inställningar gjorts. Låt oss kontrollera 'Mina preferenser'.",
+        "step7_desc_2": "Kontrollera även TAK-nätverksstatusen. En grön moln betyder att serveranslutningen är OK, röd betyder att den är frånkopplad."
+      },
+      "phase4": {
+        "step1_title": "1. Kontrollera enhetsinställningar",
+        "step1_desc_1": "Kontrollera WinTAK:s enhetsinställningar.",
+        "step1_desc_2": "Tryck på de tre staplade linjerna, hamburger-menyn, i det övre vänstra hörnet.",
+        "step1_desc_3": "Välj Inställningar.",
+        "step1_desc_4": "Välj Visningspreferenser.",
+        "step1_desc_5": "Visningspreferenser-menyn öppnas. Välj Enhetsvisningsformat.",
+        "step1_desc_6": "Kontrollera att inställningarna är som visas på bilden. Ändra om det behövs.",
+        "step2_title": "2. Felsökning",
+        "step2_desc": "TBD: Felsökning."
+      },
+      "wizard_title": {
+        "phase1": "Ställ in Windows PC:s språk till engelska",
+        "phase2": "Ladda ner och installera WinTAK",
+        "phase3": "Konfigurera WinTAK",
+        "phase4": "Ställ in måttenheter"
+      }
+  }
   },
   "wizard": {
     "complete": "Klar",

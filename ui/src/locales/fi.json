@@ -105,25 +105,191 @@
         "phase5": "Viimeistely"
       }
     },
-    "ios": {
-      "step1_download": "Lataa zip-paketti:",
-      "step2_install": "Tuo paketti sovellukseen.",
-      "step3_done": "iTAK on k\u00e4ytt\u00f6valmis.",
-      "title": "iTAK-paketin asennus"
+  "ios": {
+    "instructions_short": "Tarvitsetko apua paketin tuonnissa?",
+    "open_instructions": "Avaa ohjeet",
+    "phase1": {
+      "step1_title": "1. Lataa sovellukset",
+      "step1_desc_title": "Lataa iTAK",
+      "step1_desc_1": "Lataa iTAK-sovellus App Storesta ja asenna se.",
+      "step1_desc_2": "Paina alla olevaa painiketta ladataksesi sovelluksen.",
+
+      "step2_title": "2. Lataa asiakaspaketti",
+      "step2_desc_title": "Lataa asiakaspaketti",
+      "step2_desc_1": "Lataa asiakaspakettisi painamalla alla olevaa vihreää painiketta.",
+      "step2_desc_2": "Löydät saman painikkeen myös etusivulta.",
+      "download_client_package": "Lataa asiakaspaketti",
+      "zip_file_warning": "HUOM! Zip-tiedostoa ei tarvitse purkaa!"
     },
-    "tracker": {
-      "step1_download": "Lataa zip-paketti:",
-      "step2_install": "Tuo paketti sovellukseen.",
-      "step3_done": "TAK Tracker on k\u00e4ytt\u00f6valmis.",
-      "title": "TAK Tracker -paketin asennus"
+    "phase2": {
+      "step1_title": "Avaa sovellus",
+      "step1_desc_1": "Avaa iTAK-sovellus.",
+      "step1_desc_2": "Kun sovellus kysyy: \"iTAK haluaa löytää ja yhdistää laitteisiin paikallisverkossasi...\", valitse Älä salli.",
+      
+      "step2_title": "Syötä kutsunimi",
+      "step2_desc_1": "Täytä profiilin asetukset:",
+      "step2_desc_2": "Syötä kutsunimesi 'Kutsunimi'-kenttään, esimerkiksi Rambo. Älä täytä Puhelin-kenttää. Paina lopuksi Seuraava.",
+      
+      "step3_title": "Aseta tiimin asetukset",
+      "step3_desc_1": "Täytä tiimin asetukset:",
+      "step3_desc_2": "Valitse 'Valitse tiimi' -kentästä tiimisi (kuten sinulle on ohjeistettu) väri pudotusvalikosta. Valitse 'Valitse tiimin rooli' -kentästä rooli 'Tiimin jäsen', ellei toisin ole ohjeistettu.\nPäämajakäyttäjät asettavat roolinsa päämajaksi.\nPaina lopuksi Seuraava.",
+      
+      "step4_title": "Anna sovellukselle tarvittavat käyttöoikeudet",
+      "step4_desc_1": "a. Aseta tietosuoja-asetukset sallimaan ilmoitukset ja sijaintipalvelut.",
+      "step4_desc_2": "iOS kysyy sitten, sallitko iTAK:lle ilmoitukset ja sijaintisi käytön. Valitse Salli ilmoitukset.",
+      "step4_desc_3": "Valitse Salli sovelluksen käytön aikana sijainnille.",
+      "step4_desc_4": "Tämän jälkeen siirrytään luomaan palvelinyhteys asiakaspaketillasi."
     },
-    "windows": {
-      "step1_download": "Lataa zip-paketti:",
-      "step1_note": "WinTAK k\u00e4ytt\u00e4\u00e4 samaa pakettia, kuin ATAK",
-      "step2_install": "Tuo paketti sovellukseen.",
-      "step3_done": "WinTAK on k\u00e4ytt\u00f6valmis.",
-      "title": "WinTAK-paketin asennus"
+    "phase3": {
+      "step1_title": "Avaa Paketit-valikko",
+      "step1_desc_1": "a. Mene karttanäkymään ja vieritä työkalupalkkia oikealle, kunnes löydät Paketti-kuvakkeen.",
+      "step1_important": "Tärkeää! Älä yritä asentaa asiakaspakettia iTAK Asetukset->Verkko->Palvelin!-valikosta. Se ei toimi.",
+      
+      "step2_title": "Lisää viestipohjapaketti iTAK:iin",
+      "step2_desc_1": "b. Paketti-valikko avautuu ja se on tyhjä. Paina alareunassa olevaa plus-kuvaketta lisätäksesi viestipohjapaketti.",
+      "step2_desc_2": "c. Valitse Paikallinen laite.",
+      "step2_desc_3": "d. Valitse pakettisi. Se on zip-tiedosto nimeltä YourCallsign.zip.",
+      "step2_desc_4": "e. Onnistuneen lisäyksen merkkinä Paketit-valikon listalla näkyy palvelimen kutsunimi ja vihreä valo. Palaa karttanäkymään.",
+      "step2_desc_5": "Palvelinyhteys on nyt luotu. Merkkinä tästä kartan oikeassa alakulmassa lukee Yhteydessä vihreänä."
+    },
+    "phase4": {
+      "step1_title": "Avaa asetukset",
+      "step1_desc_1": "a. Avaa Asetukset uudelleen ylävasemmassa kulmassa olevasta hammasrataskuvakkeesta.",
+      "step1_desc_2": "b. Valitse Asetuksista Asetukset-vaihtoehto.",
+      "step1_desc_3": "Valmistaudu asettamaan oikeat mittayksiköt ja koordinaattijärjestelmä.",
+      
+      "step2_title": "Aseta yksiköt",
+      "step2_desc_1": "Valitse mittayksiköt:",
+      "step2_desc_2": "Valitse MGRS koordinaattimuodoksi ja Metrit etäisyysmuodoksi.",
+      
+      "step3_title": "Vaihtoehtoisesti muuta kartan lähde",
+      "step3_desc_1": "a. Jos haluat vaihtaa kartan lähteen, valitse Kartan lähde Asetuksista.",
+      "step3_desc_2": "b. Valitse haluamasi kartan lähde. Huom! Saatavuus voi vaihdella.",
+      "step3_desc_3": "Hienoa! Olet nyt valmistanut iTAK:in käyttöön.\nJos tarvitset kutsunimesi muokkaamista, voit tehdä sen Asetukset-valikosta valitsemalla kutsunimesi."
+    },
+    "phase5": {
+      "step1_title": "Avaa tiedonsiirron synkronointi -valikko",
+      "step1_desc_1": "Päävalikossa avaa työkalupalkki (alareunassa) ja vieritä oikealle löytääksesi Tiedonsiirron synkronointi -valikon.",
+      
+      "step2_title": "Tilaa syöte",
+      "step2_desc_1": "Tiedonsiirron synkronointi -valikossa, paina Tilaa-painiketta.",
+      "step2_desc_2": "Valitse saatavilla oleva palvelin (tulee näkyviin suorituspaikkasi nimi, kuten 'positive-beetle.').",
+      "step2_desc_3": "Seuraavassa näkymässä valitse RECON-syöte ja muut syötteet, joihin sinut on ohjeistettu tilaamaan.",
+      
+      "step3_title": "Syöte käytettävissäsi",
+      "step3_desc_1": "Tästä eteenpäin Command Postin käyttäjien luoma ja päivittämä Recon-syöte on käytettävissäsi.",
+      "step3_desc_2": "Syöte näkyy Tiedonsiirron synkronointi -valikossasi. Ohjeet syötteen käytöstä löytyvät ryhmän käytön ohjeista."
+    },
+    "step1_download": "Lataa zip-paketti:",
+    "step2_install": "Tuo paketti.",
+    "step3_done": "Valmis, ITAK on valmis käyttöön.",
+    "title": "ITAK-paketin asennus",
+    "wizard_title": {
+      "phase1": "Asenna iOS-sovellukset",
+      "phase2": "Tee perusasetukset",
+      "phase3": "Yhdistä palvelimeen",
+      "phase4": "Aseta yksiköt",
+      "phase5": "Ota tiedonsynkronointi käyttöön"
     }
+  },
+  "tracker": {
+    "step1_download": "Lataa zip-paketti:",
+    "step2_install": "Tuo paketti.",
+    "step3_done": "Valmis, TAK Tracker on valmis käyttöön.",
+    "title": "TAK Tracker -paketin asennus"
+  },
+  "windows": {
+    "instructions_short": "Tarvitsetko apua paketin tuonnissa?",
+    "open_instructions": "Avaa ohjeet",
+    "step1_download": "Lataa zip-paketti:",
+    "step1_note": "WinTAK käyttää samaa pakettia kuin ATAK",
+    "step2_install": "Tuo paketti.",
+    "step3_done": "Valmis, WinTAK on valmis käyttöön.",
+    "title": "WinTAK-paketin asennus",
+
+    "phase1": {
+      "step1_title": "1. Aseta alueeksi Yhdysvallat",
+      "step1_desc_1": "WinTAK vaatii työaseman kielen olevan englanti ja alueasetukseksi Yhdysvallat.",
+      "step1_desc_2": "Ennen sovelluksen asentamista etsi Aika ja kieli -asetukset hakupalkista (vasemmasta alakulmasta).",
+      "step1_desc_3": "Aloita alueen asetuksen muuttaminen. Valitse Alue Aika ja kieli -valikon sivupalkista.",
+      "step1_desc_4": "Valitse Yhdysvallat maaksi tai alueeksi. Varmista, että alueellinen formaatti on myös asetettu englanniksi (Yhdysvallat).",
+      
+      "step2_title": "2. Aseta kieli Englanti (Yhdysvallat)",
+      "step2_desc_1": "Valitse Aika ja kieli -valikon sivupalkista Kieli.",
+      "step2_desc_2": "Aseta Windowsin näyttökieleksi Englanti (Yhdysvallat).",
+      "step2_desc_3": "Viimeistele kieliasetusten muuttaminen kirjautumalla ulos ja takaisin sisään.",
+      
+      "step3_title": "3. Lisää kielipaketti tarvittaessa",
+      "step3_desc_1": "Jos englanti ei ole saatavilla näyttökielenä, paina Lisää kieli ja etsi se.",
+      "step3_desc_2": "Paina Asenna kielipaketti. Odota, että kielipaketti asennetaan.",
+      "step3_desc_3": "Sen jälkeen voit valita englannin näyttökieleksi kuten vaiheessa 2 on kuvattu.",
+      "step3_desc_4": "Kieliasetukset ovat nyt valmiit."
+    },
+    "phase2": {
+      "step1_title": "1. Lataa WinTAK",
+      "step1_desc_1": "Lataa WinTAK-sovellus puolustusvoimien määrittämästä sijainnista.",
+      "step1_desc_2": "Tärkeää! Lataa Windows-sovelluksia vain ohjeistetusta sijainnista.",
+      
+      "step3_title": "2. Avaa asennusohjelma",
+      "step3_desc_1": "Etsi ladattu zip-tiedosto ja pura se. Etsi .msi-asennustiedosto zip-tiedoston Products-kansiosta.",
+      "step3_desc_2": "Kaksoispaina .msi-tiedostoa avataksesi asennusohjelman.",
+      
+      "step4_title": "3. Asenna asennusohjelmalla",
+      "step4_desc_1": "Asenna WinTAK käyttämällä asennusohjelmaa.",
+      "step4_desc_2": "Paina Seuraava. Valitse asennuspaikka.",
+      "step4_desc_3": "Vaihtoehtoisesti voit muuttaa asennuspaikkaa Selaa-painikkeen avulla. Paina Seuraava.",
+      "step4_desc_4": "Valitse asennettavat komponentit asennusohjelmasta. Valitse ainakin seuraava komponentti: Tiedonsiirron synkronointi.",
+      "step4_desc_5": "Paina Seuraava. Asennusohjelma on valmis aloittamaan asennuksen, paina Asenna."
+    },
+    "phase3": {
+      "step1_title": "1. Avaa sovellus",
+      "step1_desc": "Avaa WinTAK-sovellus työpöydältä.",
+      
+      "step2_title": "2. Hyväksy EULA",
+      "step2_desc_1": "Hetken kuluttua Laitteen asetusten asennusohjelma avautuu.",
+      "step2_desc_2": "Ensimmäiseksi hyväksy EULA.",
+      
+      "step3_title": "3. Luo palvelinyhteys",
+      "step3_desc_1": "Seuraavaksi luodaan palvelinyhteys.",
+      "step3_desc_2": "a. Sovellus kysyy, haluatko tuoda datapaketin.",
+      "step3_desc_3": "b. Valitse 'Kyllä'. Suuntaa asiakaspakettiin.",
+      "step3_desc_4": "Kun olet valinnut paketin ja painanut Avaa, valintaikkuna 'Valitse tuontistrategia' avautuu.",
+      "step3_desc_5": "c. Valitse 'UserPreferenceImportStrategy', ja paina OK.",
+      
+      "step4_title": "4. Valitse kartan pohja",
+      "step4_desc_1": "Viestipohjapaketin mukana voi tulla erilaisia kartan pohjia.",
+      
+      "step5_title": "5. Aseta kutsunimi",
+      "step5_desc_1": "Laitteen asetusten asennusohjelma kysyy, haluatko määrittää kutsunimesi.",
+      "step5_desc_2": "Näitä ei tarvita, poista valinnat ja paina OK.",
+      
+      "step6_title": "6. Aseta laajennukset",
+      "step6_desc_1": "Sovellus kysyy, halutaanko laajennuksia asentaa.",
+      "step6_desc_2": "Seuraavaksi sovellus kysyy, halutaanko DTED-0 korkeustieto-mallit ladata automaattisesti.",
+      
+      "step7_title": "7. Tarkista asetukset",
+      "step7_desc_1": "Nyt WinTAK:in perusasetukset on tehty. Tarkista 'Omat asetukset'.",
+      "step7_desc_2": "Tarkista myös TAK-verkko-tila. Vihreä pilvi tarkoittaa, että palvelinyhteys on kunnossa, punainen tarkoittaa, että se on katkennut."
+    },
+    "phase4": {
+      "step1_title": "1. Tarkista yksikköasetukset",
+      "step1_desc_1": "Tarkista WinTAK:n yksikköasetukset.",
+      "step1_desc_2": "Paina kolmea pinoa, hampurilaisvalikkoa ylävasemmassa kulmassa.",
+      "step1_desc_3": "Valitse Asetukset.",
+      "step1_desc_4": "Valitse Näyttöasetukset.",
+      "step1_desc_5": "Näyttöasetukset avautuvat. Valitse Yksikkönäyttöasetukset.",
+      "step1_desc_6": "Tarkista, että asetukset ovat kuvassa näkyvien kaltaisia. Muuta tarvittaessa.",
+      
+      "step2_title": "2. Vianetsintä",
+      "step2_desc": "TBD: Vianetsintä."
+    },
+    "wizard_title": {
+      "phase1": "Aseta Windows-tietokoneesi kieli englanniksi",
+      "phase2": "Lataa ja asenna WinTAK",
+      "phase3": "Määritä WinTAK",
+      "phase4": "Aseta mittayksiköt"
+    }
+  }
   },
   "wizard": {
     "complete": "Valmis",
