@@ -12,10 +12,5 @@ export const IosInstructionPage = () => {
     { id: 5, title: t("tabs.ios.wizard_title.phase5") },
   ];
 
-  return (
-    <InstructionsWizard
-      phases={IOS_PHASES}
-      basePath="/ios"
-    />
-  );
+  return <InstructionsWizard phases={IOS_PHASES} basePath="/ios" />;
 };

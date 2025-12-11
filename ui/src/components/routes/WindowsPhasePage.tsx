@@ -4,7 +4,6 @@ import { WindowsPhase2 } from "../instructions/windows/WindowsPhase2";
 import { WindowsPhase3 } from "../instructions/windows/WindowsPhase3";
 import { WindowsPhase4 } from "../instructions/windows/WindowsPhase4";
 
-
 const PHASE_MAP: Record<string, React.ComponentType<any>> = {
   1: WindowsPhase1,
   2: WindowsPhase2,

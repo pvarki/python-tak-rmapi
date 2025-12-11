@@ -12,7 +12,12 @@ export const AndroidPhase5 = () => {
 
   return (
     <div className="space-y-4">
-      <Accordion type="single" collapsible defaultValue="step1" className="space-y-2">
+      <Accordion
+        type="single"
+        collapsible
+        defaultValue="step1"
+        className="space-y-2"
+      >
         {/* Step 1 */}
         <AccordionItem value="step1">
           <Card className="p-2">
@@ -80,7 +85,9 @@ export const AndroidPhase5 = () => {
                     className="w-full max-w-[500px]"
                     alt={t("tabs.android.phase5.step2_title")}
                   />
-                  <p className="font-medium">{t("tabs.android.phase5.step2_desc_1")}</p>
+                  <p className="font-medium">
+                    {t("tabs.android.phase5.step2_desc_1")}
+                  </p>
 
                   {/* Fixed numbered list */}
                   <ol className="list-decimal space-y-2 pl-8 marker:font-medium">
@@ -88,7 +95,9 @@ export const AndroidPhase5 = () => {
                       <Trans
                         t={t}
                         i18nKey="tabs.android.phase5.step2_desc_2_1"
-                        components={{ bold: <span className="font-semibold" /> }}
+                        components={{
+                          bold: <span className="font-semibold" />,
+                        }}
                       />
                     </li>
                     <li className="pl-2">
@@ -116,26 +125,34 @@ export const AndroidPhase5 = () => {
                       <Trans
                         t={t}
                         i18nKey="tabs.android.phase5.step2_desc_2_5"
-                        components={{ bold: <span className="font-semibold" /> }}
+                        components={{
+                          bold: <span className="font-semibold" />,
+                        }}
                       />
                     </li>
                     <li className="pl-2">
                       <Trans
                         t={t}
                         i18nKey="tabs.android.phase5.step2_desc_2_6"
-                        components={{ bold: <span className="font-semibold" /> }}
+                        components={{
+                          bold: <span className="font-semibold" />,
+                        }}
                       />
                     </li>
                     <li className="pl-2">
                       <Trans
                         t={t}
                         i18nKey="tabs.android.phase5.step2_desc_2_7"
-                        components={{ bold: <span className="font-semibold" /> }}
+                        components={{
+                          bold: <span className="font-semibold" />,
+                        }}
                       />
                     </li>
                   </ol>
 
-                  <p className="font-medium">{t("tabs.android.phase5.step2_desc_3")}</p>
+                  <p className="font-medium">
+                    {t("tabs.android.phase5.step2_desc_3")}
+                  </p>
                   <img
                     src="/ui/tak/atak/25-MetersToKilo1.png"
                     className="w-full max-w-[500px]"
@@ -156,7 +173,9 @@ export const AndroidPhase5 = () => {
             <AccordionContent className="overflow-x-auto">
               <CardContent className="p-2 space-y-4 text-sm">
                 <div className="pl-4 space-y-4">
-                  <p className="font-medium">{t("tabs.android.phase5.step3_desc_1")}</p>
+                  <p className="font-medium">
+                    {t("tabs.android.phase5.step3_desc_1")}
+                  </p>
 
                   {/* Fixed numbered list */}
                   <ol className="list-decimal space-y-2 pl-8 marker:font-medium">
@@ -164,35 +183,45 @@ export const AndroidPhase5 = () => {
                       <Trans
                         t={t}
                         i18nKey="tabs.android.phase5.step3_desc_2_1"
-                        components={{ bold: <span className="font-semibold" /> }}
+                        components={{
+                          bold: <span className="font-semibold" />,
+                        }}
                       />
                     </li>
                     <li className="pl-2">
                       <Trans
                         t={t}
                         i18nKey="tabs.android.phase5.step3_desc_2_2"
-                        components={{ bold: <span className="font-semibold" /> }}
+                        components={{
+                          bold: <span className="font-semibold" />,
+                        }}
                       />
                     </li>
                     <li className="pl-2">
                       <Trans
                         t={t}
                         i18nKey="tabs.android.phase5.step3_desc_2_3"
-                        components={{ bold: <span className="font-semibold" /> }}
+                        components={{
+                          bold: <span className="font-semibold" />,
+                        }}
                       />
                     </li>
                     <li className="pl-2">
                       <Trans
                         t={t}
                         i18nKey="tabs.android.phase5.step3_desc_2_4"
-                        components={{ bold: <span className="font-semibold" /> }}
+                        components={{
+                          bold: <span className="font-semibold" />,
+                        }}
                       />
                     </li>
                     <li className="pl-2">
                       <Trans
                         t={t}
                         i18nKey="tabs.android.phase5.step3_desc_2_5"
-                        components={{ bold: <span className="font-semibold" /> }}
+                        components={{
+                          bold: <span className="font-semibold" />,
+                        }}
                       />
                     </li>
                   </ol>

@@ -26,7 +26,9 @@ export function AndroidTab({ zip }: Props) {
       <div className="mt-4">
         <p className="mb-2">{t("tabs.android.instructions_short")}</p>
         <Button asChild variant="secondary">
-          <Link to={"/android/1" as any}>{t("tabs.android.open_instructions")}</Link>
+          <Link to={"/android/1" as any}>
+            {t("tabs.android.open_instructions")}
+          </Link>
         </Button>
       </div>
     </div>

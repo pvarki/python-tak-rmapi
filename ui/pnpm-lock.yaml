@@ -22,7 +22,7 @@ importers:
       "@tailwindcss/vite":
         specifier: ^4.1.16
         version: 4.1.16(vite@5.2.10(@types/node@24.10.0)(lightningcss@1.30.2))
-      '@tanstack/react-router':
+      "@tanstack/react-router":
         specifier: ^1.133.22
         version: 1.139.14(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       class-variance-authority:
@@ -3884,14 +3884,20 @@ packages:
     hasBin: true
 
   seroval-plugins@1.4.0:
-    resolution: {integrity: sha512-zir1aWzoiax6pbBVjoYVd0O1QQXgIL3eVGBMsBsNmM8Ukq90yGaWlfx0AB9dTS8GPqrOrbXn79vmItCUP9U3BQ==}
-    engines: {node: '>=10'}
+    resolution:
+      {
+        integrity: sha512-zir1aWzoiax6pbBVjoYVd0O1QQXgIL3eVGBMsBsNmM8Ukq90yGaWlfx0AB9dTS8GPqrOrbXn79vmItCUP9U3BQ==,
+      }
+    engines: { node: ">=10" }
     peerDependencies:
       seroval: ^1.0
 
   seroval@1.4.0:
-    resolution: {integrity: sha512-BdrNXdzlofomLTiRnwJTSEAaGKyHHZkbMXIywOh7zlzp4uZnXErEwl9XZ+N1hJSNpeTtNxWvVwN0wUzAIQ4Hpg==}
-    engines: {node: '>=10'}
+    resolution:
+      {
+        integrity: sha512-BdrNXdzlofomLTiRnwJTSEAaGKyHHZkbMXIywOh7zlzp4uZnXErEwl9XZ+N1hJSNpeTtNxWvVwN0wUzAIQ4Hpg==,
+      }
+    engines: { node: ">=10" }
 
   setprototypeof@1.2.0:
     resolution:

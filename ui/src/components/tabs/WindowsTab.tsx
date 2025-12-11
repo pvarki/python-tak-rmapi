@@ -23,14 +23,16 @@ export function WindowsTab({ zip }: Props) {
           className="p-2"
         />
 
-          <p className="text-xs mt-2 text-muted-foreground pl-2 border-l-2 border-muted-foreground">
-            {t("tabs.windows.step1_note")}
-          </p>
+        <p className="text-xs mt-2 text-muted-foreground pl-2 border-l-2 border-muted-foreground">
+          {t("tabs.windows.step1_note")}
+        </p>
       </div>
       <div className="mt-4">
         <p className="mb-2">{t("tabs.windows.instructions_short")}</p>
         <Button asChild variant="secondary">
-          <Link to={"/windows/1" as any}>{t("tabs.windows.open_instructions")}</Link>
+          <Link to={"/windows/1" as any}>
+            {t("tabs.windows.open_instructions")}
+          </Link>
         </Button>
       </div>
     </div>

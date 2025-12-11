@@ -1,5 +1,10 @@
 import { useTranslation } from "react-i18next";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Card, CardContent } from "@/components/ui/card";
 
 export const WindowsPhase3 = () => {
@@ -7,8 +12,12 @@ export const WindowsPhase3 = () => {
 
   return (
     <div className="space-y-4">
-      <Accordion type="single" collapsible defaultValue="step1" className="space-y-2">
-
+      <Accordion
+        type="single"
+        collapsible
+        defaultValue="step1"
+        className="space-y-2"
+      >
         {/* Step 1: Open the Application */}
         <AccordionItem value="step1">
           <Card className="p-2">
@@ -18,7 +27,11 @@ export const WindowsPhase3 = () => {
             <AccordionContent>
               <CardContent className="p-2 space-y-4 text-sm">
                 <p>{t("tabs.windows.phase3.step1_desc")}</p>
-                <img src="/ui/tak/wintak/Kuva14.png" className="mx-auto pr-5 w-[90px] " alt="Open the Application" />
+                <img
+                  src="/ui/tak/wintak/Kuva14.png"
+                  className="mx-auto pr-5 w-[90px] "
+                  alt="Open the Application"
+                />
               </CardContent>
             </AccordionContent>
           </Card>
@@ -34,7 +47,11 @@ export const WindowsPhase3 = () => {
               <CardContent className="p-2 space-y-4 text-sm">
                 <p>{t("tabs.windows.phase3.step2_desc_1")}</p>
                 <p>{t("tabs.windows.phase3.step2_desc_2")}</p>
-                <img src="/ui/tak/wintak/Kuva16.png" className="mx-auto pr-5 w-[400px] " alt="Accept EULA" />
+                <img
+                  src="/ui/tak/wintak/Kuva16.png"
+                  className="mx-auto pr-5 w-[400px] "
+                  alt="Accept EULA"
+                />
               </CardContent>
             </AccordionContent>
           </Card>
@@ -50,11 +67,23 @@ export const WindowsPhase3 = () => {
               <CardContent className="p-2 space-y-4 text-sm">
                 <p>{t("tabs.windows.phase3.step3_desc_1")}</p>
                 <p>{t("tabs.windows.phase3.step3_desc_2")}</p>
-                <img src="/ui/tak/wintak/Kuva17.png" className="mx-auto pr-5 w-[400px] " alt="Establish Server Connection" />
+                <img
+                  src="/ui/tak/wintak/Kuva17.png"
+                  className="mx-auto pr-5 w-[400px] "
+                  alt="Establish Server Connection"
+                />
                 <p>{t("tabs.windows.phase3.step3_desc_3")}</p>
-                <img src="/ui/tak/wintak/Kuva18.png" className="mx-auto pr-5 w-[400px] " alt="Choose Client Package" />
+                <img
+                  src="/ui/tak/wintak/Kuva18.png"
+                  className="mx-auto pr-5 w-[400px] "
+                  alt="Choose Client Package"
+                />
                 <p>{t("tabs.windows.phase3.step3_desc_4")}</p>
-                <img src="/ui/tak/wintak/Kuva19.png" className="mx-auto pr-5 w-[400px] " alt="Import Strategy" />
+                <img
+                  src="/ui/tak/wintak/Kuva19.png"
+                  className="mx-auto pr-5 w-[400px] "
+                  alt="Import Strategy"
+                />
                 <p>{t("tabs.windows.phase3.step3_desc_5")}</p>
               </CardContent>
             </AccordionContent>
@@ -70,7 +99,11 @@ export const WindowsPhase3 = () => {
             <AccordionContent>
               <CardContent className="p-2 space-y-4 text-sm">
                 <p>{t("tabs.windows.phase3.step4_desc_1")}</p>
-                <img src="/ui/tak/wintak/Kuva20.png" className="mx-auto pr-5 w-[400px] " alt="Choose a Map Base" />
+                <img
+                  src="/ui/tak/wintak/Kuva20.png"
+                  className="mx-auto pr-5 w-[400px] "
+                  alt="Choose a Map Base"
+                />
               </CardContent>
             </AccordionContent>
           </Card>
@@ -85,9 +118,17 @@ export const WindowsPhase3 = () => {
             <AccordionContent>
               <CardContent className="p-2 space-y-4 text-sm">
                 <p>{t("tabs.windows.phase3.step5_desc_1")}</p>
-                <img src="/ui/tak/wintak/Kuva21.png" className="mx-auto pr-5 w-[400px] " alt="Set Callsign" />
+                <img
+                  src="/ui/tak/wintak/Kuva21.png"
+                  className="mx-auto pr-5 w-[400px] "
+                  alt="Set Callsign"
+                />
                 <p>{t("tabs.windows.phase3.step5_desc_2")}</p>
-                <img src="/ui/tak/wintak/Kuva23.png" className="mx-auto pr-5 w-[400px] " alt="Additional WMS" />
+                <img
+                  src="/ui/tak/wintak/Kuva23.png"
+                  className="mx-auto pr-5 w-[400px] "
+                  alt="Additional WMS"
+                />
               </CardContent>
             </AccordionContent>
           </Card>
@@ -102,9 +143,17 @@ export const WindowsPhase3 = () => {
             <AccordionContent>
               <CardContent className="p-2 space-y-4 text-sm">
                 <p>{t("tabs.windows.phase3.step6_desc_1")}</p>
-                <img src="/ui/tak/wintak/Kuva24.png" className="mx-auto pr-5 w-[400px] " alt="Set Plugins" />
+                <img
+                  src="/ui/tak/wintak/Kuva24.png"
+                  className="mx-auto pr-5 w-[400px] "
+                  alt="Set Plugins"
+                />
                 <p>{t("tabs.windows.phase3.step6_desc_2")}</p>
-                <img src="/ui/tak/wintak/Kuva25.png" className="mx-auto pr-5 w-[400px] " alt="DTED-0 Models" />
+                <img
+                  src="/ui/tak/wintak/Kuva25.png"
+                  className="mx-auto pr-5 w-[400px] "
+                  alt="DTED-0 Models"
+                />
               </CardContent>
             </AccordionContent>
           </Card>
@@ -119,14 +168,21 @@ export const WindowsPhase3 = () => {
             <AccordionContent>
               <CardContent className="p-2 space-y-4 text-sm">
                 <p>{t("tabs.windows.phase3.step7_desc_1")}</p>
-                <img src="/ui/tak/wintak/Kuva26.png" className="mx-auto pr-5 w-[400px] " alt="Review Settings" />
+                <img
+                  src="/ui/tak/wintak/Kuva26.png"
+                  className="mx-auto pr-5 w-[400px] "
+                  alt="Review Settings"
+                />
                 <p>{t("tabs.windows.phase3.step7_desc_2")}</p>
-                <img src="/ui/tak/wintak/Kuva27.png" className="mx-auto pr-10 w-[200px] " alt="TAK Network Status" />
+                <img
+                  src="/ui/tak/wintak/Kuva27.png"
+                  className="mx-auto pr-10 w-[200px] "
+                  alt="TAK Network Status"
+                />
               </CardContent>
             </AccordionContent>
           </Card>
         </AccordionItem>
-
       </Accordion>
     </div>
   );

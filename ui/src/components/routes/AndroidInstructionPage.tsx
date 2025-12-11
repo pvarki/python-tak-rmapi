@@ -12,10 +12,5 @@ export const AndroidInstructionPage = () => {
     { id: 5, title: t("tabs.android.wizard_title.phase5") },
   ];
 
-  return (
-    <InstructionsWizard
-      phases={ANDROID_PHASES}
-      basePath="/android"
-    />
-  );
+  return <InstructionsWizard phases={ANDROID_PHASES} basePath="/android" />;
 };

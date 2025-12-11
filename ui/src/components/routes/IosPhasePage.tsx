@@ -5,7 +5,6 @@ import { IosPhase3 } from "../instructions/ios/IosPhase3";
 import { IosPhase4 } from "../instructions/ios/IosPhase4";
 import { IosPhase5 } from "../instructions/ios/IosPhase5";
 
-
 const PHASE_MAP: Record<string, React.ComponentType<any>> = {
   1: IosPhase1,
   2: IosPhase2,
