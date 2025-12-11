@@ -1,14 +1,14 @@
 import { detectPlatform, Platform } from "@/lib/detectPlatform";
 import { TAK_Zip } from "@/lib/interfaces";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { AndroidTab } from "../tabs/AndroidTab";
-import { WindowsTab } from "../tabs/WindowsTab";
 import { TrackerTab } from "../tabs/TrackerTab";
 import { Spinner } from "../ui/spinner";
 import { IosTab } from "../tabs/IosTab";
 import { useRouter, useRouterState } from "@tanstack/react-router";
+import { WindowsTab } from "../tabs/WindowsTab";
 
 interface Data {
   tak_zips: TAK_Zip[];

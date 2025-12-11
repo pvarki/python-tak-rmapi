@@ -11,6 +11,10 @@ import { HomePage } from "./components/routes/HomePage";
 import { AndroidPhasePage } from "./components/routes/AndroidPhasePage";
 import { AndroidInstructionPage } from "./components/routes/AndroidInstructionPage";
 import { Spinner } from "./components/ui/spinner";
+import { IosPhasePage } from "./components/routes/IosPhasePage";
+import { IosInstructionPage } from "./components/routes/IosInstructionPage";
+import { WindowsInstructionPage } from "./components/routes/WindowsInstructionPage";
+import { WindowsPhasePage } from "./components/routes/WindowsPhasePage";
 
 const RootLayoutComponent = () => (
     <div className="max-w-5xl mx-auto p-6">
@@ -28,6 +32,7 @@ const homeRoute = createRoute({
   component: HomePage,
 });
 
+//Android
 const androidRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/android",
@@ -40,12 +45,40 @@ const androidPhaseRoute = createRoute({
   component: AndroidPhasePage,
 });
 
+//Ios
+const iosRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/ios",
+  component: IosInstructionPage
+});
 
+const iosPhaseRoute = createRoute({
+  getParentRoute: () => iosRoute,
+  path: "$phaseId",
+  component: IosPhasePage,
+});
+
+//Windows
+const windowsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/windows",
+  component: WindowsInstructionPage
+});
+
+const windowsPhaseRoute = createRoute({
+  getParentRoute: () => windowsRoute,
+  path: "$phaseId",
+  component: WindowsPhasePage,
+});
 
 const routeTree = rootRoute.addChildren([
     homeRoute,
     androidRoute,
-    androidPhaseRoute
+    androidPhaseRoute,
+    iosRoute,
+    iosPhaseRoute,
+    windowsPhaseRoute,
+    windowsRoute,
 ]);
 
 interface Props {
