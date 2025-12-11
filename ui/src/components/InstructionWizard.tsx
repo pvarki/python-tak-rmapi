@@ -55,7 +55,7 @@ export const InstructionsWizard: React.FC<InstructionsWizardProps> = ({
   };
 
   return (
-   <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-screen">
       {/* Top bar */}
       <div className="px-6 pt-6 pb-4 space-y-2">
         <div className="flex items-center justify-between">
@@ -120,6 +120,5 @@ export const InstructionsWizard: React.FC<InstructionsWizardProps> = ({
         </Button>
       </div>
     </div>
-
   );
 };

@@ -1,14 +1,23 @@
-import { useTranslation, Trans } from "react-i18next"
-import { Card, CardContent } from "@/components/ui/card"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { useTranslation, Trans } from "react-i18next";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 export const AndroidPhase3 = () => {
-  const { t } = useTranslation("tak")
+  const { t } = useTranslation("tak");
 
   return (
     <div className="space-y-4">
-      <Accordion type="single" collapsible defaultValue="step1" className="space-y-2">
-
+      <Accordion
+        type="single"
+        collapsible
+        defaultValue="step1"
+        className="space-y-2"
+      >
         {/* Step 1 */}
         <AccordionItem value="step1">
           <Card className="p-2">
@@ -18,10 +27,20 @@ export const AndroidPhase3 = () => {
             <AccordionContent>
               <CardContent className="p-2 space-y-4 text-sm">
                 <div className="pl-4 space-y-2">
-                  <img src="/ui/tak/atak/10-Settings1.png" width="300px" alt={t("tabs.android.phase3.step1_title")} />
-                  <p className="font-medium">{t("tabs.android.phase3.step1_desc_1")}</p>
+                  <img
+                    src="/ui/tak/atak/10-Settings1.png"
+                    width="300px"
+                    alt={t("tabs.android.phase3.step1_title")}
+                  />
                   <p className="font-medium">
-                    <Trans t={t} i18nKey="tabs.android.phase3.step1_desc_2" components={{ bold: <span className="font-semibold" /> }} />
+                    {t("tabs.android.phase3.step1_desc_1")}
+                  </p>
+                  <p className="font-medium">
+                    <Trans
+                      t={t}
+                      i18nKey="tabs.android.phase3.step1_desc_2"
+                      components={{ bold: <span className="font-semibold" /> }}
+                    />
                   </p>
                 </div>
               </CardContent>
@@ -38,22 +57,37 @@ export const AndroidPhase3 = () => {
             <AccordionContent>
               <CardContent className="p-2 space-y-4 text-sm">
                 <div className="pl-4 space-y-2">
-                  <img src="/ui/tak/atak/15-MyTeam1.png" width="400px" alt={t("tabs.android.phase3.step2_title")} />
+                  <img
+                    src="/ui/tak/atak/15-MyTeam1.png"
+                    width="400px"
+                    alt={t("tabs.android.phase3.step2_title")}
+                  />
                   <p className="font-medium">
-                    <Trans t={t} i18nKey="tabs.android.phase3.step2_desc_1" components={{ bold: <span className="font-semibold" /> }} />
+                    <Trans
+                      t={t}
+                      i18nKey="tabs.android.phase3.step2_desc_1"
+                      components={{ bold: <span className="font-semibold" /> }}
+                    />
                   </p>
                   <p className="font-medium">
-                    <Trans t={t} i18nKey="tabs.android.phase3.step2_desc_2" components={{ bold: <span className="font-semibold" /> }} />
+                    <Trans
+                      t={t}
+                      i18nKey="tabs.android.phase3.step2_desc_2"
+                      components={{ bold: <span className="font-semibold" /> }}
+                    />
                   </p>
-                  <img src="/ui/tak/atak/16-MyRole1.png" width="400px" alt={t("tabs.android.phase3.step2_title")} />
+                  <img
+                    src="/ui/tak/atak/16-MyRole1.png"
+                    width="400px"
+                    alt={t("tabs.android.phase3.step2_title")}
+                  />
                   <p>{t("tabs.android.phase3.step2_desc_3")}</p>
                 </div>
               </CardContent>
             </AccordionContent>
           </Card>
         </AccordionItem>
-
       </Accordion>
     </div>
-  )
-}
+  );
+};

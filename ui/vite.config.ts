@@ -45,12 +45,12 @@ export default defineConfig(({ mode }) => {
           },
           "react-i18next": {
             requiredVersion: "16.3.3",
-            singleton: true
+            singleton: true,
           },
           "@tanstack/react-router": {
             requiredVersion: "1.135.2",
-            singleton: true
-          }
+            singleton: true,
+          },
         },
         runtime: "@module-federation/enhanced/runtime",
       }),
