@@ -107,7 +107,5 @@
   <entry key="datasyncLargeFilePrompt" class="class java.lang.String">30</entry>
   <entry key="datasyncRequireServerConn" class="class java.lang.Boolean">true</entry>
   <entry key="datasyncShowNonFeedContent" class="class java.lang.Boolean">true</entry>
-  <!-- Air Guardian Settings -->
-  <entry key="airguardian_proxy_address" class="class java.lang.String">{{ v.airguardian_url }}</entry>
  </preference>
 </preferences>
