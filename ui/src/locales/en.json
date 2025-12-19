@@ -16,6 +16,8 @@
   },
   "tabs": {
     "android": {
+  "open_atak": "ATAK: Auto import package",
+  "open_atak_manual_note": "Or import manually",
       "instructions_short": "Need help importing the package?",
       "open_instructions": "Open instructions",
       "phase1": {
