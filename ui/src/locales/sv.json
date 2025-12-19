@@ -16,6 +16,8 @@
   },
   "tabs": {
     "android": {
+      "open_atak": "ATAK: Importera paketet automatiskt",
+      "open_atak_manual_note": "Eller importera paketet manuellt",
       "instructions_short": "Beh\u00f6ver du hj\u00e4lp med att importera paketet?",
       "open_instructions": "\u00d6ppna instruktioner",
       "phase1": {
