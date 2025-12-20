@@ -1,4 +1,4 @@
-"""Proxy endpoints for rmapi directed queries"""
+"""Endpoint to deliver user missionpackages from templates/tak_missionpackage"""
 
 from pathlib import Path
 import logging
