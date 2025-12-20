@@ -10,6 +10,7 @@ interface Props {
 
 export function AndroidTab({ zip }: Props) {
   const { t } = useTranslation("tak");
+  const baseUrl = `${window.location.protocol}//${window.location.host}`;
 
   return (
     <div className="mt-4">
@@ -19,7 +20,7 @@ export function AndroidTab({ zip }: Props) {
           {/* eslint-disable-next-line */}
           <Link
             to={
-              "tak://com.atakmap.app/import?url=https://mtls.localmaeher.dev.pvarki.fi:4439/api/v1/product/proxy/tak/api/v1/proxy/client-zip/atak.zip" as any
+              `tak://com.atakmap.app/import?url=${baseUrl}/api/v1/product/proxy/tak/api/v1/proxy/client-zip/atak.zip` as any
             }
           >
             {t("tabs.android.open_atak")}
