@@ -16,9 +16,9 @@
   },
   "tabs": {
     "android": {
+      "instructions_short": "Tarvitsetko apua paketin tuonnissa?",
       "open_atak": "ATAK: Tuo paketti automaattisesti",
       "open_atak_manual_note": "Tai tuo paketti manuaalisesti",
-      "instructions_short": "Tarvitsetko apua paketin tuonnissa?",
       "open_instructions": "Avaa ohjeet",
       "phase1": {
         "step1_desc_civ": "Lataa ATAK-CIV -sovellus Play Kaupasta ja asenna se:",

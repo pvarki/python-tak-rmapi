@@ -16,9 +16,9 @@
   },
   "tabs": {
     "android": {
+      "instructions_short": "Beh\u00f6ver du hj\u00e4lp med att importera paketet?",
       "open_atak": "ATAK: Importera paketet automatiskt",
       "open_atak_manual_note": "Eller importera paketet manuellt",
-      "instructions_short": "Beh\u00f6ver du hj\u00e4lp med att importera paketet?",
       "open_instructions": "\u00d6ppna instruktioner",
       "phase1": {
         "step1_desc_civ": "Ladda ner appen ATAK-CIV fr\u00e5n Play Store och installera den:",
