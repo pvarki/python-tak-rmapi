@@ -368,19 +368,19 @@ class TAKPackageZip:
         """Handle manifest .p12 rows"""
         tmp_folder = await self.chk_manifest_file_extra_folder(row=row, tmp_folder=tmp_folder)
         # FIXME: do the blocking IO in executor
-        LOGGER.info(f"PKCS12 Got template {row}, tmp folder {tmp_folder}...")
+        LOGGER.info("PKCS12 Got template {}, tmp folder {}...", row, tmp_folder)
         if "rasenmaeher_ca-public.p12" in row:
             # FIXME: instead of adding the root key into the software, need a way to get full chain with Root CA
             templates_folder = Path(__file__).parent.parent / "templates"
-            LOGGER.info(f"Searching keys from  {templates_folder}...")
+            LOGGER.info("Searching keys from  {}...", templates_folder)
             ca_files = templates_folder.rglob("*.pem")
             srcdata = Path("/le_certs/rasenmaeher/fullchain.pem").read_bytes()
             for ca_f in sorted(ca_files):
-                LOGGER.info(f"Adding PEM {ca_f.name} to CA bundle")
+                LOGGER.info("Adding PEM {} to CA bundle", ca_f.name)
                 srcdata = srcdata + ca_f.read_bytes()
 
             tgtfile = Path(tmp_folder) / "rasenmaeher_ca-public.p12"
-            LOGGER.info(f"Creating {tgtfile}")
+            LOGGER.info("Creating {}", tgtfile)
             p12bytes = convert_pem_to_pkcs12(srcdata, None, "public", None, "ca-chains")
             tgtfile.parent.mkdir(parents=True, exist_ok=True)
             LOGGER.debug("{} exists: {}".format(tgtfile.parent, tgtfile.parent.exists()))
