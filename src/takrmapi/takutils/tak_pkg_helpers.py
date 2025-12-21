@@ -2,8 +2,6 @@
 
 from typing import List, Any, Dict, ClassVar
 import logging
-import secrets
-import string
 from dataclasses import dataclass, field
 from pathlib import Path
 from glob import glob
@@ -45,7 +43,7 @@ class TAKDataPackage:
     template_type: str
 
     _pkgvars: TAKPkgVars = field(init=False)
-    ephemeral_key: ClassVar[str] = ""
+    ephemeral_key: ClassVar[bytes] = os.urandom(32)
     # TODO savolaiset muuttujat
     # _zip_path: Path = field(init=False)
     # _zip_tmp_folder: Path = field(init=False)
@@ -82,12 +80,8 @@ class TAKDataPackage:
         )
 
     @classmethod
-    def get_ephemeral_key(cls) -> str:
+    def get_ephemeral_byteskey(cls) -> bytes:
         """Return key for ephemeral file requests"""
-        if cls.ephemeral_key:
-            return cls.ephemeral_key
-
-        cls.ephemeral_key = "".join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(32))
         return cls.ephemeral_key
 
     @property
