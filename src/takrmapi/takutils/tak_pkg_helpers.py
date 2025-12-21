@@ -4,7 +4,6 @@ from typing import List, Any, Dict, ClassVar
 import logging
 from dataclasses import dataclass, field
 from pathlib import Path
-from glob import glob
 import tempfile
 import asyncio
 import os
@@ -353,7 +352,7 @@ class TAKPackageZip:
         await asyncio.get_running_loop().run_in_executor(None, shutil.make_archive, zipfile, "zip", tmp_folder)
 
     async def tak_missionpackage_extras(self, manifest_file: Path, tmp_folder: Path) -> None:
-        """Check if there is some extra that needs to be done defined in manfiest"""
+        """Check if there is some extra that needs to be done defined in the manifest"""
         manifest_rows = manifest_file.read_text().splitlines()
         for row in manifest_rows:
             # .p12 rows
@@ -361,7 +360,7 @@ class TAKPackageZip:
             if "<!--" in row:
                 continue
 
-            # Add certificate file to zip package
+            # Add the certificate files to the zip package
             if ".p12" in row:
                 await self.tak_missionpackage_add_p12(row, tmp_folder)
 
@@ -369,17 +368,19 @@ class TAKPackageZip:
         """Handle manifest .p12 rows"""
         tmp_folder = await self.chk_manifest_file_extra_folder(row=row, tmp_folder=tmp_folder)
         # FIXME: do the blocking IO in executor
+        LOGGER.info("PKCS12 Got template %s, tmp folder %s...", row, tmp_folder)
         if "rasenmaeher_ca-public.p12" in row:
             # FIXME: instead of adding the root key into the software, need a way to get full chain with Root CA
-            templates_folder = Path(__file__).parent / "templates"
-            ca_files = sorted(glob(f"{templates_folder}/*.pem"))
+            templates_folder = Path(__file__).parent.parent / "templates"
+            LOGGER.info("Searching keys from  %s...", templates_folder)
+            ca_files = templates_folder.rglob("*.pem")
             srcdata = Path("/le_certs/rasenmaeher/fullchain.pem").read_bytes()
-            if ca_files:
-                for ca_f in ca_files:
-                    srcdata = srcdata + Path(ca_f).read_bytes()
+            for ca_f in sorted(ca_files):
+                LOGGER.info("Adding PEM %s to CA bundle", ca_f.name)
+                srcdata = srcdata + ca_f.read_bytes()
 
             tgtfile = Path(tmp_folder) / "rasenmaeher_ca-public.p12"
-            LOGGER.info("Creating {}".format(tgtfile))
+            LOGGER.info("Creating %s", tgtfile)
             p12bytes = convert_pem_to_pkcs12(srcdata, None, "public", None, "ca-chains")
             tgtfile.parent.mkdir(parents=True, exist_ok=True)
             LOGGER.debug("{} exists: {}".format(tgtfile.parent, tgtfile.parent.exists()))
