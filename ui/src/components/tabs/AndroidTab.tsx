@@ -29,14 +29,14 @@ export function AndroidTab({ zip }: Props) {
   const handleOpenATAK = async () => {
     try {
       const response = await fetch(
-        `${baseUrl}/api/v1/product/proxy/tak/api/v1/tak-missionpackages/ephemeral/atak.zip`
+        `${baseUrl}/api/v1/product/proxy/tak/api/v1/tak-missionpackages/ephemeral/atak.zip`,
       );
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data = await response.json() as EphemeralUrl;
+      const data = (await response.json()) as EphemeralUrl;
       const fullTakUrl = `tak://com.atakmap.app/import?url=${data.ephemeral_url}`;
       setTakUrl(fullTakUrl);
       setIsDialogOpen(true);
@@ -103,7 +103,6 @@ export function AndroidTab({ zip }: Props) {
           </div>
         </DialogContent>
       </Dialog>
-
     </div>
   );
 }
