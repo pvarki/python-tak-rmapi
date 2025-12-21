@@ -16,6 +16,7 @@ from .description import router_v2 as description_router_v2
 from .description import router_v2_admin as description_admin_router
 from .userinfo import router as userinfo_router
 
+from .tak_missionpackage import ephemeral_router as ephemeral_takmissionpackage_router
 
 all_routers = APIRouter()
 all_routers.include_router(testing_router, prefix="/users", tags=["users"])  # REMOVE ME
@@ -33,3 +34,9 @@ all_routers_v2 = APIRouter()
 all_routers_v2.include_router(description_router_v2, prefix="/description", tags=["description"])
 all_routers_v2.include_router(description_admin_router, prefix="/admin/description", tags=["description"])
 all_routers_v2.include_router(userinfo_router, prefix="/clients", tags=["clients"])
+
+
+all_routers_ephemeral_v1 = APIRouter()
+all_routers_ephemeral_v1.include_router(
+    ephemeral_takmissionpackage_router, prefix="/tak-missionpackages", tags=["ephemeral-tak-missionpackages"]
+)

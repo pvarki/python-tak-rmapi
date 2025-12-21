@@ -14,7 +14,7 @@ from takrmapi import __version__
 from takrmapi import config
 from takrmapi.takutils import tak_init
 from .config import LOG_LEVEL
-from .api import all_routers, all_routers_v2
+from .api import all_routers, all_routers_v2, all_routers_ephemeral_v1
 
 
 LOGGER = logging.getLogger(__name__)
@@ -57,6 +57,7 @@ def get_app_no_init() -> FastAPI:
     app = FastAPI(docs_url="/api/docs", openapi_url="/api/openapi.json", lifespan=app_lifespan, version=__version__)
     app.include_router(router=all_routers, prefix="/api/v1")
     app.include_router(router=all_routers_v2, prefix="/api/v2")
+    app.include_router(router=all_routers_ephemeral_v1, prefix="/ephemeral/api/v1")
     return app
 
 
