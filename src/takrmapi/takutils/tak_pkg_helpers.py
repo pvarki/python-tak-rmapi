@@ -4,7 +4,6 @@ from typing import List, Any, Dict, ClassVar
 import logging
 from dataclasses import dataclass, field
 from pathlib import Path
-from glob import glob
 import tempfile
 import asyncio
 import os
@@ -353,7 +352,7 @@ class TAKPackageZip:
         await asyncio.get_running_loop().run_in_executor(None, shutil.make_archive, zipfile, "zip", tmp_folder)
 
     async def tak_missionpackage_extras(self, manifest_file: Path, tmp_folder: Path) -> None:
-        """Check if there is some extra that needs to be done defined in manfiest"""
+        """Check if there is some extra that needs to be done defined in the manifest"""
         manifest_rows = manifest_file.read_text().splitlines()
         for row in manifest_rows:
             # .p12 rows
@@ -361,7 +360,7 @@ class TAKPackageZip:
             if "<!--" in row:
                 continue
 
-            # Add certificate file to zip package
+            # Add the certificate files to the zip package
             if ".p12" in row:
                 await self.tak_missionpackage_add_p12(row, tmp_folder)
 
@@ -372,11 +371,11 @@ class TAKPackageZip:
         if "rasenmaeher_ca-public.p12" in row:
             # FIXME: instead of adding the root key into the software, need a way to get full chain with Root CA
             templates_folder = Path(__file__).parent / "templates"
-            ca_files = sorted(glob(f"{templates_folder}/*.pem"))
+            ca_files = templates_folder.rglob("*.pem")
             srcdata = Path("/le_certs/rasenmaeher/fullchain.pem").read_bytes()
-            if ca_files:
-                for ca_f in ca_files:
-                    srcdata = srcdata + Path(ca_f).read_bytes()
+            for ca_f in ca_files:
+                LOGGER.info(f"Adding PEM {ca_f.name} to CA bundle")
+                srcdata = srcdata + ca_f.read_bytes()
 
             tgtfile = Path(tmp_folder) / "rasenmaeher_ca-public.p12"
             LOGGER.info("Creating {}".format(tgtfile))
