@@ -1,7 +1,9 @@
 """Helper functions to manage tak data packages"""
 
-from typing import List, Any, Dict
+from typing import List, Any, Dict, ClassVar
 import logging
+import secrets
+import string
 from dataclasses import dataclass, field
 from pathlib import Path
 from glob import glob
@@ -43,7 +45,7 @@ class TAKDataPackage:
     template_type: str
 
     _pkgvars: TAKPkgVars = field(init=False)
-
+    ephemeral_key: ClassVar[str] = ""
     # TODO savolaiset muuttujat
     # _zip_path: Path = field(init=False)
     # _zip_tmp_folder: Path = field(init=False)
@@ -78,6 +80,15 @@ class TAKDataPackage:
             zip_tmp_folder=Path("na"),
             template_file_render_str="",
         )
+
+    @classmethod
+    def get_ephemeral_key(cls) -> str:
+        """Return key for ephemeral file requests"""
+        if cls.ephemeral_key:
+            return cls.ephemeral_key
+
+        cls.ephemeral_key = "".join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(32))
+        return cls.ephemeral_key
 
     @property
     def is_folder(self) -> bool:
