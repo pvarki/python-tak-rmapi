@@ -50,16 +50,6 @@ export function AndroidTab({ zip }: Props) {
     <div className="mt-4">
       <p className="text-lg font-semibold">{t("tabs.android.title")}</p>
       <div className="font-normal">
-        {/*<Button asChild>*/}
-        {/*  /!* eslint-disable-next-line *!/*/}
-        {/*  <Link*/}
-        {/*    to={*/}
-        {/*      `tak://com.atakmap.app/import?url=${baseUrl}/api/v1/product/proxy/tak/api/v1/proxy/client-zip/atak.zip` as any*/}
-        {/*    }*/}
-        {/*  >*/}
-        {/*    {t("tabs.android.open_atak")}*/}
-        {/*  </Link>*/}
-        {/*</Button>*/}
         <Button onClick={() => void handleOpenATAK()}>
           {t("tabs.android.open_atak")}
         </Button>
@@ -87,19 +77,19 @@ export function AndroidTab({ zip }: Props) {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>ATAK Import URL</DialogTitle>
+            <DialogTitle>ATAK Mission Package Auto Import</DialogTitle>
             <DialogDescription>
-              Click the link below to open in ATAK
+              Click the button below to open in ATAK
             </DialogDescription>
           </DialogHeader>
+          <Button asChild>
+            <Link to={takUrl} onClick={() => setIsDialogOpen(false)}>
+              Open ATAK and connect to service
+            </Link>
+          </Button>
           <div className="mt-4">
-            <a
-              href={takUrl}
-              className="text-blue-600 hover:text-blue-800 underline break-all"
-              onClick={() => setIsDialogOpen(false)}
-            >
-              {takUrl}
-            </a>
+            When ATAK opens and asks about importing a package with a long link,
+            choose "Yes"
           </div>
         </DialogContent>
       </Dialog>
