@@ -51,6 +51,8 @@ TEMPLATES_PATH: Path = cfg("TEMPLATES_PATH", cast=Path, default=Path(__file__).p
 TAK_CERTS_FOLDER: Path = cfg("TAK_CERTS_FOLDER", cast=Path, default=Path("/opt/tak/data/certs/files"))
 RMAPI_PERSISTENT_FOLDER: Path = cfg("RMAPI_PERSISTENT_FOLDER", cast=Path, default=Path("/data/persistent"))
 
+PRODUCT_HTTPS_EPHEMERAL_PORT: int = cfg("PRODUCT_HTTPS_EPHEMERAL_PORT", cast=int, default=4627)
+
 # TAK vite asset graphical addons
 VITE_ASSET_SET: str = cfg("VITE_ASSET_SET", cast=str, default="not_used_by_default")
 VITE_ASSET_SET_TEMPLATES_FOLDER: Path = cfg(
