@@ -1,5 +1,7 @@
 """Helper functions to manage tak data packages"""
 
+import base64
+import binascii
 from typing import List, Any, Dict, ClassVar
 import logging
 from dataclasses import dataclass, field
@@ -34,6 +36,23 @@ class TAKPkgVars:
     template_file_render_str: str
 
 
+def _get_secret_key_from_environ() -> bytes:
+    """Fetch the secret key from the environment variable."""
+
+    from_env = os.environ.get("TAKRMAPI_SECRET_KEY", "")
+    try:
+        key_candidate = base64.b64decode(from_env.encode("ascii"))
+    except (TypeError, binascii.Error):
+        LOGGER.warning("TAKRMAPI_SECRET_KEY is not valid base64 encoded string.")
+        return b""
+
+    if len(key_candidate) >= 32:
+        return key_candidate[:32]
+
+    LOGGER.warning("TAKRMAPI_SECRET_KEY is too short. It should be at least 32 bytes long.")
+    return b""
+
+
 @dataclass
 class TAKDataPackage:
     """TAK Datapackage helper"""
@@ -42,7 +61,8 @@ class TAKDataPackage:
     template_type: str
 
     _pkgvars: TAKPkgVars = field(init=False)
-    ephemeral_key: ClassVar[bytes] = os.urandom(32)
+    ephemeral_key: ClassVar[bytes] = b""
+
     # TODO savolaiset muuttujat
     # _zip_path: Path = field(init=False)
     # _zip_tmp_folder: Path = field(init=False)
@@ -81,6 +101,11 @@ class TAKDataPackage:
     @classmethod
     def get_ephemeral_byteskey(cls) -> bytes:
         """Return key for ephemeral file requests"""
+        if not cls.ephemeral_key:
+            cls.ephemeral_key = _get_secret_key_from_environ()
+            if not cls.ephemeral_key:
+                raise RuntimeError("Ephemeral key not set!")
+
         return cls.ephemeral_key
 
     @property
