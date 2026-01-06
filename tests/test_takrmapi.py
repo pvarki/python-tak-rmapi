@@ -8,7 +8,7 @@ from takrmapi.api.tak_missionpackage import generate_encrypted_ephemeral_url_fra
 
 def test_version() -> None:
     """Make sure version matches expected"""
-    assert __version__ == "1.9.0"
+    assert __version__ == "1.10.0"
 
 
 def test_ephemeral_link_generation() -> None:
