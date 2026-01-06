@@ -6,6 +6,8 @@ from secrets import token_bytes
 
 from unittest import mock
 
+import pytest
+
 from takrmapi import __version__
 from takrmapi.api.tak_missionpackage import (
     generate_encrypted_ephemeral_url_fragment,
@@ -17,6 +19,12 @@ from takrmapi.takutils.tak_pkg_helpers import TAKDataPackage
 def test_version() -> None:
     """Make sure version matches expected"""
     assert __version__ == "1.10.0"
+
+
+@pytest.fixture(autouse=True)
+def clear_encryption_keys() -> None:
+    """Clear ephemeral keys between tests."""
+    TAKDataPackage.ephemeral_key = b""
 
 
 @mock.patch("os.environ", {"TAKRMAPI_SECRET_KEY": base64.b64encode(token_bytes(32)).decode("utf-8")})
