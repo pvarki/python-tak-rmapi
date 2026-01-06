@@ -4,7 +4,7 @@ from pathlib import Path
 import logging
 import base64
 import binascii
-import urllib
+import urllib.parse
 import time
 import os
 import json
@@ -28,7 +28,7 @@ router = APIRouter(dependencies=[Depends(MTLSHeader(auto_error=True))])
 ephemeral_router = APIRouter()
 
 
-async def hash_from_str(hash_from: str) -> str:
+def hash_from_str(hash_from: str) -> str:
     """Return checksum string from given string"""
     ct_digest = hashes.Hash(hashes.SHA256())
     ct_digest.update(hash_from.encode("ascii"))
@@ -36,7 +36,7 @@ async def hash_from_str(hash_from: str) -> str:
     try:
         ct_dig_str = binascii.hexlify(ct_dig).decode()
     except binascii.Error as e:
-        LOGGER.info("Unable to convert digest bin to string... Possible malformed query...")
+        LOGGER.info("Unable to convert digest bin to string. Possible malformed query.")
         LOGGER.debug(e)
         return "err"
 
@@ -73,7 +73,7 @@ async def return_tak_zip(user: UserCRUDRequest, variant: str, background_tasks: 
     )
 
 
-@router.post("/ephemeral/{variant}.zip")
+@router.post("/ephemeral-old/{variant}.zip")
 async def return_ephemeral_dl_link(user: UserCRUDRequest, variant: str) -> Dict[str, str]:
     """MVP. Replace with better one once it works... Return ephemeral download link to get TAK client zip file"""
     localuser = tak_helpers.UserCRUD(user)
@@ -85,13 +85,13 @@ async def return_ephemeral_dl_link(user: UserCRUDRequest, variant: str) -> Dict[
     urlsafe: str = urllib.parse.quote_plus(u_str)
 
     return {
-        "ephemeral_url": "https://{}:{}/ephemeral/api/v1/tak-missionpackages/ephemeral/{}".format(
+        "ephemeral_url": "https://{}:{}/ephemeral/api/v1/tak-missionpackages/ephemeral-old/{}".format(
             config.read_tak_fqdn(), config.PRODUCT_HTTPS_EPHEMERAL_PORT, urlsafe
         )
     }
 
 
-@ephemeral_router.get("/ephemeral/{ephemeral_str}")
+@ephemeral_router.get("/ephemeral-old/{ephemeral_str}")
 async def return_ephemeral_tak_zip(ephemeral_str: str, background_tasks: BackgroundTasks) -> FileResponse:
     """MVP. Replace with better one once it works... Return the TAK client zip file using ephemeral link"""
     if ephemeral_str == "":
@@ -147,92 +147,41 @@ async def return_ephemeral_tak_zip(ephemeral_str: str, background_tasks: Backgro
     )
 
 
-@router.post("/ephemeral-wip/{variant}.zip")
+@router.post("/ephemeral/{variant}.zip")
 async def wip_return_ephemeral_dl_link(user: UserCRUDRequest, variant: str) -> Dict[str, str]:
     """Return ephemeral download link to get TAK client zip file"""
     localuser = tak_helpers.UserCRUD(user)
     if not localuser:
         raise HTTPException(status_code=404, detail="User data not found")
     request_time = int(time.time())
-    plaintext_str: str = json.dumps({"callsign": user.callsign, "uuid": user.uuid, "variant": variant})
-    iv = os.urandom(12)
 
-    encryptor = Cipher(algorithms.AES(TAKDataPackage.get_ephemeral_byteskey()), modes.GCM(iv)).encryptor()
+    encrypted_url = generate_encrypted_ephemeral_url_fragment(user.callsign, user.uuid, variant, request_time)
 
-    user_payload: bytes = encryptor.update(plaintext_str.encode("ascii")) + encryptor.finalize()
-
-    user_payload_b64: str = base64.b64encode(user_payload).decode("ascii")
-    iv_b64: str = base64.b64encode(iv).decode("ascii")
-    payload_digest: str = await hash_from_str(user_payload_b64 + iv_b64 + str(request_time))
-
-    urlsafe: str = urllib.parse.quote_plus(
-        base64.b64encode(
-            json.dumps(
-                {
-                    "payload_b64": user_payload_b64,
-                    "iv_b64": iv_b64,
-                    "request_time": request_time,
-                    "digest": payload_digest,
-                }
-            ).encode("ascii")
-        )
+    ephemeral_url = "https://{}:{}/ephemeral/api/v1/tak-missionpackages/ephemeral/{}".format(
+        config.read_tak_fqdn(), config.PRODUCT_HTTPS_EPHEMERAL_PORT, urllib.parse.quote_plus(encrypted_url)
     )
 
-    return {
-        "ephemeral_url": "https://{}:{}/ephemeral/api/v1/tak-missionpackages/ephemeral-wip/{}".format(
-            config.read_tak_fqdn(), config.PRODUCT_HTTPS_EPHEMERAL_PORT, urlsafe
-        )
-    }
+    LOGGER.info("Returning ephemeral url: %s", ephemeral_url)
+
+    return {"ephemeral_url": ephemeral_url}
 
 
-@ephemeral_router.get("/ephemeral-wip/{ephemeral_str}")
+@ephemeral_router.get("/ephemeral/{ephemeral_str}")
 async def wip_return_ephemeral_tak_zip(ephemeral_str: str, background_tasks: BackgroundTasks) -> FileResponse:
     # async def wip_return_ephemeral_tak_zip(ephemeral_str: str) -> Dict[str, str]:
     """Return the TAK client zip file using ephemeral link"""
-    try:
-        e_decoded = base64.b64decode(ephemeral_str.encode("ascii")).decode("ascii")
-    except binascii.Error as exc:
-        LOGGER.info("Unable to decode base64 to string... Possible malformed query...")
-        LOGGER.debug(exc)
-        raise HTTPException(status_code=404, detail="User data not found") from exc
-
-    ephemeral_json = json.loads(e_decoded)
-
-    if ephemeral_json["request_time"] + 300 < int(time.time()):
-        raise HTTPException(status_code=404, detail="User data not found")
-
-    payload_digest: str = await hash_from_str(
-        ephemeral_json["payload_b64"] + ephemeral_json["iv_b64"] + str(ephemeral_json["request_time"])
-    )
-
-    if payload_digest != ephemeral_json["digest"]:
-        LOGGER.info(
-            "Checksum mismatch. Calculated: {} but got from response: {}".format(
-                payload_digest, ephemeral_json["digest"]
-            )
-        )
-        raise HTTPException(status_code=404, detail="User data not found")
-
-    iv: bytes = base64.b64decode(ephemeral_json["iv_b64"].encode("ascii"))
-    user_payload: bytes = base64.b64decode(ephemeral_json["payload_b64"].encode("ascii"))
-
-    decryptor = Cipher(algorithms.AES(TAKDataPackage.get_ephemeral_byteskey()), modes.GCM(iv)).encryptor()
-
-    decrypted_payload = decryptor.update(user_payload) + decryptor.finalize()
-    decrypted_json = json.loads(decrypted_payload.decode("ascii"))
-
-    LOGGER.debug("Got the following data in ephemeral user payload: {}".format(decrypted_json))
+    callsign, user_uuid, variant = parse_encrypted_ephemeral_url_fragment(ephemeral_str)
 
     localuser: tak_helpers.UserCRUD = tak_helpers.UserCRUD(
-        UserCRUDRequest(uuid=decrypted_json["uuid"], callsign=decrypted_json["callsign"], x509cert="")
+        UserCRUDRequest(uuid=user_uuid, callsign=callsign, x509cert="")
     )
     if not localuser:
         raise HTTPException(status_code=404, detail="User data not found")
 
-    walk_dir = Path(config.TAK_MISSIONPKG_TEMPLATES_FOLDER) / "default" / decrypted_json["variant"]
+    walk_dir = Path(config.TAK_MISSIONPKG_TEMPLATES_FOLDER) / "default" / variant
 
     if not walk_dir.is_dir():
-        raise HTTPException(status_code=404, detail=f"Variant '{decrypted_json['variant']}' not found")
+        raise HTTPException(status_code=404, detail=f"Variant '{variant}' not found")
 
     tak_missionpkg = TAKPackageZip(localuser)
 
@@ -247,5 +196,67 @@ async def wip_return_ephemeral_tak_zip(ephemeral_str: str, background_tasks: Bac
     return FileResponse(
         path=target_pkg.zip_path,
         media_type="application/zip",
-        filename=f"{localuser.callsign}_{decrypted_json['variant']}.zip",
+        filename=f"{localuser.callsign}_{variant}.zip",
     )
+
+
+def generate_encrypted_ephemeral_url_fragment(user_callsign: str, user_uuid: str, variant: str, request_time: float) -> str:
+    """Return encrypted ephemeral url"""
+    plaintext_str: str = json.dumps({"callsign": user_callsign, "uuid": user_uuid, "variant": variant})
+    iv = os.urandom(12)
+    encryptor = Cipher(algorithms.AES(TAKDataPackage.get_ephemeral_byteskey()), modes.GCM(iv)).encryptor()
+    user_payload: bytes = encryptor.update(plaintext_str.encode("ascii")) + encryptor.finalize()
+    user_payload_b64: str = base64.b64encode(user_payload).decode("ascii")
+    iv_b64: str = base64.b64encode(iv).decode("ascii")
+    payload_digest: str = hash_from_str(user_payload_b64 + iv_b64 + str(request_time))
+    encode: str = base64.b64encode(
+        json.dumps(
+            {
+                "payload_b64": user_payload_b64,
+                "iv_b64": iv_b64,
+                "request_time": request_time,
+                "digest": payload_digest,
+            }
+        ).encode("ascii")
+    ).decode("ascii")
+
+    return encode
+
+
+def parse_encrypted_ephemeral_url_fragment(ephemeral_str: str) -> tuple[str, str, str]:
+    """Parse and decrypt ephemeral url and return callsign, user uuid and variant.
+
+    Verify that the ephemeral link is not expired and that the checksum matches.
+    """
+    try:
+        e_decoded = base64.b64decode(ephemeral_str.encode("ascii")).decode("ascii")
+    except binascii.Error as exc:
+        LOGGER.info("Unable to decode base64 to string. Possible malformed query.")
+        LOGGER.debug(exc)
+        raise HTTPException(status_code=404, detail="User data not found") from exc
+    ephemeral_json = json.loads(e_decoded)
+    if ephemeral_json["request_time"] + 300 < int(time.time()):
+        LOGGER.info("Ephemeral link has expired.")
+        raise HTTPException(status_code=404, detail="User data not found")
+    payload_digest: str = hash_from_str(
+        ephemeral_json["payload_b64"] + ephemeral_json["iv_b64"] + str(ephemeral_json["request_time"])
+    )
+    if payload_digest != ephemeral_json["digest"]:
+        LOGGER.info(
+            "Checksum mismatch. Calculated: {}, but got from response: {}".format(
+                payload_digest, ephemeral_json["digest"]
+            )
+        )
+        raise HTTPException(status_code=404, detail="User data not found")
+    iv: bytes = base64.b64decode(ephemeral_json["iv_b64"].encode("ascii"))
+    user_payload: bytes = base64.b64decode(ephemeral_json["payload_b64"].encode("ascii"))
+    decryptor = Cipher(algorithms.AES(TAKDataPackage.get_ephemeral_byteskey()), modes.GCM(iv)).encryptor()
+    decrypted_payload = decryptor.update(user_payload) + decryptor.finalize()
+    decrypted_json = json.loads(decrypted_payload.decode("ascii"))
+    variant = decrypted_json["variant"]
+    callsign = decrypted_json["callsign"]
+    user_uuid = decrypted_json["uuid"]
+
+    LOGGER.debug("Got the following data in ephemeral user payload: {}".format(decrypted_json))
+
+    return callsign, user_uuid, variant
