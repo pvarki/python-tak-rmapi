@@ -170,6 +170,8 @@ async def wip_return_ephemeral_dl_link(user: UserCRUDRequest, variant: str) -> D
 async def wip_return_ephemeral_tak_zip(ephemeral_str: str, background_tasks: BackgroundTasks) -> FileResponse:
     # async def wip_return_ephemeral_tak_zip(ephemeral_str: str) -> Dict[str, str]:
     """Return the TAK client zip file using ephemeral link"""
+    LOGGER.info("Got ephemeral url fragment: %s", ephemeral_str)
+
     callsign, user_uuid, variant = parse_encrypted_ephemeral_url_fragment(ephemeral_str)
 
     localuser: tak_helpers.UserCRUD = tak_helpers.UserCRUD(
@@ -200,7 +202,9 @@ async def wip_return_ephemeral_tak_zip(ephemeral_str: str, background_tasks: Bac
     )
 
 
-def generate_encrypted_ephemeral_url_fragment(user_callsign: str, user_uuid: str, variant: str, request_time: float) -> str:
+def generate_encrypted_ephemeral_url_fragment(
+    user_callsign: str, user_uuid: str, variant: str, request_time: float
+) -> str:
     """Return encrypted ephemeral url"""
     plaintext_str: str = json.dumps({"callsign": user_callsign, "uuid": user_uuid, "variant": variant})
     iv = os.urandom(12)
@@ -234,10 +238,13 @@ def parse_encrypted_ephemeral_url_fragment(ephemeral_str: str) -> tuple[str, str
         LOGGER.info("Unable to decode base64 to string. Possible malformed query.")
         LOGGER.debug(exc)
         raise HTTPException(status_code=404, detail="User data not found") from exc
+
     ephemeral_json = json.loads(e_decoded)
     if ephemeral_json["request_time"] + 300 < int(time.time()):
         LOGGER.info("Ephemeral link has expired.")
         raise HTTPException(status_code=404, detail="User data not found")
+
+    # TODO: probably should be a keyed hash to catch attempts to pass an incorrect link early
     payload_digest: str = hash_from_str(
         ephemeral_json["payload_b64"] + ephemeral_json["iv_b64"] + str(ephemeral_json["request_time"])
     )
@@ -248,11 +255,19 @@ def parse_encrypted_ephemeral_url_fragment(ephemeral_str: str) -> tuple[str, str
             )
         )
         raise HTTPException(status_code=404, detail="User data not found")
+
     iv: bytes = base64.b64decode(ephemeral_json["iv_b64"].encode("ascii"))
     user_payload: bytes = base64.b64decode(ephemeral_json["payload_b64"].encode("ascii"))
+
     decryptor = Cipher(algorithms.AES(TAKDataPackage.get_ephemeral_byteskey()), modes.GCM(iv)).encryptor()
     decrypted_payload = decryptor.update(user_payload) + decryptor.finalize()
-    decrypted_json = json.loads(decrypted_payload.decode("ascii"))
+
+    try:
+        decrypted_json = json.loads(decrypted_payload.decode("ascii"))
+    except (json.JSONDecodeError, UnicodeDecodeError) as exc:
+        LOGGER.exception("Decryption failure. It could be someone is trying something nasty.")
+        raise HTTPException(status_code=404, detail="User data not found") from exc
+
     variant = decrypted_json["variant"]
     callsign = decrypted_json["callsign"]
     user_uuid = decrypted_json["uuid"]
