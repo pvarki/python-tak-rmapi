@@ -8,7 +8,6 @@ import urllib.parse
 import time
 import os
 import json
-from typing import Dict
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
@@ -65,11 +64,14 @@ async def create_mission_package(
 ) -> TAKDataPackage:
     """Create mission package from template"""
     walk_dir = Path(config.TAK_MISSIONPKG_TEMPLATES_FOLDER) / "default" / variant
+
     if not walk_dir.is_dir():
         raise HTTPException(status_code=404, detail=f"Variant '{variant}' not found")
+
     tak_missionpkg = TAKPackageZip(localuser)
     target_pkg = TAKDataPackage(template_path=walk_dir, template_type="mission")
     await tak_missionpkg.create_zip_bundles(datapackages=[target_pkg])
+
     if not target_pkg.zip_path or not target_pkg.zip_path.is_file():
         raise HTTPException(status_code=500, detail="Failed to generate ZIP")
 
@@ -79,7 +81,7 @@ async def create_mission_package(
 
 
 @router.post("/ephemeral/{variant}.zip")
-async def return_ephemeral_dl_link(user: UserCRUDRequest, variant: str) -> Dict[str, str]:
+async def return_ephemeral_dl_link(user: UserCRUDRequest, variant: str) -> dict[str, str]:
     """Return an ephemeral download link to get the TAK client zip file"""
     localuser = tak_helpers.UserCRUD(user)
     if not localuser:
@@ -91,7 +93,7 @@ async def return_ephemeral_dl_link(user: UserCRUDRequest, variant: str) -> Dict[
     ephemeral_url = (
         f"https://{config.read_tak_fqdn()}:{config.PRODUCT_HTTPS_EPHEMERAL_PORT}/"
         f"ephemeral/api/v1/tak-missionpackages/ephemeral/"
-        f"{urllib.parse.quote_plus(encrypted_url)}/{variant}.zip"
+        f"{urllib.parse.quote_plus(encrypted_url)}/{config.read_deployment_name()}-{variant}.zip"
     )
 
     LOGGER.info("Returning ephemeral url: %s", ephemeral_url)
@@ -99,7 +101,7 @@ async def return_ephemeral_dl_link(user: UserCRUDRequest, variant: str) -> Dict[
     return {"ephemeral_url": ephemeral_url}
 
 
-@ephemeral_router.get("/ephemeral/{ephemeral_str}/{variant}.zip")
+@ephemeral_router.get("/ephemeral/{ephemeral_str}/{zipfile_name}.zip")
 async def return_ephemeral_tak_zip(ephemeral_str: str, background_tasks: BackgroundTasks) -> FileResponse:
     """Return the TAK client zip file using an ephemeral link"""
     LOGGER.info("Got ephemeral url fragment: %s", ephemeral_str)
@@ -117,7 +119,7 @@ async def return_ephemeral_tak_zip(ephemeral_str: str, background_tasks: Backgro
     return FileResponse(
         path=target_pkg.zip_path,
         media_type="application/zip",
-        filename=f"{localuser.callsign}_{variant}.zip",
+        filename=f"{localuser.callsign}_{config.read_deployment_name()}_{variant}.zip",
     )
 
 
