@@ -8,6 +8,7 @@ import urllib.parse
 import time
 import os
 import json
+import secrets
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
@@ -90,10 +91,14 @@ async def return_ephemeral_dl_link(user: UserCRUDRequest, variant: str) -> dict[
 
     encrypted_url = generate_encrypted_ephemeral_url_fragment(user.callsign, user.uuid, variant, request_time)
 
+    # ATAK seems to take offense if the package file name is the same between
+    # requests, so we add a random token to the filename.
+    nonce = secrets.token_hex(8)
+
     ephemeral_url = (
         f"https://{config.read_tak_fqdn()}:{config.PRODUCT_HTTPS_EPHEMERAL_PORT}/"
         f"ephemeral/api/v1/tak-missionpackages/ephemeral/"
-        f"{urllib.parse.quote_plus(encrypted_url)}/{config.read_deployment_name()}-{variant}.zip"
+        f"{urllib.parse.quote_plus(encrypted_url)}/{config.read_deployment_name()}_{nonce}_{variant}.zip"
     )
 
     LOGGER.info("Returning ephemeral url: %s", ephemeral_url)
