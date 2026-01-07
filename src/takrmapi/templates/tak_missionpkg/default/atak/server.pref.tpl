@@ -2,7 +2,7 @@
 <preferences>
     <preference version="1" name="cot_streams">
         <entry key="count" class="class java.lang.Integer">1</entry>
-        <entry key="description0" class="class java.lang.String">{{ tak_server_fqdn }}</entry>
+        <entry key="description0" class="class java.lang.String">{{ v.tak_server_deployment_name }}</entry>
         <entry key="enabled0" class="class java.lang.Boolean">true</entry>
         <entry key="connectString0" class="class java.lang.String">{{ v.tak_server_public_address }}:8089:ssl</entry>
     </preference>
