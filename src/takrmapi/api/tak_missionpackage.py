@@ -8,7 +8,7 @@ import urllib.parse
 import time
 import os
 import json
-from typing import List, Dict
+from typing import Dict
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
@@ -51,20 +51,7 @@ async def return_tak_zip(user: UserCRUDRequest, variant: str, background_tasks: 
     if not localuser:
         raise HTTPException(status_code=404, detail="User data not found")
 
-    walk_dir = Path(config.TAK_MISSIONPKG_TEMPLATES_FOLDER) / "default" / variant
-
-    if not walk_dir.is_dir():
-        raise HTTPException(status_code=404, detail=f"Variant '{variant}' not found")
-
-    tak_missionpkg = TAKPackageZip(localuser)
-
-    target_pkg = TAKDataPackage(template_path=walk_dir, template_type="mission")
-    await tak_missionpkg.create_zip_bundles(datapackages=[target_pkg])
-
-    if not target_pkg.zip_path or not target_pkg.zip_path.is_file():
-        raise HTTPException(status_code=500, detail="Failed to generate ZIP")
-
-    background_tasks.add_task(tak_missionpkg.helpers.remove_tmp_dir, target_pkg.zip_tmp_folder)
+    target_pkg = await create_mission_package(localuser, variant, background_tasks)
 
     return FileResponse(
         path=target_pkg.zip_path,
@@ -73,82 +60,26 @@ async def return_tak_zip(user: UserCRUDRequest, variant: str, background_tasks: 
     )
 
 
-@router.post("/ephemeral-old/{variant}.zip")
-async def return_ephemeral_dl_link(user: UserCRUDRequest, variant: str) -> Dict[str, str]:
-    """MVP. Replace with better one once it works... Return ephemeral download link to get TAK client zip file"""
-    localuser = tak_helpers.UserCRUD(user)
-    if not localuser:
-        raise HTTPException(status_code=404, detail="User data not found")
-    request_time = int(time.time())
-    r_str: str = f"{user.callsign}__{user.uuid}__{variant}__{request_time}"
-    u_str: str = base64.b64encode(r_str.encode("ascii")).decode("ascii")
-    urlsafe: str = urllib.parse.quote_plus(u_str)
-
-    return {
-        "ephemeral_url": "https://{}:{}/ephemeral/api/v1/tak-missionpackages/ephemeral-old/{}".format(
-            config.read_tak_fqdn(), config.PRODUCT_HTTPS_EPHEMERAL_PORT, urlsafe
-        )
-    }
-
-
-@ephemeral_router.get("/ephemeral-old/{ephemeral_str}")
-async def return_ephemeral_tak_zip(ephemeral_str: str, background_tasks: BackgroundTasks) -> FileResponse:
-    """MVP. Replace with better one once it works... Return the TAK client zip file using ephemeral link"""
-    if ephemeral_str == "":
-        raise HTTPException(status_code=404, detail="No found..")
-
-    try:
-        e_decoded = base64.b64decode(ephemeral_str.encode("ascii")).decode("ascii")
-    except binascii.Error as exc:
-        LOGGER.info("Unable to decode base64 to string... Possible malformed query...")
-        LOGGER.debug(exc)
-        raise HTTPException(status_code=404, detail="User data not found") from exc
-
-    e_split: List[str] = e_decoded.split("__")
-    try:
-        callsign: str = e_split[0]
-        uuid_str: str = e_split[1]
-        variant: str = e_split[2]
-        request_time: int = int(e_split[3])
-    except IndexError as exc:
-        LOGGER.info("Unable to decode base64 to string... Possible malformed query...")
-        LOGGER.debug(exc)
-        raise HTTPException(status_code=404, detail="User data not found") from exc
-
-    # Five minute window to use the ephemeral link
-    if not request_time + 300 > int(time.time()):
-        raise HTTPException(status_code=404, detail="User data not found")
-
-    localuser: tak_helpers.UserCRUD = tak_helpers.UserCRUD(
-        UserCRUDRequest(uuid=uuid_str, callsign=callsign, x509cert="")
-    )
-    if not localuser:
-        raise HTTPException(status_code=404, detail="User data not found")
-
+async def create_mission_package(
+    localuser: tak_helpers.UserCRUD, variant: str, background_tasks: BackgroundTasks
+) -> TAKDataPackage:
+    """Create mission package from template"""
     walk_dir = Path(config.TAK_MISSIONPKG_TEMPLATES_FOLDER) / "default" / variant
-
     if not walk_dir.is_dir():
         raise HTTPException(status_code=404, detail=f"Variant '{variant}' not found")
-
     tak_missionpkg = TAKPackageZip(localuser)
-
     target_pkg = TAKDataPackage(template_path=walk_dir, template_type="mission")
     await tak_missionpkg.create_zip_bundles(datapackages=[target_pkg])
-
     if not target_pkg.zip_path or not target_pkg.zip_path.is_file():
         raise HTTPException(status_code=500, detail="Failed to generate ZIP")
 
     background_tasks.add_task(tak_missionpkg.helpers.remove_tmp_dir, target_pkg.zip_tmp_folder)
 
-    return FileResponse(
-        path=target_pkg.zip_path,
-        media_type="application/zip",
-        filename=f"{localuser.callsign}_{variant}.zip",
-    )
+    return target_pkg
 
 
 @router.post("/ephemeral/{variant}.zip")
-async def wip_return_ephemeral_dl_link(user: UserCRUDRequest, variant: str) -> Dict[str, str]:
+async def return_ephemeral_dl_link(user: UserCRUDRequest, variant: str) -> Dict[str, str]:
     """Return an ephemeral download link to get the TAK client zip file"""
     localuser = tak_helpers.UserCRUD(user)
     if not localuser:
@@ -169,7 +100,7 @@ async def wip_return_ephemeral_dl_link(user: UserCRUDRequest, variant: str) -> D
 
 
 @ephemeral_router.get("/ephemeral/{ephemeral_str}/{variant}.zip")
-async def wip_return_ephemeral_tak_zip(ephemeral_str: str, background_tasks: BackgroundTasks) -> FileResponse:
+async def return_ephemeral_tak_zip(ephemeral_str: str, background_tasks: BackgroundTasks) -> FileResponse:
     """Return the TAK client zip file using an ephemeral link"""
     LOGGER.info("Got ephemeral url fragment: %s", ephemeral_str)
 
@@ -181,20 +112,7 @@ async def wip_return_ephemeral_tak_zip(ephemeral_str: str, background_tasks: Bac
     if not localuser:
         raise HTTPException(status_code=404, detail="User data not found")
 
-    walk_dir = Path(config.TAK_MISSIONPKG_TEMPLATES_FOLDER) / "default" / variant
-
-    if not walk_dir.is_dir():
-        raise HTTPException(status_code=404, detail=f"Variant '{variant}' not found")
-
-    tak_missionpkg = TAKPackageZip(localuser)
-
-    target_pkg = TAKDataPackage(template_path=walk_dir, template_type="mission")
-    await tak_missionpkg.create_zip_bundles(datapackages=[target_pkg])
-
-    if not target_pkg.zip_path or not target_pkg.zip_path.is_file():
-        raise HTTPException(status_code=500, detail="Failed to generate ZIP")
-
-    background_tasks.add_task(tak_missionpkg.helpers.remove_tmp_dir, target_pkg.zip_tmp_folder)
+    target_pkg = await create_mission_package(localuser, variant, background_tasks)
 
     return FileResponse(
         path=target_pkg.zip_path,
