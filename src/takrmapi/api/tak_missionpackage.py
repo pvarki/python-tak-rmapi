@@ -149,7 +149,7 @@ async def return_ephemeral_tak_zip(ephemeral_str: str, background_tasks: Backgro
 
 @router.post("/ephemeral/{variant}.zip")
 async def wip_return_ephemeral_dl_link(user: UserCRUDRequest, variant: str) -> Dict[str, str]:
-    """Return ephemeral download link to get TAK client zip file"""
+    """Return an ephemeral download link to get the TAK client zip file"""
     localuser = tak_helpers.UserCRUD(user)
     if not localuser:
         raise HTTPException(status_code=404, detail="User data not found")
@@ -157,8 +157,10 @@ async def wip_return_ephemeral_dl_link(user: UserCRUDRequest, variant: str) -> D
 
     encrypted_url = generate_encrypted_ephemeral_url_fragment(user.callsign, user.uuid, variant, request_time)
 
-    ephemeral_url = "https://{}:{}/ephemeral/api/v1/tak-missionpackages/ephemeral/{}".format(
-        config.read_tak_fqdn(), config.PRODUCT_HTTPS_EPHEMERAL_PORT, urllib.parse.quote_plus(encrypted_url)
+    ephemeral_url = (
+        f"https://{config.read_tak_fqdn()}:{config.PRODUCT_HTTPS_EPHEMERAL_PORT}/"
+        f"ephemeral/api/v1/tak-missionpackages/ephemeral/"
+        f"{urllib.parse.quote_plus(encrypted_url)}/{variant}.zip"
     )
 
     LOGGER.info("Returning ephemeral url: %s", ephemeral_url)
@@ -166,10 +168,9 @@ async def wip_return_ephemeral_dl_link(user: UserCRUDRequest, variant: str) -> D
     return {"ephemeral_url": ephemeral_url}
 
 
-@ephemeral_router.get("/ephemeral/{ephemeral_str}")
+@ephemeral_router.get("/ephemeral/{ephemeral_str}/{variant}.zip")
 async def wip_return_ephemeral_tak_zip(ephemeral_str: str, background_tasks: BackgroundTasks) -> FileResponse:
-    # async def wip_return_ephemeral_tak_zip(ephemeral_str: str) -> Dict[str, str]:
-    """Return the TAK client zip file using ephemeral link"""
+    """Return the TAK client zip file using an ephemeral link"""
     LOGGER.info("Got ephemeral url fragment: %s", ephemeral_str)
 
     callsign, user_uuid, variant = parse_encrypted_ephemeral_url_fragment(ephemeral_str)
