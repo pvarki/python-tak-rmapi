@@ -18,6 +18,12 @@
     "android": {
       "instructions_short": "Tarvitsetko apua paketin tuonnissa?",
       "open_atak": "ATAK: Tuo paketti automaattisesti",
+      "open_atak_dialog": {
+        "description": "Avaa ATAK painamalla alla olevaa painiketta",
+        "note": "Kun ATAK avautuu ja kysyy pitk\u00e4n linkin sis\u00e4lt\u00e4v\u00e4n paketin tuonnista, valitse \"Kyll\u00e4\"",
+        "open": "Avaa ATAK ja yhdist\u00e4 palveluun",
+        "title": "ATAK-teht\u00e4v\u00e4paketin automaattinen tuonti"
+      },
       "open_atak_manual_note": "Tai tuo paketti manuaalisesti",
       "open_instructions": "Avaa ohjeet",
       "phase1": {

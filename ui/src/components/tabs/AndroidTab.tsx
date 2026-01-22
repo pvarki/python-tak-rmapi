@@ -77,20 +77,19 @@ export function AndroidTab({ zip }: Props) {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>ATAK Mission Package Auto Import</DialogTitle>
+            <DialogTitle className="mt-2">
+              {t("tabs.android.open_atak_dialog.title")}
+            </DialogTitle>
             <DialogDescription>
-              Click the button below to open in ATAK
+              {t("tabs.android.open_atak_dialog.description")}
             </DialogDescription>
           </DialogHeader>
           <Button asChild>
             <Link to={takUrl} onClick={() => setIsDialogOpen(false)}>
-              Open ATAK and connect to service
+              {t("tabs.android.open_atak_dialog.open")}
             </Link>
           </Button>
-          <div className="mt-4">
-            When ATAK opens and asks about importing a package with a long link,
-            choose "Yes"
-          </div>
+          <div className="mt-4">{t("tabs.android.open_atak_dialog.note")}</div>
         </DialogContent>
       </Dialog>
     </div>

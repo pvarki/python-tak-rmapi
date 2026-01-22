@@ -6,6 +6,104 @@
   "loading": {
     "user_data": "Laddar anv\u00e4ndardata..."
   },
+  "onboarding": {
+    "android": {
+      "steps": {
+        "tak-auto-import": {
+          "description": "To connect to server, just press that button, make sure ATAK opens a popup, press yes there. \n If ATAK did not open you a popup, please try again.",
+          "title": "Auto Import"
+        },
+        "tak-download": {
+          "description": "Download the ATAK-CIV app from the Play Store and install it:",
+          "title": "Download"
+        },
+        "tak-manual-import": {
+          "description": "You can also manually import the configuration package",
+          "title": "Manual Import"
+        }
+      }
+    },
+    "back": "Back",
+    "clickToEnlarge": "Click to enlarge",
+    "completion": "Onboarding Completed!",
+    "completionDesc": "You're all set and ready to operate at full capacity.",
+    "finish": "Finish",
+    "imageMissing": "Image not available",
+    "ios": {
+      "steps": {
+        "health": {
+          "description": "See how everything's running at a glance. Check if your systems are healthy and your network is connected.",
+          "title": "System Status"
+        },
+        "instructions": {
+          "description": "Need help getting started? Find step-by-step guides and tips for making the most of Modular Apps.",
+          "title": "Help & Guides"
+        },
+        "invite": {
+          "description": "Bring new people onto your team with secure invite codes or QR codes. Share them however works best for you.",
+          "title": "Invite People"
+        },
+        "products": {
+          "description": "Launch the Team Awareness Kit and other apps you need. Everything's ready to go when you are.",
+          "title": "Your Apps"
+        },
+        "users": {
+          "description": "See who's on your team, approve new members, and manage everyone's access. Keep things secure and organized.",
+          "title": "Team Members"
+        },
+        "welcome": {
+          "description": "This is your home base for managing everything. Launch apps, check system status, and keep your team organized\u2014all in one place.",
+          "title": "Welcome!"
+        }
+      }
+    },
+    "next": "Next",
+    "of": "of",
+    "progressSaved": "Your onboarding progress has been saved.",
+    "review": "Review onboarding",
+    "step": "Step",
+    "title": "Onboard to TAK",
+    "windows": {
+      "back": "Back",
+      "clickToEnlarge": "Click to enlarge",
+      "completion": "Onboarding Completed!",
+      "completionDesc": "You're all set and ready to operate at full capacity.",
+      "finish": "Finish",
+      "imageMissing": "Image not available",
+      "next": "Next",
+      "of": "of",
+      "progressSaved": "Your onboarding progress has been saved.",
+      "review": "Review onboarding",
+      "step": "Step",
+      "steps": {
+        "health": {
+          "description": "See how everything's running at a glance. Check if your systems are healthy and your network is connected.",
+          "title": "System Status"
+        },
+        "instructions": {
+          "description": "Need help getting started? Find step-by-step guides and tips for making the most of Modular Apps.",
+          "title": "Help & Guides"
+        },
+        "invite": {
+          "description": "Bring new people onto your team with secure invite codes or QR codes. Share them however works best for you.",
+          "title": "Invite People"
+        },
+        "products": {
+          "description": "Launch the Team Awareness Kit and other apps you need. Everything's ready to go when you are.",
+          "title": "Your Apps"
+        },
+        "users": {
+          "description": "See who's on your team, approve new members, and manage everyone's access. Keep things secure and organized.",
+          "title": "Team Members"
+        },
+        "welcome": {
+          "description": "This is your home base for managing everything. Launch apps, check system status, and keep your team organized\u2014all in one place.",
+          "title": "Welcome!"
+        }
+      },
+      "title": "Onboard to Deploy App"
+    }
+  },
   "platform": {
     "android": "ATAK",
     "choose": "V\u00e4lj plattform",
@@ -18,6 +116,12 @@
     "android": {
       "instructions_short": "Beh\u00f6ver du hj\u00e4lp med att importera paketet?",
       "open_atak": "ATAK: Importera paketet automatiskt",
+      "open_atak_dialog": {
+        "description": "Klicka p\u00e5 knappen nedan f\u00f6r att \u00f6ppna i ATAK",
+        "note": "N\u00e4r ATAK \u00f6ppnas och fr\u00e5gar om import av ett paket med en l\u00e5ng l\u00e4nk, v\u00e4lj \"Yes\"",
+        "open": "\u00d6ppna ATAK och anslut till tj\u00e4nsten",
+        "title": "Automatisk import av ATAK-uppdragspaket"
+      },
       "open_atak_manual_note": "Eller importera paketet manuellt",
       "open_instructions": "\u00d6ppna instruktioner",
       "phase1": {
