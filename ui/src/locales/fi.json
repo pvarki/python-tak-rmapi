@@ -6,6 +6,121 @@
   "loading": {
     "user_data": "Ladataan k\u00e4ytt\u00e4j\u00e4n tietoja..."
   },
+  "onboarding": {
+    "android": {
+      "downloadFromPlayStore": "Lataa Google Play:st\u00e4",
+      "steps": {
+        "tak-auto-import": {
+          "description": "Yhdist\u00e4 palvelimeen painamalla kuvan mukaisia painikkeita. Varmista, ett\u00e4 ATAK avaa ponnahdusikkunan ja valitse siin\u00e4 \"Yes\".\n\nJos ATAK ei avaa ponnahdusikkunaa, yrit\u00e4 uudelleen.",
+          "title": "Automaattinen tuonti"
+        },
+        "tak-data-sync": {
+          "description": "Sinun tulee ottaa k\u00e4ytt\u00f6\u00f6n Data Sync lis\u00e4osa, saadaksesi ATAK k\u00e4ytt\u00f6\u00f6n",
+          "title": "Data Sync"
+        },
+        "tak-download": {
+          "description": "Lataa ATAK-CIV-sovellus laitteellesi: ",
+          "title": "Lataus"
+        },
+        "tak-home": {
+          "description": "ATAK:ista l\u00f6yd\u00e4t n\u00e4kymi\u00e4 eri tarpeisiisi. Messages v\u00e4lilehdell\u00e4 voit viestitell\u00e4 tiimisi kanssa. Feeds-n\u00e4kym\u00e4 auttaa seuraamaan liikett\u00e4 ja tapahtumia yhdell\u00e4 silm\u00e4yksell\u00e4. Tools-valikosta l\u00f6yd\u00e4t kaikki muut ominaisuudet. Alakulman Status-kuvake kertoo onko ATAK-sovelluksessi toimintakunnossa.",
+          "title": "ATAK:in ty\u00f6kalut"
+        },
+        "tak-manual-import": {
+          "description": "Voit my\u00f6s tuoda m\u00e4\u00e4rityspaketin manuaalisesti.",
+          "title": "Manuaalinen tuonti"
+        },
+        "tak-plugins": {
+          "description": "Tools-valikosta l\u00f6yd\u00e4t Plugins v\u00e4lilehden",
+          "title": "ATAK Plugins (lis\u00e4osat)"
+        },
+        "tak-welcome": {
+          "description": "Tervetuloa ATAK:in asennukseen",
+          "title": "Tervetuloa"
+        }
+      }
+    },
+    "back": "Back",
+    "clickToEnlarge": "Click to enlarge",
+    "completion": "Onboarding Completed!",
+    "completionDesc": "You're all set and ready to operate at full capacity.",
+    "finish": "Finish",
+    "imageMissing": "Image not available",
+    "ios": {
+      "steps": {
+        "health": {
+          "description": "See how everything's running at a glance. Check if your systems are healthy and your network is connected.",
+          "title": "System Status"
+        },
+        "instructions": {
+          "description": "Need help getting started? Find step-by-step guides and tips for making the most of Modular Apps.",
+          "title": "Help & Guides"
+        },
+        "invite": {
+          "description": "Bring new people onto your team with secure invite codes or QR codes. Share them however works best for you.",
+          "title": "Invite People"
+        },
+        "products": {
+          "description": "Launch the Team Awareness Kit and other apps you need. Everything's ready to go when you are.",
+          "title": "Your Apps"
+        },
+        "users": {
+          "description": "See who's on your team, approve new members, and manage everyone's access. Keep things secure and organized.",
+          "title": "Team Members"
+        },
+        "welcome": {
+          "description": "This is your home base for managing everything. Launch apps, check system status, and keep your team organized\u2014all in one place.",
+          "title": "Welcome!"
+        }
+      }
+    },
+    "next": "Next",
+    "of": "/",
+    "progressSaved": "Your onboarding progress has been saved.",
+    "review": "Review onboarding",
+    "step": "Vaihe",
+    "title": "Onboard to TAK",
+    "windows": {
+      "back": "Back",
+      "clickToEnlarge": "Click to enlarge",
+      "completion": "Onboarding Completed!",
+      "completionDesc": "You're all set and ready to operate at full capacity.",
+      "finish": "Finish",
+      "imageMissing": "Image not available",
+      "next": "Next",
+      "of": "of",
+      "progressSaved": "Your onboarding progress has been saved.",
+      "review": "Review onboarding",
+      "step": "Step",
+      "steps": {
+        "health": {
+          "description": "See how everything's running at a glance. Check if your systems are healthy and your network is connected.",
+          "title": "System Status"
+        },
+        "instructions": {
+          "description": "Need help getting started? Find step-by-step guides and tips for making the most of Modular Apps.",
+          "title": "Help & Guides"
+        },
+        "invite": {
+          "description": "Bring new people onto your team with secure invite codes or QR codes. Share them however works best for you.",
+          "title": "Invite People"
+        },
+        "products": {
+          "description": "Launch the Team Awareness Kit and other apps you need. Everything's ready to go when you are.",
+          "title": "Your Apps"
+        },
+        "users": {
+          "description": "See who's on your team, approve new members, and manage everyone's access. Keep things secure and organized.",
+          "title": "Team Members"
+        },
+        "welcome": {
+          "description": "This is your home base for managing everything. Launch apps, check system status, and keep your team organized\u2014all in one place.",
+          "title": "Welcome!"
+        }
+      },
+      "title": "Onboard to Deploy App"
+    }
+  },
   "platform": {
     "android": "ATAK",
     "choose": "Valitse alusta",

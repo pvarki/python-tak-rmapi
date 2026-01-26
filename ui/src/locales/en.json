@@ -8,18 +8,35 @@
   },
   "onboarding": {
     "android": {
+      "downloadFromPlayStore": "Download from Google Play",
       "steps": {
         "tak-auto-import": {
-          "description": "To connect to server, just press that button, make sure ATAK opens a popup, press yes there. \n If ATAK did not open you a popup, please try again.",
+          "description": "To connect to the server, just comlete the steps shown above, make sure ATAK opens a popup, press \"yes\" when prompted. \n If ATAK did not open popup window, please try again.",
           "title": "Auto Import"
+        },
+        "tak-data-sync": {
+          "description": "You need to enable Data Sync plugin order for ATAK to work.",
+          "title": "Data Sync"
         },
         "tak-download": {
           "description": "Download the ATAK-CIV app from the Play Store and install it:",
           "title": "Download"
         },
+        "tak-home": {
+          "description": "Inside ATAK you have few options. Use the Messages tab for communication with your team. Feeds tab helps you follow traffic and events inside ATAK . Tap the Tools menu for more options including the Plugins tab. At the bottom you can see the Status of your current ATAK.",
+          "title": "ATAK tools"
+        },
         "tak-manual-import": {
           "description": "You can also manually import the configuration package",
           "title": "Manual Import"
+        },
+        "tak-plugins": {
+          "description": "Tools-valikosta l\u00f6yd\u00e4t Plugins v\u00e4lilehden",
+          "title": "ATAK Plugins (lis\u00e4osat)"
+        },
+        "tak-welcome": {
+          "description": "Welcome to ATAK Installation",
+          "title": "Welcome"
         }
       }
     },

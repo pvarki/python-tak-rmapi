@@ -8,18 +8,35 @@
   },
   "onboarding": {
     "android": {
+      "downloadFromPlayStore": "Ladda ner fr\u00e5n Google Play Store",
       "steps": {
         "tak-auto-import": {
-          "description": "To connect to server, just press that button, make sure ATAK opens a popup, press yes there. \n If ATAK did not open you a popup, please try again.",
-          "title": "Auto Import"
+          "description": "F\u00f6r att ansluta till servern, tryck p\u00e5 knappen. Kontrollera att ATAK \u00f6ppnar ett popup-f\u00f6nster och v\u00e4lj \"Ja\".\n\nOm ATAK inte \u00f6ppnar ett popup-f\u00f6nster, f\u00f6rs\u00f6k igen.",
+          "title": "Automatisk import"
+        },
+        "tak-data-sync": {
+          "description": "Du beh\u00f6ver aktivera till\u00e4gget Data Sync f\u00f6r att kunna anv\u00e4nda ATAK",
+          "title": "Data Sync"
         },
         "tak-download": {
-          "description": "Download the ATAK-CIV app from the Play Store and install it:",
-          "title": "Download"
+          "description": "Ladda ner ATAK-CIV-appen fr\u00e5n Google Play Butik och installera den.",
+          "title": "Ladda ner"
+        },
+        "tak-home": {
+          "description": "I ATAK har du flera alternativ. Anv\u00e4nd fliken Meddelanden f\u00f6r att kommunicera med ditt team. Fliken Fl\u00f6den hj\u00e4lper dig att f\u00f6lja trafik och h\u00e4ndelser i ATAK. Tryck p\u00e5 menyn Verktyg f\u00f6r fler alternativ, inklusive fliken Plugins. L\u00e4ngst ner ser du statusen f\u00f6r din aktuella ATAK.",
+          "title": "ATAK-verktyg"
         },
         "tak-manual-import": {
-          "description": "You can also manually import the configuration package",
-          "title": "Manual Import"
+          "description": "Du kan ocks\u00e5 importera konfigurationspaketet manuellt.",
+          "title": "Manuell import"
+        },
+        "tak-plugins": {
+          "description": "I menyn Verktyg hittar du fliken Plugins.",
+          "title": "ATAK-plugins (till\u00e4gg)"
+        },
+        "tak-welcome": {
+          "description": "V\u00e4lkommen till installationen av ATAK",
+          "title": "V\u00e4lkommen"
         }
       }
     },
@@ -58,10 +75,10 @@
       }
     },
     "next": "Next",
-    "of": "of",
+    "of": "av",
     "progressSaved": "Your onboarding progress has been saved.",
     "review": "Review onboarding",
-    "step": "Step",
+    "step": "Steg",
     "title": "Onboard to TAK",
     "windows": {
       "back": "Back",

@@ -15,6 +15,7 @@ import { Spinner } from "../ui/spinner";
 import { IosTab } from "../tabs/IosTab";
 import { useRouter, useRouterState } from "@tanstack/react-router";
 import { WindowsTab } from "../tabs/WindowsTab";
+import { OnboardingHandler } from "../instructions/onboarding/OnboardingHandler";
 
 interface Data {
   tak_zips: TAK_Zip[];
@@ -35,6 +36,7 @@ export const HomePage = () => {
 
   const defaultPlatform = detectPlatform();
   const [platform, setPlatform] = useState<Platform>(defaultPlatform);
+  const [mtlsModalOpen, setMtlsModalOpen] = useState(false);
 
   const { t, i18n } = useTranslation(PRODUCT_SHORTNAME);
 
@@ -111,6 +113,9 @@ export const HomePage = () => {
           <p className="text-accent-foreground">{t("loading.user_data")}</p>
         </div>
       )}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <OnboardingHandler />
+      </div>
     </div>
   );
 };
