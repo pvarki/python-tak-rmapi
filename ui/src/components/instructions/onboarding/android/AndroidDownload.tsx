@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 
 export const AndroidDownload = () => {
   const { t } = useTranslation("tak");
-  
+
   return (
     <div className="flex justify-center">
       <a
@@ -23,9 +23,10 @@ export const AndroidDownload = () => {
         />
 
         <span className="text-sm font-medium text-primary-light group-hover:underline">
-          {t("onboarding.android.downloadFromPlayStore") || "Download from Google Play"}
+          {t("onboarding.android.downloadFromPlayStore") ||
+            "Download from Google Play"}
         </span>
       </a>
     </div>
   );
-}
+};

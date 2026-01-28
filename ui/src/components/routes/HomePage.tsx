@@ -51,13 +51,19 @@ export const HomePage = () => {
 
     switch (platform) {
       case Platform.Android:
-        return <AndroidTab zip={data.tak_zips[platformToIndex[Platform.Android]]} />;
+        return (
+          <AndroidTab zip={data.tak_zips[platformToIndex[Platform.Android]]} />
+        );
       case Platform.iOS:
         return <IosTab zip={data.tak_zips[platformToIndex[Platform.iOS]]} />;
       case Platform.Windows:
-        return <WindowsTab zip={data.tak_zips[platformToIndex[Platform.Windows]]} />;
+        return (
+          <WindowsTab zip={data.tak_zips[platformToIndex[Platform.Windows]]} />
+        );
       case Platform.Tracker:
-        return <TrackerTab zip={data.tak_zips[platformToIndex[Platform.Tracker]]} />;
+        return (
+          <TrackerTab zip={data.tak_zips[platformToIndex[Platform.Tracker]]} />
+        );
       default:
         return null;
     }
@@ -76,10 +82,7 @@ export const HomePage = () => {
         <div className="mt-8 font-black">
           <p className="text-center">{t("platform.choose")}</p>
           <div className="w-full mt-2">
-            <Select
-              value={platform}
-              onValueChange={handlePlatformChange}
-            >
+            <Select value={platform} onValueChange={handlePlatformChange}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder={t("platform.select_placeholder")} />
               </SelectTrigger>
@@ -104,11 +107,9 @@ export const HomePage = () => {
               </SelectContent>
             </Select>
 
-            <div className="mt-4">
-              {currentTab}
-            </div>
+            <div className="mt-4">{currentTab}</div>
           </div>
-            
+
           <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
             <OnboardingHandler />
           </div>

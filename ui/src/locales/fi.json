@@ -40,65 +40,62 @@
         }
       }
     },
-    "wintak": {
-      "description": "Valitse käyttämäsi alusta (1), jos sitä ei tunnisteta oikein. Lataa pakettisi (2). Lue paketin tuomista koskevat ohjeet (3)."
-    },
+    "back": "Takaisin",
+    "clickToEnlarge": "Klikkaa suurentaaksesi",
+    "completion": "K\u00e4ytt\u00f6\u00f6notto valmis!",
+    "completionDesc": "Kaikki on valmista ja voit nyt toimia t\u00e4ydell\u00e4 kapasiteetilla.",
+    "finish": "Lopeta",
     "general": {
       "steps": {
-        "welcome": {
-          "description": "Tervetuloa TAK-järjestelmään!",
-          "title": "Tervetuloa"
-        },
         "install": {
-          "description": "Muista valita käyttämäsi alusta (1), jos sitä ei tunnisteta oikein. Kun olet ladannut paketin (2) ja tuonut sen, olet valmis aloittamaan!",
+          "description": "Muista valita k\u00e4ytt\u00e4m\u00e4si alusta (1), jos sit\u00e4 ei tunnisteta oikein. Kun olet ladannut paketin (2) ja tuonut sen, olet valmis aloittamaan!",
           "title": "Paketin lataus"
         },
         "return": {
-          "description": "Voit aina avata tämän oppaan uudelleen painamalla painiketta oikeassa alakulmassa.",
+          "description": "Voit aina avata t\u00e4m\u00e4n oppaan uudelleen painamalla painiketta oikeassa alakulmassa.",
           "title": "Oppaan avaaminen"
+        },
+        "welcome": {
+          "description": "Tervetuloa TAK-j\u00e4rjestelm\u00e4\u00e4n!",
+          "title": "Tervetuloa"
         }
       }
     },
-    "back": "Takaisin",
-    "clickToEnlarge": "Klikkaa suurentaaksesi",
-    "completion": "Käyttöönotto valmis!",
-    "completionDesc": "Kaikki on valmista ja voit nyt toimia täydellä kapasiteetilla.",
-    "finish": "Lopeta",
     "imageMissing": "Kuvaa ei ole saatavilla",
     "ios": {
       "downloadFromAppStore": "Lataa App Storesta",
       "steps": {
-        "welcome": {
-          "description": "Tervetuloa iTAK-asennukseen",
-          "title": "Tervetuloa"
+        "itak-import": {
+          "description": "Avaa \"Packages\"-valikko ja lis\u00e4\u00e4 uusi paketti paikallisesta laitteesta. Valitse tiedosto, jonka latasit aiemmin.",
+          "title": "Tuo paketti"
+        },
+        "itak-settings": {
+          "description": "Asetukset l\u00f6ytyv\u00e4t oikeasta yl\u00e4kulmasta. Sielt\u00e4 voit vaihtaa karttaa ja mieltymysasetuksia. Suositus: Muuta mieltymysasetuksista (preferences) yksik\u00f6t k\u00e4ytt\u00e4m\u00e4\u00e4n MGRS-koordinaatteja ja metrisi\u00e4 yksik\u00f6it\u00e4.",
+          "title": "Muuta asetuksia"
+        },
+        "itak-setup": {
+          "description": "Avaa iTAK. Kun sovellus pyyt\u00e4\u00e4 lupaa k\u00e4ytt\u00e4\u00e4 paikallisen verkon laitteita, \u00e4l\u00e4 salli sit\u00e4. SALLI kaikki muut luvat. Aseta kutsunimesi (callsign) vastaamaan Deploy App -sovelluksessa olevaa nime\u00e4.",
+          "title": "iTAK-asennus"
+        },
+        "itak-sync1": {
+          "description": "Avaa \"Data Sync\"-valikko ja tilaa \"RECON\"-sy\u00f6te.",
+          "title": "Data Sync (1/2)"
+        },
+        "itak-sync2": {
+          "description": "Palaa \"Data Sync\"-valikkoon ja suorita t\u00e4ysi synkronointi.",
+          "title": "Data Sync (2/2)"
         },
         "tak-download": {
           "description": "Lataa iTAK-sovellus App Storesta ja asenna se:",
           "title": "Lataa"
         },
         "tak-package": {
-          "description": "Varmista, että alustasi on valittu oikein. Lataa sen jälkeen pakettisi.",
+          "description": "Varmista, ett\u00e4 alustasi on valittu oikein. Lataa sen j\u00e4lkeen pakettisi.",
           "title": "Paketin lataus"
         },
-        "itak-setup": {
-          "description": "Avaa iTAK. Kun sovellus pyytää lupaa käyttää paikallisen verkon laitteita, älä salli sitä. SALLI kaikki muut luvat. Aseta kutsunimesi (callsign) vastaamaan Deploy App -sovelluksessa olevaa nimeä.",
-          "title": "iTAK-asennus"
-        },
-        "itak-settings": {
-          "description": "Asetukset löytyvät oikeasta yläkulmasta. Sieltä voit vaihtaa karttaa ja mieltymysasetuksia. Suositus: Muuta mieltymysasetuksista (preferences) yksiköt käyttämään MGRS-koordinaatteja ja metrisiä yksiköitä.",
-          "title": "Muuta asetuksia"
-        },
-        "itak-import": {
-          "description": "Avaa \"Packages\"-valikko ja lisää uusi paketti paikallisesta laitteesta. Valitse tiedosto, jonka latasit aiemmin.",
-          "title": "Tuo paketti"
-        },
-        "itak-sync1": {
-          "description": "Avaa \"Data Sync\"-valikko ja tilaa \"RECON\"-syöte.",
-          "title": "Data Sync (1/2)"
-        },
-        "itak-sync2": {
-          "description": "Palaa \"Data Sync\"-valikkoon ja suorita täysi synkronointi.",
-          "title": "Data Sync (2/2)"
+        "welcome": {
+          "description": "Tervetuloa iTAK-asennukseen",
+          "title": "Tervetuloa"
         }
       }
     },
@@ -147,6 +144,9 @@
         }
       },
       "title": "Onboard to Deploy App"
+    },
+    "wintak": {
+      "description": "Valitse k\u00e4ytt\u00e4m\u00e4si alusta (1), jos sit\u00e4 ei tunnisteta oikein. Lataa pakettisi (2). Lue paketin tuomista koskevat ohjeet (3)."
     }
   },
   "platform": {

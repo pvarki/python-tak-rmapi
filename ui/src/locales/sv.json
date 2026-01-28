@@ -40,65 +40,62 @@
         }
       }
     },
-    "wintak": {
-      "description": "Välj den plattform du använder (1) om den inte detekteras korrekt. Ladda ner ditt paket (2). Läs instruktionerna för hur du importerar ditt paket (3)."
-    },
-   "general": {
+    "back": "Bak\u00e5t",
+    "clickToEnlarge": "Klicka f\u00f6r att f\u00f6rstora",
+    "completion": "Onboarding slutf\u00f6rd!",
+    "completionDesc": "Du \u00e4r nu redo att arbeta med full kapacitet.",
+    "finish": "Slutf\u00f6r",
+    "general": {
       "steps": {
-        "welcome": {
-          "description": "Välkommen till TAK!",
-          "title": "Välkommen"
-        },
         "install": {
-          "description": "Kom ihåg att välja den plattform du använder (1) om den inte upptäcks automatiskt. När du har laddat ner ditt paket (2) och importerat det är du redo att köra!",
+          "description": "Kom ih\u00e5g att v\u00e4lja den plattform du anv\u00e4nder (1) om den inte uppt\u00e4cks automatiskt. N\u00e4r du har laddat ner ditt paket (2) och importerat det \u00e4r du redo att k\u00f6ra!",
           "title": "Nedladdning av paket"
         },
         "return": {
-          "description": "Du kan alltid öppna den här guiden igen genom att trycka på knappen i det nedre högra hörnet.",
-          "title": "Öppna guide"
+          "description": "Du kan alltid \u00f6ppna den h\u00e4r guiden igen genom att trycka p\u00e5 knappen i det nedre h\u00f6gra h\u00f6rnet.",
+          "title": "\u00d6ppna guide"
+        },
+        "welcome": {
+          "description": "V\u00e4lkommen till TAK!",
+          "title": "V\u00e4lkommen"
         }
       }
     },
-    "back": "Bakåt",
-    "clickToEnlarge": "Klicka för att förstora",
-    "completion": "Onboarding slutförd!",
-    "completionDesc": "Du är nu redo att arbeta med full kapacitet.",
-    "finish": "Slutför",
     "imageMissing": "Bild saknas",
     "ios": {
-      "downloadFromAppStore": "Ladda ner från App Store",
+      "downloadFromAppStore": "Ladda ner fr\u00e5n App Store",
       "steps": {
-        "welcome": {
-          "description": "Välkommen till iTAK-installationen",
-          "title": "Välkommen"
-        },
-        "tak-download": {
-          "description": "Ladda ner iTAK-appen från App Store och installera den:",
-          "title": "Ladda ner"
-        },
-        "tak-package": {
-          "description": "Kontrollera att din plattform är rätt inställd. Ladda därefter ner ditt klientpaket.",
-          "title": "Nedladdning av paket"
-        },
-        "itak-setup": {
-          "description": "Öppna iTAK. När du tillfrågas om tillåtelse att komma åt enheter i lokala nätverk, välj 'tillåt inte'. TILLÅT alla andra behörigheter. Du bör ställa in din anropssignal (callsign) så att den matchar den i Deploy App.",
-          "title": "Konfigurera iTAK"
-        },
-        "itak-settings": {
-          "description": "Inställningar nås från det övre högra hörnet. Där kan du ändra karta och preferenser. Rekommenderas: Ändra enheter i inställningarna till att använda MGRS och metriska enheter.",
-          "title": "Ändra inställningar"
-        },
         "itak-import": {
-          "description": "Öppna menyn \"Packages\" och lägg till ett nytt paket från din lokala enhet. Välj filen som du laddade ned tidigare.",
+          "description": "\u00d6ppna menyn \"Packages\" och l\u00e4gg till ett nytt paket fr\u00e5n din lokala enhet. V\u00e4lj filen som du laddade ned tidigare.",
           "title": "Importera paketet"
         },
+        "itak-settings": {
+          "description": "Inst\u00e4llningar n\u00e5s fr\u00e5n det \u00f6vre h\u00f6gra h\u00f6rnet. D\u00e4r kan du \u00e4ndra karta och preferenser. Rekommenderas: \u00c4ndra enheter i inst\u00e4llningarna till att anv\u00e4nda MGRS och metriska enheter.",
+          "title": "\u00c4ndra inst\u00e4llningar"
+        },
+        "itak-setup": {
+          "description": "\u00d6ppna iTAK. N\u00e4r du tillfr\u00e5gas om till\u00e5telse att komma \u00e5t enheter i lokala n\u00e4tverk, v\u00e4lj 'till\u00e5t inte'. TILL\u00c5T alla andra beh\u00f6righeter. Du b\u00f6r st\u00e4lla in din anropssignal (callsign) s\u00e5 att den matchar den i Deploy App.",
+          "title": "Konfigurera iTAK"
+        },
         "itak-sync1": {
-          "description": "Öppna menyn \"Data Sync\" och prenumerera på \"RECON\"-flödet.",
+          "description": "\u00d6ppna menyn \"Data Sync\" och prenumerera p\u00e5 \"RECON\"-fl\u00f6det.",
           "title": "Data Sync (1/2)"
         },
         "itak-sync2": {
-          "description": "Gå tillbaka till menyn \"Data Sync\" och gör en fullständig synkronisering.",
+          "description": "G\u00e5 tillbaka till menyn \"Data Sync\" och g\u00f6r en fullst\u00e4ndig synkronisering.",
           "title": "Data Sync (2/2)"
+        },
+        "tak-download": {
+          "description": "Ladda ner iTAK-appen fr\u00e5n App Store och installera den:",
+          "title": "Ladda ner"
+        },
+        "tak-package": {
+          "description": "Kontrollera att din plattform \u00e4r r\u00e4tt inst\u00e4lld. Ladda d\u00e4refter ner ditt klientpaket.",
+          "title": "Nedladdning av paket"
+        },
+        "welcome": {
+          "description": "V\u00e4lkommen till iTAK-installationen",
+          "title": "V\u00e4lkommen"
         }
       }
     },
@@ -147,6 +144,9 @@
         }
       },
       "title": "Onboard to Deploy App"
+    },
+    "wintak": {
+      "description": "V\u00e4lj den plattform du anv\u00e4nder (1) om den inte detekteras korrekt. Ladda ner ditt paket (2). L\u00e4s instruktionerna f\u00f6r hur du importerar ditt paket (3)."
     }
   },
   "platform": {
