@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 
 export const IosDownload = () => {
   const { t } = useTranslation("tak");
-  
+
   return (
     <div className="flex justify-center">
       <a
@@ -22,9 +22,10 @@ export const IosDownload = () => {
         />
 
         <span className="text-sm font-medium text-primary-light group-hover:underline">
-          {t("onboarding.ios.downloadFromAppStore") || "Download from App Store"}
+          {t("onboarding.ios.downloadFromAppStore") ||
+            "Download from App Store"}
         </span>
       </a>
     </div>
   );
-}
+};

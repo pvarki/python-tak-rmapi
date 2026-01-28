@@ -92,7 +92,7 @@ interface Props {
   data: {
     tak_zips: TAK_Zip[];
   };
-  meta: MetaData
+  meta: MetaData;
 }
 
 const PRODUCT_SHORTNAME = "tak";
@@ -103,7 +103,7 @@ export default function App({ data, meta }: Props) {
   const { t, i18n } = useTranslation(PRODUCT_SHORTNAME);
   const router = useMemo(
     () => createRouter({ routeTree, basepath: "/product/tak" }),
-    [data]
+    [data],
   );
 
   useEffect(() => {

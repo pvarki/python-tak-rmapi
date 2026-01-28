@@ -40,15 +40,13 @@
         }
       }
     },
-    "wintak": {
-      "description": "Choose the platform you are using (1), if it isn't detected correctly. Download your package (2). Read the instructions for importing your package (3)."
-    },
-    "general":{
+    "back": "Back",
+    "clickToEnlarge": "Click to enlarge",
+    "completion": "Onboarding Completed!",
+    "completionDesc": "You're all set and ready to operate at full capacity.",
+    "finish": "Finish",
+    "general": {
       "steps": {
-        "welcome": {
-          "description": "Welcome to TAK!",
-          "title": "Welcome"
-        },
         "install": {
           "description": "Remember to choose the platform you are using (1), if it isn't detected correctly. After downloading your package (2) and importing it you are ready to go!",
           "title": "Package Download"
@@ -56,21 +54,36 @@
         "return": {
           "description": "You can always re-open to this guide by pressing the button in the bottom right corner.",
           "title": "Opening guide"
+        },
+        "welcome": {
+          "description": "Welcome to TAK!",
+          "title": "Welcome"
         }
       }
     },
-    "back": "Back",
-    "clickToEnlarge": "Click to enlarge",
-    "completion": "Onboarding Completed!",
-    "completionDesc": "You're all set and ready to operate at full capacity.",
-    "finish": "Finish",
     "imageMissing": "Image not available",
     "ios": {
       "downloadFromAppStore": "Download from the App Store",
       "steps": {
-        "welcome": {
-          "description": "Welcome to iTAK Installation",
-          "title": "Welcome"
+        "itak-import": {
+          "description": "Open the \"Packages\"-menu and add a new package from local device. Select the file you downloaded previously.",
+          "title": "Import the package"
+        },
+        "itak-settings": {
+          "description": "Settings can be accessed from the top right corner. There you can change the map and preferences. Recommended: Change units inside preferences to use MGRS and metric units.",
+          "title": "Change settings"
+        },
+        "itak-setup": {
+          "description": "Open up iTAK. When prompted for permission to access devices in local networks, don't allow it. ALLOW all other permissions. You should set up your callsign match the one inside Deploy App.",
+          "title": "Setup iTAK"
+        },
+        "itak-sync1": {
+          "description": "Open the \"Data Sync\"-menu and subscribe to the \"RECON\"-feed.",
+          "title": "Data Sync (1/2)"
+        },
+        "itak-sync2": {
+          "description": "Go back to the \"Data Sync\"-menu and do a full sync.",
+          "title": "Data Sync (2/2)"
         },
         "tak-download": {
           "description": "Download the iTAK app from the App Store and install it:",
@@ -80,25 +93,9 @@
           "description": "Check that your platform is set right. After that download your client package.",
           "title": "Package download"
         },
-        "itak-setup": {
-          "description": "Open up iTAK. When prompted for permission to access devices in local networks, don't allow it. ALLOW all other permissions. You should set up your callsign match the one inside Deploy App.",
-          "title": "Setup iTAK"
-        },
-        "itak-settings": {
-          "description": "Settings can be accessed from the top right corner. There you can change the map and preferences. Recommended: Change units inside preferences to use MGRS and metric units.",
-          "title": "Change settings"
-        },
-        "itak-import": {
-          "description": "Open the \"Packages\"-menu and add a new package from local device. Select the file you downloaded previously.",
-          "title": "Import the package"
-        },
-        "itak-sync1": {
-          "description": "Open the \"Data Sync\"-menu and subscribe to the \"RECON\"-feed.",
-          "title": "Data Sync (1/2)"
-        },
-        "itak-sync2": {
-          "description": "Go back to the \"Data Sync\"-menu and do a full sync.",
-          "title": "Data Sync (2/2)"
+        "welcome": {
+          "description": "Welcome to iTAK Installation",
+          "title": "Welcome"
         }
       }
     },
@@ -147,6 +144,9 @@
         }
       },
       "title": "Onboard to Deploy App"
+    },
+    "wintak": {
+      "description": "Choose the platform you are using (1), if it isn't detected correctly. Download your package (2). Read the instructions for importing your package (3)."
     }
   },
   "platform": {
