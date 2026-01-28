@@ -6,6 +6,149 @@
   "loading": {
     "user_data": "Laddar anv\u00e4ndardata..."
   },
+  "onboarding": {
+    "android": {
+      "downloadFromPlayStore": "Ladda ner fr\u00e5n Google Play Store",
+      "steps": {
+        "tak-auto-import": {
+          "description": "F\u00f6r att ansluta till servern, tryck p\u00e5 knappen. Kontrollera att ATAK \u00f6ppnar ett popup-f\u00f6nster och v\u00e4lj \"Ja\".\n\nOm ATAK inte \u00f6ppnar ett popup-f\u00f6nster, f\u00f6rs\u00f6k igen.",
+          "title": "Automatisk import"
+        },
+        "tak-data-sync": {
+          "description": "Du beh\u00f6ver aktivera till\u00e4gget Data Sync f\u00f6r att kunna anv\u00e4nda ATAK",
+          "title": "Data Sync"
+        },
+        "tak-download": {
+          "description": "Ladda ner ATAK-CIV-appen fr\u00e5n Google Play Butik och installera den.",
+          "title": "Ladda ner"
+        },
+        "tak-home": {
+          "description": "I ATAK har du flera alternativ. Anv\u00e4nd fliken Meddelanden f\u00f6r att kommunicera med ditt team. Fliken Fl\u00f6den hj\u00e4lper dig att f\u00f6lja trafik och h\u00e4ndelser i ATAK. Tryck p\u00e5 menyn Verktyg f\u00f6r fler alternativ, inklusive fliken Plugins. L\u00e4ngst ner ser du statusen f\u00f6r din aktuella ATAK.",
+          "title": "ATAK-verktyg"
+        },
+        "tak-manual-import": {
+          "description": "Du kan ocks\u00e5 importera konfigurationspaketet manuellt.",
+          "title": "Manuell import"
+        },
+        "tak-plugins": {
+          "description": "I menyn Verktyg hittar du fliken Plugins.",
+          "title": "ATAK-plugins (till\u00e4gg)"
+        },
+        "tak-welcome": {
+          "description": "V\u00e4lkommen till installationen av ATAK",
+          "title": "V\u00e4lkommen"
+        }
+      }
+    },
+    "back": "Bak\u00e5t",
+    "clickToEnlarge": "Klicka f\u00f6r att f\u00f6rstora",
+    "completion": "Onboarding slutf\u00f6rd!",
+    "completionDesc": "Du \u00e4r nu redo att arbeta med full kapacitet.",
+    "finish": "Slutf\u00f6r",
+    "general": {
+      "steps": {
+        "install": {
+          "description": "Kom ih\u00e5g att v\u00e4lja den plattform du anv\u00e4nder (1) om den inte uppt\u00e4cks automatiskt. N\u00e4r du har laddat ner ditt paket (2) och importerat det \u00e4r du redo att k\u00f6ra!",
+          "title": "Nedladdning av paket"
+        },
+        "return": {
+          "description": "Du kan alltid \u00f6ppna den h\u00e4r guiden igen genom att trycka p\u00e5 knappen i det nedre h\u00f6gra h\u00f6rnet.",
+          "title": "\u00d6ppna guide"
+        },
+        "welcome": {
+          "description": "V\u00e4lkommen till TAK!",
+          "title": "V\u00e4lkommen"
+        }
+      }
+    },
+    "imageMissing": "Bild saknas",
+    "ios": {
+      "downloadFromAppStore": "Ladda ner fr\u00e5n App Store",
+      "steps": {
+        "itak-import": {
+          "description": "\u00d6ppna menyn \"Packages\" och l\u00e4gg till ett nytt paket fr\u00e5n din lokala enhet. V\u00e4lj filen som du laddade ned tidigare.",
+          "title": "Importera paketet"
+        },
+        "itak-settings": {
+          "description": "Inst\u00e4llningar n\u00e5s fr\u00e5n det \u00f6vre h\u00f6gra h\u00f6rnet. D\u00e4r kan du \u00e4ndra karta och preferenser. Rekommenderas: \u00c4ndra enheter i inst\u00e4llningarna till att anv\u00e4nda MGRS och metriska enheter.",
+          "title": "\u00c4ndra inst\u00e4llningar"
+        },
+        "itak-setup": {
+          "description": "\u00d6ppna iTAK. N\u00e4r du tillfr\u00e5gas om till\u00e5telse att komma \u00e5t enheter i lokala n\u00e4tverk, v\u00e4lj 'till\u00e5t inte'. TILL\u00c5T alla andra beh\u00f6righeter. Du b\u00f6r st\u00e4lla in din anropssignal (callsign) s\u00e5 att den matchar den i Deploy App.",
+          "title": "Konfigurera iTAK"
+        },
+        "itak-sync1": {
+          "description": "\u00d6ppna menyn \"Data Sync\" och prenumerera p\u00e5 \"RECON\"-fl\u00f6det.",
+          "title": "Data Sync (1/2)"
+        },
+        "itak-sync2": {
+          "description": "G\u00e5 tillbaka till menyn \"Data Sync\" och g\u00f6r en fullst\u00e4ndig synkronisering.",
+          "title": "Data Sync (2/2)"
+        },
+        "tak-download": {
+          "description": "Ladda ner iTAK-appen fr\u00e5n App Store och installera den:",
+          "title": "Ladda ner"
+        },
+        "tak-package": {
+          "description": "Kontrollera att din plattform \u00e4r r\u00e4tt inst\u00e4lld. Ladda d\u00e4refter ner ditt klientpaket.",
+          "title": "Nedladdning av paket"
+        },
+        "welcome": {
+          "description": "V\u00e4lkommen till iTAK-installationen",
+          "title": "V\u00e4lkommen"
+        }
+      }
+    },
+    "next": "Next",
+    "of": "av",
+    "progressSaved": "Your onboarding progress has been saved.",
+    "review": "Review onboarding",
+    "step": "Steg",
+    "title": "Onboard to TAK",
+    "windows": {
+      "back": "Back",
+      "clickToEnlarge": "Click to enlarge",
+      "completion": "Onboarding Completed!",
+      "completionDesc": "You're all set and ready to operate at full capacity.",
+      "finish": "Finish",
+      "imageMissing": "Image not available",
+      "next": "Next",
+      "of": "of",
+      "progressSaved": "Your onboarding progress has been saved.",
+      "review": "Review onboarding",
+      "step": "Step",
+      "steps": {
+        "health": {
+          "description": "See how everything's running at a glance. Check if your systems are healthy and your network is connected.",
+          "title": "System Status"
+        },
+        "instructions": {
+          "description": "Need help getting started? Find step-by-step guides and tips for making the most of Modular Apps.",
+          "title": "Help & Guides"
+        },
+        "invite": {
+          "description": "Bring new people onto your team with secure invite codes or QR codes. Share them however works best for you.",
+          "title": "Invite People"
+        },
+        "products": {
+          "description": "Launch the Team Awareness Kit and other apps you need. Everything's ready to go when you are.",
+          "title": "Your Apps"
+        },
+        "users": {
+          "description": "See who's on your team, approve new members, and manage everyone's access. Keep things secure and organized.",
+          "title": "Team Members"
+        },
+        "welcome": {
+          "description": "This is your home base for managing everything. Launch apps, check system status, and keep your team organized\u2014all in one place.",
+          "title": "Welcome!"
+        }
+      },
+      "title": "Onboard to Deploy App"
+    },
+    "wintak": {
+      "description": "V\u00e4lj den plattform du anv\u00e4nder (1) om den inte detekteras korrekt. Ladda ner ditt paket (2). L\u00e4s instruktionerna f\u00f6r hur du importerar ditt paket (3)."
+    }
+  },
   "platform": {
     "android": "ATAK",
     "choose": "V\u00e4lj plattform",
@@ -18,6 +161,12 @@
     "android": {
       "instructions_short": "Beh\u00f6ver du hj\u00e4lp med att importera paketet?",
       "open_atak": "ATAK: Importera paketet automatiskt",
+      "open_atak_dialog": {
+        "description": "Klicka p\u00e5 knappen nedan f\u00f6r att \u00f6ppna i ATAK",
+        "note": "N\u00e4r ATAK \u00f6ppnas och fr\u00e5gar om import av ett paket med en l\u00e5ng l\u00e4nk, v\u00e4lj \"Yes\"",
+        "open": "\u00d6ppna ATAK och anslut till tj\u00e4nsten",
+        "title": "Automatisk import av ATAK-uppdragspaket"
+      },
       "open_atak_manual_note": "Eller importera paketet manuellt",
       "open_instructions": "\u00d6ppna instruktioner",
       "phase1": {

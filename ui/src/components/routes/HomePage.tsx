@@ -1,6 +1,6 @@
 import { detectPlatform, Platform } from "@/lib/detectPlatform";
 import { TAK_Zip } from "@/lib/interfaces";
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Select,
@@ -13,8 +13,9 @@ import { AndroidTab } from "../tabs/AndroidTab";
 import { TrackerTab } from "../tabs/TrackerTab";
 import { Spinner } from "../ui/spinner";
 import { IosTab } from "../tabs/IosTab";
-import { useRouter, useRouterState } from "@tanstack/react-router";
+import { useRouter } from "@tanstack/react-router";
 import { WindowsTab } from "../tabs/WindowsTab";
+import { OnboardingHandler } from "../instructions/onboarding/OnboardingHandler";
 
 interface Data {
   tak_zips: TAK_Zip[];
@@ -30,17 +31,43 @@ const platformToIndex: Record<Platform, number> = {
 const PRODUCT_SHORTNAME = "tak";
 
 export const HomePage = () => {
-  //@ts-ignore
   const router = useRouter();
 
-  const defaultPlatform = detectPlatform();
+  const defaultPlatform = useMemo(() => detectPlatform(), []);
   const [platform, setPlatform] = useState<Platform>(defaultPlatform);
 
-  const { t, i18n } = useTranslation(PRODUCT_SHORTNAME);
+  const { t } = useTranslation(PRODUCT_SHORTNAME);
 
   const data = router.options.context
     ? (router.options.context as Data)
     : undefined;
+
+  const handlePlatformChange = useCallback((value: string) => {
+    setPlatform(value as Platform);
+  }, []);
+
+  const currentTab = useMemo(() => {
+    if (!data?.tak_zips) return null;
+
+    switch (platform) {
+      case Platform.Android:
+        return (
+          <AndroidTab zip={data.tak_zips[platformToIndex[Platform.Android]]} />
+        );
+      case Platform.iOS:
+        return <IosTab zip={data.tak_zips[platformToIndex[Platform.iOS]]} />;
+      case Platform.Windows:
+        return (
+          <WindowsTab zip={data.tak_zips[platformToIndex[Platform.Windows]]} />
+        );
+      case Platform.Tracker:
+        return (
+          <TrackerTab zip={data.tak_zips[platformToIndex[Platform.Tracker]]} />
+        );
+      default:
+        return null;
+    }
+  }, [platform, data?.tak_zips]);
 
   return (
     <div className="max-w-3xl mx-auto p-4">
@@ -55,10 +82,7 @@ export const HomePage = () => {
         <div className="mt-8 font-black">
           <p className="text-center">{t("platform.choose")}</p>
           <div className="w-full mt-2">
-            <Select
-              value={platform}
-              onValueChange={(value) => setPlatform(value as Platform)}
-            >
+            <Select value={platform} onValueChange={handlePlatformChange}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder={t("platform.select_placeholder")} />
               </SelectTrigger>
@@ -83,26 +107,11 @@ export const HomePage = () => {
               </SelectContent>
             </Select>
 
-            <div className="mt-4">
-              {platform === Platform.Android && (
-                <AndroidTab
-                  zip={data.tak_zips[platformToIndex[Platform.Android]]}
-                />
-              )}
-              {platform === Platform.iOS && (
-                <IosTab zip={data.tak_zips[platformToIndex[Platform.iOS]]} />
-              )}
-              {platform === Platform.Windows && (
-                <WindowsTab
-                  zip={data.tak_zips[platformToIndex[Platform.Windows]]}
-                />
-              )}
-              {platform === Platform.Tracker && (
-                <TrackerTab
-                  zip={data.tak_zips[platformToIndex[Platform.Tracker]]}
-                />
-              )}
-            </div>
+            <div className="mt-4">{currentTab}</div>
+          </div>
+
+          <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+            <OnboardingHandler />
           </div>
         </div>
       ) : (

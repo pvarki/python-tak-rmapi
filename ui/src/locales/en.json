@@ -6,6 +6,149 @@
   "loading": {
     "user_data": "Loading user data..."
   },
+  "onboarding": {
+    "android": {
+      "downloadFromPlayStore": "Download from Google Play",
+      "steps": {
+        "tak-auto-import": {
+          "description": "To connect to the server, just comlete the steps shown above, make sure ATAK opens a popup, press \"yes\" when prompted. \n If ATAK did not open popup window, please try again.",
+          "title": "Auto Import"
+        },
+        "tak-data-sync": {
+          "description": "You need to enable Data Sync plugin order for ATAK to work.",
+          "title": "Data Sync"
+        },
+        "tak-download": {
+          "description": "Download the ATAK-CIV app from the Play Store and install it:",
+          "title": "Download"
+        },
+        "tak-home": {
+          "description": "Inside ATAK you have few options. Use the Messages tab for communication with your team. Feeds tab helps you follow traffic and events inside ATAK . Tap the Tools menu for more options including the Plugins tab. At the bottom you can see the Status of your current ATAK.",
+          "title": "ATAK tools"
+        },
+        "tak-manual-import": {
+          "description": "You can also manually import the configuration package",
+          "title": "Manual Import"
+        },
+        "tak-plugins": {
+          "description": "You can find Plugins-tab from the Tools-menu.",
+          "title": "ATAK Plugins"
+        },
+        "tak-welcome": {
+          "description": "Welcome to ATAK Installation",
+          "title": "Welcome"
+        }
+      }
+    },
+    "back": "Back",
+    "clickToEnlarge": "Click to enlarge",
+    "completion": "Onboarding Completed!",
+    "completionDesc": "You're all set and ready to operate at full capacity.",
+    "finish": "Finish",
+    "general": {
+      "steps": {
+        "install": {
+          "description": "Remember to choose the platform you are using (1), if it isn't detected correctly. After downloading your package (2) and importing it you are ready to go!",
+          "title": "Package Download"
+        },
+        "return": {
+          "description": "You can always re-open to this guide by pressing the button in the bottom right corner.",
+          "title": "Opening guide"
+        },
+        "welcome": {
+          "description": "Welcome to TAK!",
+          "title": "Welcome"
+        }
+      }
+    },
+    "imageMissing": "Image not available",
+    "ios": {
+      "downloadFromAppStore": "Download from the App Store",
+      "steps": {
+        "itak-import": {
+          "description": "Open the \"Packages\"-menu and add a new package from local device. Select the file you downloaded previously.",
+          "title": "Import the package"
+        },
+        "itak-settings": {
+          "description": "Settings can be accessed from the top right corner. There you can change the map and preferences. Recommended: Change units inside preferences to use MGRS and metric units.",
+          "title": "Change settings"
+        },
+        "itak-setup": {
+          "description": "Open up iTAK. When prompted for permission to access devices in local networks, don't allow it. ALLOW all other permissions. You should set up your callsign match the one inside Deploy App.",
+          "title": "Setup iTAK"
+        },
+        "itak-sync1": {
+          "description": "Open the \"Data Sync\"-menu and subscribe to the \"RECON\"-feed.",
+          "title": "Data Sync (1/2)"
+        },
+        "itak-sync2": {
+          "description": "Go back to the \"Data Sync\"-menu and do a full sync.",
+          "title": "Data Sync (2/2)"
+        },
+        "tak-download": {
+          "description": "Download the iTAK app from the App Store and install it:",
+          "title": "Download"
+        },
+        "tak-package": {
+          "description": "Check that your platform is set right. After that download your client package.",
+          "title": "Package download"
+        },
+        "welcome": {
+          "description": "Welcome to iTAK Installation",
+          "title": "Welcome"
+        }
+      }
+    },
+    "next": "Next",
+    "of": "of",
+    "progressSaved": "Your onboarding progress has been saved.",
+    "review": "Review onboarding",
+    "step": "Step",
+    "title": "Onboard to TAK",
+    "windows": {
+      "back": "Back",
+      "clickToEnlarge": "Click to enlarge",
+      "completion": "Onboarding Completed!",
+      "completionDesc": "You're all set and ready to operate at full capacity.",
+      "finish": "Finish",
+      "imageMissing": "Image not available",
+      "next": "Next",
+      "of": "of",
+      "progressSaved": "Your onboarding progress has been saved.",
+      "review": "Review onboarding",
+      "step": "Step",
+      "steps": {
+        "health": {
+          "description": "See how everything's running at a glance. Check if your systems are healthy and your network is connected.",
+          "title": "System Status"
+        },
+        "instructions": {
+          "description": "Need help getting started? Find step-by-step guides and tips for making the most of Modular Apps.",
+          "title": "Help & Guides"
+        },
+        "invite": {
+          "description": "Bring new people onto your team with secure invite codes or QR codes. Share them however works best for you.",
+          "title": "Invite People"
+        },
+        "products": {
+          "description": "Launch the Team Awareness Kit and other apps you need. Everything's ready to go when you are.",
+          "title": "Your Apps"
+        },
+        "users": {
+          "description": "See who's on your team, approve new members, and manage everyone's access. Keep things secure and organized.",
+          "title": "Team Members"
+        },
+        "welcome": {
+          "description": "This is your home base for managing everything. Launch apps, check system status, and keep your team organized\u2014all in one place.",
+          "title": "Welcome!"
+        }
+      },
+      "title": "Onboard to Deploy App"
+    },
+    "wintak": {
+      "description": "Choose the platform you are using (1), if it isn't detected correctly. Download your package (2). Read the instructions for importing your package (3)."
+    }
+  },
   "platform": {
     "android": "ATAK",
     "choose": "Choose your platform",
@@ -18,6 +161,12 @@
     "android": {
       "instructions_short": "Need help importing the package?",
       "open_atak": "ATAK: Auto import package",
+      "open_atak_dialog": {
+        "description": "Click the button below to open in ATAK",
+        "note": "When ATAK opens and asks about importing a package with a long link, choose \"Yes\"",
+        "open": "Open ATAK and connect to service",
+        "title": "ATAK Mission Package Auto Import"
+      },
       "open_atak_manual_note": "Or import manually",
       "open_instructions": "Open instructions",
       "phase1": {

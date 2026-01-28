@@ -26,6 +26,7 @@ export function IosTab({ zip }: Props) {
       <div className="mt-4">
         <p className="mb-2">{t("tabs.ios.instructions_short")}</p>
         <Button asChild variant="secondary">
+          {/* eslint-disable-next-line */}
           <Link to={"/ios/1" as any}>{t("tabs.ios.open_instructions")}</Link>
         </Button>
       </div>
