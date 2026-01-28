@@ -1,5 +1,5 @@
 import { TAK_Zip } from "./lib/interfaces";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import enLang from "./locales/en.json";
@@ -11,7 +11,6 @@ import {
   createRoute,
   createRouter,
   Outlet,
-  redirect,
   RouterProvider,
 } from "@tanstack/react-router";
 import { HomePage } from "./components/routes/HomePage";
@@ -22,6 +21,7 @@ import { IosPhasePage } from "./components/routes/IosPhasePage";
 import { IosInstructionPage } from "./components/routes/IosInstructionPage";
 import { WindowsInstructionPage } from "./components/routes/WindowsInstructionPage";
 import { WindowsPhasePage } from "./components/routes/WindowsPhasePage";
+import { MetaData, MetadataProvider } from "./hooks/use-metadata";
 
 const RootLayoutComponent = () => (
   <div className="max-w-5xl mx-auto p-6">
@@ -92,15 +92,19 @@ interface Props {
   data: {
     tak_zips: TAK_Zip[];
   };
+  meta: MetaData
 }
 
 const PRODUCT_SHORTNAME = "tak";
 
-export default ({ data }: Props) => {
+export default function App({ data, meta }: Props) {
   const [ready, setReady] = useState(false);
 
   const { t, i18n } = useTranslation(PRODUCT_SHORTNAME);
-  const router = createRouter({ routeTree, basepath: "/product/tak" });
+  const router = useMemo(
+    () => createRouter({ routeTree, basepath: "/product/tak" }),
+    [data]
+  );
 
   useEffect(() => {
     async function load() {
@@ -115,8 +119,8 @@ export default ({ data }: Props) => {
       setReady(true);
     }
 
-    load();
-  }, []);
+    void load();
+  }, [i18n]);
 
   if (!ready) {
     return (
@@ -127,5 +131,9 @@ export default ({ data }: Props) => {
     );
   }
 
-  return <RouterProvider router={router} context={data} />;
-};
+  return (
+    <MetadataProvider meta={meta}>
+      <RouterProvider router={router} context={data} />
+    </MetadataProvider>
+  );
+}

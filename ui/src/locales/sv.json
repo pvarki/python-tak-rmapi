@@ -40,37 +40,65 @@
         }
       }
     },
-    "back": "Back",
-    "clickToEnlarge": "Click to enlarge",
-    "completion": "Onboarding Completed!",
-    "completionDesc": "You're all set and ready to operate at full capacity.",
-    "finish": "Finish",
-    "imageMissing": "Image not available",
-    "ios": {
+    "wintak": {
+      "description": "Välj den plattform du använder (1) om den inte detekteras korrekt. Ladda ner ditt paket (2). Läs instruktionerna för hur du importerar ditt paket (3)."
+    },
+   "general": {
       "steps": {
-        "health": {
-          "description": "See how everything's running at a glance. Check if your systems are healthy and your network is connected.",
-          "title": "System Status"
-        },
-        "instructions": {
-          "description": "Need help getting started? Find step-by-step guides and tips for making the most of Modular Apps.",
-          "title": "Help & Guides"
-        },
-        "invite": {
-          "description": "Bring new people onto your team with secure invite codes or QR codes. Share them however works best for you.",
-          "title": "Invite People"
-        },
-        "products": {
-          "description": "Launch the Team Awareness Kit and other apps you need. Everything's ready to go when you are.",
-          "title": "Your Apps"
-        },
-        "users": {
-          "description": "See who's on your team, approve new members, and manage everyone's access. Keep things secure and organized.",
-          "title": "Team Members"
-        },
         "welcome": {
-          "description": "This is your home base for managing everything. Launch apps, check system status, and keep your team organized\u2014all in one place.",
-          "title": "Welcome!"
+          "description": "Välkommen till TAK!",
+          "title": "Välkommen"
+        },
+        "install": {
+          "description": "Kom ihåg att välja den plattform du använder (1) om den inte upptäcks automatiskt. När du har laddat ner ditt paket (2) och importerat det är du redo att köra!",
+          "title": "Nedladdning av paket"
+        },
+        "return": {
+          "description": "Du kan alltid öppna den här guiden igen genom att trycka på knappen i det nedre högra hörnet.",
+          "title": "Öppna guide"
+        }
+      }
+    },
+    "back": "Bakåt",
+    "clickToEnlarge": "Klicka för att förstora",
+    "completion": "Onboarding slutförd!",
+    "completionDesc": "Du är nu redo att arbeta med full kapacitet.",
+    "finish": "Slutför",
+    "imageMissing": "Bild saknas",
+    "ios": {
+      "downloadFromAppStore": "Ladda ner från App Store",
+      "steps": {
+        "welcome": {
+          "description": "Välkommen till iTAK-installationen",
+          "title": "Välkommen"
+        },
+        "tak-download": {
+          "description": "Ladda ner iTAK-appen från App Store och installera den:",
+          "title": "Ladda ner"
+        },
+        "tak-package": {
+          "description": "Kontrollera att din plattform är rätt inställd. Ladda därefter ner ditt klientpaket.",
+          "title": "Nedladdning av paket"
+        },
+        "itak-setup": {
+          "description": "Öppna iTAK. När du tillfrågas om tillåtelse att komma åt enheter i lokala nätverk, välj 'tillåt inte'. TILLÅT alla andra behörigheter. Du bör ställa in din anropssignal (callsign) så att den matchar den i Deploy App.",
+          "title": "Konfigurera iTAK"
+        },
+        "itak-settings": {
+          "description": "Inställningar nås från det övre högra hörnet. Där kan du ändra karta och preferenser. Rekommenderas: Ändra enheter i inställningarna till att använda MGRS och metriska enheter.",
+          "title": "Ändra inställningar"
+        },
+        "itak-import": {
+          "description": "Öppna menyn \"Packages\" och lägg till ett nytt paket från din lokala enhet. Välj filen som du laddade ned tidigare.",
+          "title": "Importera paketet"
+        },
+        "itak-sync1": {
+          "description": "Öppna menyn \"Data Sync\" och prenumerera på \"RECON\"-flödet.",
+          "title": "Data Sync (1/2)"
+        },
+        "itak-sync2": {
+          "description": "Gå tillbaka till menyn \"Data Sync\" och gör en fullständig synkronisering.",
+          "title": "Data Sync (2/2)"
         }
       }
     },

@@ -40,37 +40,65 @@
         }
       }
     },
-    "back": "Back",
-    "clickToEnlarge": "Click to enlarge",
-    "completion": "Onboarding Completed!",
-    "completionDesc": "You're all set and ready to operate at full capacity.",
-    "finish": "Finish",
-    "imageMissing": "Image not available",
-    "ios": {
+    "wintak": {
+      "description": "Valitse käyttämäsi alusta (1), jos sitä ei tunnisteta oikein. Lataa pakettisi (2). Lue paketin tuomista koskevat ohjeet (3)."
+    },
+    "general": {
       "steps": {
-        "health": {
-          "description": "See how everything's running at a glance. Check if your systems are healthy and your network is connected.",
-          "title": "System Status"
-        },
-        "instructions": {
-          "description": "Need help getting started? Find step-by-step guides and tips for making the most of Modular Apps.",
-          "title": "Help & Guides"
-        },
-        "invite": {
-          "description": "Bring new people onto your team with secure invite codes or QR codes. Share them however works best for you.",
-          "title": "Invite People"
-        },
-        "products": {
-          "description": "Launch the Team Awareness Kit and other apps you need. Everything's ready to go when you are.",
-          "title": "Your Apps"
-        },
-        "users": {
-          "description": "See who's on your team, approve new members, and manage everyone's access. Keep things secure and organized.",
-          "title": "Team Members"
-        },
         "welcome": {
-          "description": "This is your home base for managing everything. Launch apps, check system status, and keep your team organized\u2014all in one place.",
-          "title": "Welcome!"
+          "description": "Tervetuloa TAK-järjestelmään!",
+          "title": "Tervetuloa"
+        },
+        "install": {
+          "description": "Muista valita käyttämäsi alusta (1), jos sitä ei tunnisteta oikein. Kun olet ladannut paketin (2) ja tuonut sen, olet valmis aloittamaan!",
+          "title": "Paketin lataus"
+        },
+        "return": {
+          "description": "Voit aina avata tämän oppaan uudelleen painamalla painiketta oikeassa alakulmassa.",
+          "title": "Oppaan avaaminen"
+        }
+      }
+    },
+    "back": "Takaisin",
+    "clickToEnlarge": "Klikkaa suurentaaksesi",
+    "completion": "Käyttöönotto valmis!",
+    "completionDesc": "Kaikki on valmista ja voit nyt toimia täydellä kapasiteetilla.",
+    "finish": "Lopeta",
+    "imageMissing": "Kuvaa ei ole saatavilla",
+    "ios": {
+      "downloadFromAppStore": "Lataa App Storesta",
+      "steps": {
+        "welcome": {
+          "description": "Tervetuloa iTAK-asennukseen",
+          "title": "Tervetuloa"
+        },
+        "tak-download": {
+          "description": "Lataa iTAK-sovellus App Storesta ja asenna se:",
+          "title": "Lataa"
+        },
+        "tak-package": {
+          "description": "Varmista, että alustasi on valittu oikein. Lataa sen jälkeen pakettisi.",
+          "title": "Paketin lataus"
+        },
+        "itak-setup": {
+          "description": "Avaa iTAK. Kun sovellus pyytää lupaa käyttää paikallisen verkon laitteita, älä salli sitä. SALLI kaikki muut luvat. Aseta kutsunimesi (callsign) vastaamaan Deploy App -sovelluksessa olevaa nimeä.",
+          "title": "iTAK-asennus"
+        },
+        "itak-settings": {
+          "description": "Asetukset löytyvät oikeasta yläkulmasta. Sieltä voit vaihtaa karttaa ja mieltymysasetuksia. Suositus: Muuta mieltymysasetuksista (preferences) yksiköt käyttämään MGRS-koordinaatteja ja metrisiä yksiköitä.",
+          "title": "Muuta asetuksia"
+        },
+        "itak-import": {
+          "description": "Avaa \"Packages\"-valikko ja lisää uusi paketti paikallisesta laitteesta. Valitse tiedosto, jonka latasit aiemmin.",
+          "title": "Tuo paketti"
+        },
+        "itak-sync1": {
+          "description": "Avaa \"Data Sync\"-valikko ja tilaa \"RECON\"-syöte.",
+          "title": "Data Sync (1/2)"
+        },
+        "itak-sync2": {
+          "description": "Palaa \"Data Sync\"-valikkoon ja suorita täysi synkronointi.",
+          "title": "Data Sync (2/2)"
         }
       }
     },
