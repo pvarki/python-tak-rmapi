@@ -32,6 +32,7 @@ repos:
     -   id: pretty-format-json
         args:
         - --autofix
+        exclude: ^ui/
 -   repo: https://github.com/psf/black
     rev: 25.11.0
     hooks:
@@ -86,7 +87,6 @@ repos:
     hooks:
     -   id: prettier
         files: ^ui/
-        exclude: \.json$
 -   repo: https://github.com/pre-commit/mirrors-eslint
     rev: v8.50.0
     hooks:
