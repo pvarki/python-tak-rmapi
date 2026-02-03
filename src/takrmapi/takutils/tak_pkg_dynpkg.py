@@ -45,9 +45,9 @@ class TAKDynPkgHelper:
             pkg_path=Path(config.TAK_DATAPACKAGE_TEMPLATES_FOLDER) / "general" / "Plugins" / "UAStool-Streaming",
             pkg_type="client",
         ),
-        "airguardian": TAKDynPkg(
-            name="airguardian",
-            pkg_path=Path(config.TAK_DATAPACKAGE_TEMPLATES_FOLDER) / "general" / "Plugins" / "Airguardian",
+        "airmarine": TAKDynPkg(
+            name="airmarine",
+            pkg_path=Path(config.TAK_DATAPACKAGE_TEMPLATES_FOLDER) / "general" / "Plugins" / "Airmarine",
             pkg_type="environment",
         ),
         "battlelog-mock": TAKDynPkg(
@@ -61,7 +61,7 @@ class TAKDynPkgHelper:
         """Post init"""
         self.mtx_check()
         self.battlelog_check()
-        self.airguard_check()
+        self.airmarine_check()
 
     @classmethod
     def enable_package(cls, name: str) -> None:
@@ -81,11 +81,11 @@ class TAKDynPkgHelper:
         LOGGER.debug("TODO remove jotain jotain...")
 
     @classmethod
-    def airguard_check(cls) -> None:
-        """Check if airguard is used in current environment"""
-        if config.AIRGUARD_API != "Not Available - ENV not set":
+    def airmarine_check(cls) -> None:
+        """Check if airmarine is used in current environment"""
+        if config.AIRMARINE_API != "Not Available - ENV not set":
             cls.dynpackages_available = True
-            cls.enable_package(name="airguardian")
+            cls.enable_package(name="airmarine")
 
     @classmethod
     def get_dyn_packages(cls, pkg_type: str = "all") -> List[TAKDataPackage]:
