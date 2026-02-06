@@ -30,6 +30,7 @@ class UserTAKTemplateVars:
     mtx_server_observer_port: ClassVar[int] = config.MTX_SERVER_OBSERVER_PORT
     mtx_server_observer_proto: ClassVar[str] = config.MTX_SERVER_OBSERVER_PROTO
     mtx_server_observer_net_proto: ClassVar[str] = config.MTX_SERVER_OBSERVER_NET_PROTO
+    airmarine_url: ClassVar[str] = config.AIRMARINE_API
 
     @property
     def tak_userfile_uid(self) -> str:

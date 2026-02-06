@@ -115,3 +115,4 @@ TAK_SERVER_NETWORKMESH_KEY_FILE: Path = cfg(
 TAK_SERVER_NETWORKMESH_KEY_STR: str = ""  # tak_init sets this variable
 
 AIRMARINE_API: str = cfg("AIRMARINE_API", cast=str, default="Not Available - ENV not set")
+AIRMARINE_URL: str = cfg("AIRMARINE_URL", cast=str, default="")
