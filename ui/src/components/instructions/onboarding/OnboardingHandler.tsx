@@ -322,7 +322,6 @@ export function OnboardingHandler() {
 
   const handleOpenChange = useCallback((newOpen: boolean) => {
     setOpen(newOpen);
-    // Don't auto-complete steps when just closing the dialog
   }, []);
 
   const handleNext = () => {
@@ -360,8 +359,8 @@ export function OnboardingHandler() {
   const imageUrl = isMobile && step.mobileImage ? step.mobileImage : step.image;
 
   const contentComponent = (
-    <div className="flex flex-col h-full max-h-[90vh]">
-      <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
+    <div className="flex flex-col h-full max-h-[85vh] w-full overflow-hidden">
+      <div className="flex-1 overflow-y-auto min-h-0 p-4 md:p-6 space-y-6">
         <div className="space-y-1">
           <h2 className="text-xl font-bold leading-tight">{t(step.title)}</h2>
           <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
@@ -421,7 +420,7 @@ export function OnboardingHandler() {
 
         <div
           className={cn(
-            "relative rounded-xl overflow-hidden aspect-video w-full border border-border shadow-sm bg-muted/20",
+            "relative rounded-xl overflow-hidden aspect-video w-full border border-border shadow-sm bg-muted/20 shrink-0",
             !imageError && !imageLoading && "cursor-pointer",
           )}
           onClick={() => !imageError && !imageLoading && setImageEnlarged(true)}
@@ -457,7 +456,7 @@ export function OnboardingHandler() {
         </div>
       </div>
 
-      <div className="p-4 border-t bg-background flex gap-3">
+      <div className="p-4 border-t bg-background flex gap-3 shrink-0 mt-auto">
         <Button
           variant="outline"
           onClick={() => currentStep > 0 && setCurrentStep((c) => c - 1)}
@@ -477,7 +476,7 @@ export function OnboardingHandler() {
         </Button>
       </div>
 
-      <div className="h-1.5 w-full bg-muted">
+      <div className="h-1.5 w-full bg-muted shrink-0">
         <div
           className="h-full bg-primary-light transition-all duration-500 ease-out"
           style={{ width: `${progress}%` }}
@@ -524,7 +523,7 @@ export function OnboardingHandler() {
         </Drawer>
       ) : (
         <Dialog open={open} onOpenChange={handleOpenChange}>
-          <DialogContent className="max-w-2xl p-0 overflow-hidden outline-none">
+          <DialogContent className="max-w-2xl max-h-[90vh] p-0 flex flex-col overflow-hidden outline-none">
             {contentComponent}
           </DialogContent>
         </Dialog>
