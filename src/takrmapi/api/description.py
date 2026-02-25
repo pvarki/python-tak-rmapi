@@ -90,7 +90,7 @@ async def return_product_description_extended(language: str) -> ProductDescripti
             icon="/ui/tak/taklogo.svg",
             description="Tilannekuvajärjestelmä",
             language="fi",
-            docs="https://docs.pvarki.fi/",
+            docs="https://docs.pvarki.fi/fi/docs/guides/tak-guide",
             component=ProductComponent(type="component", ref="/ui/tak/remoteEntry.js"),
         )
     if language == "sv":
@@ -100,7 +100,7 @@ async def return_product_description_extended(language: str) -> ProductDescripti
             icon="/ui/tak/taklogo.svg",
             description="Situationsbildsystem",
             language="sv",
-            docs="https://docs.pvarki.fi/",
+            docs="https://docs.pvarki.fi/sv/docs/guides/tak-guide",
             component=ProductComponent(type="component", ref="/ui/tak/remoteEntry.js"),
         )
     # Fall back to English
@@ -110,7 +110,7 @@ async def return_product_description_extended(language: str) -> ProductDescripti
         icon="/ui/tak/taklogo.svg",
         description="Situational awareness system",
         language="en",
-        docs="https://docs.pvarki.fi/",
+        docs="https://docs.pvarki.fi/en/docs/guides/tak-guide",
         component=ProductComponent(type="component", ref="/ui/tak/remoteEntry.js"),
     )
 
