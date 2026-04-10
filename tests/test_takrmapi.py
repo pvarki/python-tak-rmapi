@@ -8,6 +8,8 @@ from unittest import mock
 
 import pytest
 
+from fastapi import HTTPException
+
 from takrmapi import __version__
 from takrmapi.api.tak_missionpackage import (
     generate_encrypted_ephemeral_url_fragment,
@@ -24,7 +26,7 @@ def test_version() -> None:
 @pytest.fixture(autouse=True)
 def clear_encryption_keys() -> None:
     """Clear ephemeral keys between tests."""
-    TAKDataPackage._ephemeral_aes_key = b""
+    TAKDataPackage._ephemeral_aes_key = b""  # pylint: disable=protected-access
 
 
 @mock.patch("os.environ", {"TAKRMAPI_SECRET_KEY": base64.b64encode(token_bytes(32)).decode("utf-8")})
@@ -41,6 +43,23 @@ def test_ephemeral_link_generation() -> None:
     assert gotten_callsign == callsign
     assert gotten_uuid == uuid
     assert gotten_variant == "testvariant"
+
+
+@mock.patch("os.environ", {"TAKRMAPI_SECRET_KEY": base64.b64encode(token_bytes(32)).decode("utf-8")})
+def test_ephemeral_link_expired_audit_log(caplog: pytest.LogCaptureFixture) -> None:
+    """Verify that an expired ephemeral link (6 min old) raises 404 and generates an audit log entry."""
+    six_minutes_ago = time.time() - 360
+    callsign = "N0CALL"
+    uuid = "12345678-1234-5678-1234-567812345678"
+
+    encrypted_url = generate_encrypted_ephemeral_url_fragment(callsign, uuid, "testvariant", six_minutes_ago)
+
+    with caplog.at_level("AUDIT", logger="takrmapi.api.tak_missionpackage"):
+        with pytest.raises(HTTPException) as exc_info:
+            parse_encrypted_ephemeral_url_fragment(encrypted_url)
+
+    assert exc_info.value.status_code == 404
+    assert "Ephemeral link has expired." in caplog.text
 
 
 EXAMPLE_KEY = "zyygdR6MGvmCe+Dm5hDMdQqTJa7VNc451SyQrirUXUI="  # pragma: allowlist secret

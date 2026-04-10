@@ -192,7 +192,7 @@ def parse_encrypted_ephemeral_url_fragment(ephemeral_str: str) -> tuple[str, str
     user_uuid = decrypted_json["uuid"]
     link_generation_time = decrypted_json["request_time"]
     if link_generation_time + 300 < int(time.time()):
-        LOGGER.info("Ephemeral link has expired.")
+        LOGGER.audit("Ephemeral link has expired.")  # type: ignore[attr-defined]
         raise HTTPException(status_code=404, detail="User data not found")
 
     LOGGER.debug("Got the following data in ephemeral user payload: {}".format(decrypted_json))
