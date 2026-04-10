@@ -9,7 +9,7 @@ FROM ${TAKSERVER_IMAGE} as tak_server
 # Tox testsuite for multiple python version #
 #############################################
 FROM advian/tox-base:debian-bookworm as tox
-ARG PYTHON_VERSIONS="3.11 3.10 3.9 3.11"
+ARG PYTHON_VERSIONS="3.11 3.12 3.13 3.14"
 ARG POETRY_VERSION="2.2.1"
 RUN export RESOLVED_VERSIONS=`pyenv_resolve $PYTHON_VERSIONS` \
     && echo RESOLVED_VERSIONS=$RESOLVED_VERSIONS \
@@ -54,7 +54,7 @@ RUN apt-get update && apt-get install -y \
         tini \
         openssh-client \
         cargo \
-        python3.10 \
+        python3.11 \
         python3-pip \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/* \
@@ -130,7 +130,7 @@ RUN --mount=type=ssh apt-get update && apt-get install -y \
         openssh-client \
         curl \
         jq \
-        python3.10 \
+        python3.11 \
         python3-pip \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/* \
