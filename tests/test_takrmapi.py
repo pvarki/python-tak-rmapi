@@ -24,7 +24,7 @@ def test_version() -> None:
 @pytest.fixture(autouse=True)
 def clear_encryption_keys() -> None:
     """Clear ephemeral keys between tests."""
-    TAKDataPackage.ephemeral_key = b""
+    TAKDataPackage._ephemeral_aes_key = b""
 
 
 @mock.patch("os.environ", {"TAKRMAPI_SECRET_KEY": base64.b64encode(token_bytes(32)).decode("utf-8")})
@@ -49,6 +49,10 @@ EXAMPLE_KEY = "zyygdR6MGvmCe+Dm5hDMdQqTJa7VNc451SyQrirUXUI="  # pragma: allowlis
 @mock.patch("os.environ", {"TAKRMAPI_SECRET_KEY": EXAMPLE_KEY})
 def test_ephemeral_key_loading() -> None:
     """Verify that ephemeral key loading works as expected."""
-    assert TAKDataPackage.get_ephemeral_byteskey() != b""
-    assert len(TAKDataPackage.get_ephemeral_byteskey()) == 32
-    assert base64.b64encode(TAKDataPackage.get_ephemeral_byteskey()).decode("ascii") == EXAMPLE_KEY
+    assert TAKDataPackage.get_ephemeral_aes_key() != b""
+    assert len(TAKDataPackage.get_ephemeral_aes_key()) == 32
+    assert base64.b64encode(TAKDataPackage.get_ephemeral_aes_key()).decode("ascii") != EXAMPLE_KEY
+    assert len(TAKDataPackage.get_ephemeral_hmac_key()) == 32
+    assert base64.b64encode(TAKDataPackage.get_ephemeral_hmac_key()).decode("ascii") != EXAMPLE_KEY
+
+    assert TAKDataPackage.get_ephemeral_hmac_key() != TAKDataPackage.get_ephemeral_aes_key()
