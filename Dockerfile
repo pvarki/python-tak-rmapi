@@ -81,7 +81,7 @@ RUN --mount=type=ssh \
     && poetry export -f requirements.txt --without-hashes -o /tmp/requirements.txt \
     && pip3 wheel --wheel-dir=/tmp/wheelhouse -r /tmp/requirements.txt \
     && virtualenv /.venv && source /.venv/bin/activate && echo 'source /.venv/bin/activate' >>/root/.profile \
-    && pip3 install --no-deps --find-links=/tmp/wheelhouse/ /tmp/wheelhouse/*.whl \
+    && pip3 install --break-system-packages --no-deps --find-links=/tmp/wheelhouse/ -r /tmp/requirements.txt \
     && true
 
 
@@ -137,7 +137,7 @@ RUN --mount=type=ssh apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/* \
     && chmod a+x /docker-entrypoint.sh \
     && WHEELFILE=`echo /tmp/wheelhouse/takrmap*.whl` \
-    && pip3 install --index-url https://nexus.dev.pvarki.fi/repository/python/simple --find-links=/tmp/wheelhouse/ "$WHEELFILE"[all] \
+    && pip3 install --break-system-packages --index-url https://nexus.dev.pvarki.fi/repository/python/simple --find-links=/tmp/wheelhouse/ "$WHEELFILE"[all] \
     && rm -rf /tmp/wheelhouse/ \
     # Make some directories
     && mkdir -p /opt/tak/data/certs \
@@ -191,7 +191,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y zsh \
     && sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" \
     && echo "source /root/.profile" >>/root/.zshrc \
-    && pip3 install git-up \
+    && pip3 --break-system-packages install git-up \
     && ln -s /app/docker/container-init.sh /container-init.sh \
     && curl https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh -o /usr/bin/wait-for-it.sh \
     && chmod a+x /usr/bin/wait-for-it.sh \
