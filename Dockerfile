@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.1.7-experimental
 ARG TEMURIN_VERSION="17"
-ARG TAKSERVER_IMAGE="pvarki/takserver:5.3-RELEASE-24"
+ARG TAKSERVER_IMAGE="pvarki/takserver:5.7-RELEASE-8"
 
 # The local reference tak_server is used in future stages
 FROM ${TAKSERVER_IMAGE} as tak_server
