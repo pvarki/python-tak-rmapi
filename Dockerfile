@@ -26,7 +26,7 @@ RUN export RESOLVED_VERSIONS=`pyenv_resolve $PYTHON_VERSIONS` \
 ######################
 # Base builder image #
 ######################
-FROM eclipse-temurin:${TEMURIN_VERSION}-jammy as builder_base
+FROM eclipse-temurin:${TEMURIN_VERSION}-noble as builder_base
 #FROM python:3.11-bookworm as builder_base
 ENV \
   # locale
@@ -54,8 +54,9 @@ RUN apt-get update && apt-get install -y \
         tini \
         openssh-client \
         cargo \
-        python3.11 \
+        python3 \
         python3-pip \
+        python3-virtualenv  \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/* \
     # githublab ssh
@@ -74,8 +75,8 @@ SHELL ["/bin/bash", "-lc"]
 WORKDIR /pysetup
 COPY ./poetry.lock ./pyproject.toml /pysetup/
 # Install basic requirements (utilizing an internal docker wheelhouse if available)
-RUN --mount=type=ssh pip3 install wheel virtualenv \
-    && poetry self add poetry-plugin-pypi-mirror \
+RUN --mount=type=ssh \
+    poetry self add poetry-plugin-pypi-mirror \
     && poetry self add poetry-plugin-export \
     && poetry export -f requirements.txt --without-hashes -o /tmp/requirements.txt \
     && pip3 wheel --wheel-dir=/tmp/wheelhouse -r /tmp/requirements.txt \
@@ -108,7 +109,7 @@ RUN --mount=type=ssh source /.venv/bin/activate \
 #########################
 # Main production build #
 #########################
-FROM eclipse-temurin:${TEMURIN_VERSION}-jammy as production
+FROM eclipse-temurin:${TEMURIN_VERSION}-noble as production
 COPY --from=production_build /tmp/wheelhouse /tmp/wheelhouse
 COPY --from=production_build /ui_build /ui_build
 COPY --from=production_build /docker-entrypoint.sh /docker-entrypoint.sh
@@ -130,7 +131,7 @@ RUN --mount=type=ssh apt-get update && apt-get install -y \
         openssh-client \
         curl \
         jq \
-        python3.11 \
+        python3 \
         python3-pip \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/* \
