@@ -1,0 +1,19 @@
+{
+  "shortname": "tak",
+  "title": {
+    "en": "TAK: Team Awareness Kit",
+    "fi": "TAK: Team Awareness Kit",
+    "sv": "TAK: Team Awareness Kit"
+  },
+  "description": {
+    "en": "Situational awareness system",
+    "fi": "Tilannekuvajärjestelmä",
+    "sv": "Situationsbildsystem"
+  },
+  "icon": "/ui/tak/taklogo.svg",
+  "docs": "https://docs.pvarki.fi/",
+  "component": {
+    "type": "component",
+    "ref": "tak"
+  }
+}

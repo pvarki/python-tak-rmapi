@@ -27,8 +27,16 @@ export const MetadataProvider = ({
 
 export const useMetadata = () => {
   const context = useContext(MetaContext);
-  if (context === undefined) {
+  const isMock = import.meta.env.VITE_MOCK === "true";
+
+  if (!context && !isMock) {
     throw new Error("useMetadata must be used within a MetadataProvider");
   }
-  return context;
+
+  return (
+    context || {
+      theme: "default",
+      callsign: "Fighter01",
+    }
+  );
 };

@@ -6,6 +6,7 @@ import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig(({ mode }) => {
   const isProd = mode === "production";
+  const isMock = process.env.VITE_MOCK === "true";
 
   return {
     server: {
@@ -19,6 +20,7 @@ export default defineConfig(({ mode }) => {
         },
       },
     },
+    base: isMock && isProd ? "/ui/tak/" : "/",
     build: {
       target: "chrome89",
       emptyOutDir: true,
@@ -36,19 +38,15 @@ export default defineConfig(({ mode }) => {
         remotes: {},
         shared: {
           react: {
-            requiredVersion: "18.3.1",
             singleton: true,
           },
           i18next: {
-            requiredVersion: "25.6.2",
             singleton: true,
           },
           "react-i18next": {
-            requiredVersion: "16.3.3",
             singleton: true,
           },
           "@tanstack/react-router": {
-            requiredVersion: "1.135.2",
             singleton: true,
           },
         },
