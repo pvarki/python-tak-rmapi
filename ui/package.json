@@ -52,7 +52,9 @@
     "preview": "npm run build && vite preview --port 4174"
   },
   "msw": {
-    "workerDirectory": ["public"]
+    "workerDirectory": [
+      "public"
+    ]
   },
   "type": "module",
   "version": "0.0.0"

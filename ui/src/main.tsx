@@ -19,7 +19,7 @@ async function enableMocking() {
     onUnhandledRequest: "bypass",
     serviceWorker: { url: "/mockServiceWorker.js" },
   });
-  console.log("[MOCK] MSW enabled — TAK integration API calls are mocked");
+  console.log("[MOCK] MSW enabled, TAK integration API calls are mocked");
 }
 
 const rootRoute = createRootRoute({
@@ -58,12 +58,7 @@ const mtxRoute = createRoute({
       callsign: "DemoUser",
     };
 
-    return (
-      <App
-        data={{ tak_zips: MOCK_TAK_ZIPS }}
-        meta={MOCK_META}
-      />
-    );
+    return <App data={{ tak_zips: MOCK_TAK_ZIPS }} meta={MOCK_META} />;
   },
 });
 
