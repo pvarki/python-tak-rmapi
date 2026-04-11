@@ -115,7 +115,7 @@
   <entry key="lastDirectory" class="class java.lang.String">/storage/emulated/0/Download</entry>
   <!-- Additional security -->
   <entry key="certEnrollmentExport" class="class java.lang.Boolean">false</entry>
-  <!-- Connected to takserver conf -->  
+  <!-- Connected to takserver conf -->
   <entry key="broadcast_disable" class="class java.lang.Boolean">true</entry>
   <entry key="autoDisableMeshSAWhenStreaming" class="class java.lang.Boolean">true</entry>
   <!-- Plugin Settings -->
