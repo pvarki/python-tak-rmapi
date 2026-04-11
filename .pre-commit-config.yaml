@@ -99,3 +99,8 @@ repos:
           - "@typescript-eslint/eslint-plugin"
           - "eslint-plugin-react-hooks"
           - "eslint-plugin-react-refresh"
+-   repo: https://github.com/rhysd/actionlint
+    rev: "v1.7.8"
+    hooks:
+        - id: actionlint
+          args: ["-shellcheck", "''"]

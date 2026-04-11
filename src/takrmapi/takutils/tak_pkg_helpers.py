@@ -2,6 +2,7 @@
 
 import base64
 import binascii
+import hashlib
 from typing import List, Any, Dict, ClassVar
 import logging
 from dataclasses import dataclass, field
@@ -36,21 +37,22 @@ class TAKPkgVars:
     template_file_render_str: str
 
 
-def _get_secret_key_from_environ() -> bytes:
+def _get_secret_key_from_environ(key_descriptor: str = "KEY") -> bytes:
     """Fetch the secret key from the environment variable."""
 
     from_env = os.environ.get("TAKRMAPI_SECRET_KEY", "")
     try:
         key_candidate = base64.b64decode(from_env.encode("ascii"))
-    except (TypeError, binascii.Error):
-        LOGGER.warning("TAKRMAPI_SECRET_KEY is not valid base64 encoded string.")
-        return b""
+    except (TypeError, binascii.Error) as e:
+        raise RuntimeError("TAKRMAPI_SECRET_KEY is not valid base64 encoded string.") from e
 
-    if len(key_candidate) >= 32:
-        return key_candidate[:32]
+    if len(key_candidate) < 32:
+        raise RuntimeError("TAKRMAPI_SECRET_KEY is too short. It should be at least 32 bytes long.")
 
-    LOGGER.warning("TAKRMAPI_SECRET_KEY is too short. It should be at least 32 bytes long.")
-    return b""
+    sha256 = hashlib.sha256()
+    sha256.update(key_candidate)
+    sha256.update(key_descriptor.encode("ascii"))
+    return sha256.digest()
 
 
 @dataclass
@@ -61,7 +63,8 @@ class TAKDataPackage:
     template_type: str
 
     _pkgvars: TAKPkgVars = field(init=False)
-    ephemeral_key: ClassVar[bytes] = b""
+    _ephemeral_aes_key: ClassVar[bytes] = b""
+    _ephemeral_hmac_key: ClassVar[bytes] = b""
 
     # TODO savolaiset muuttujat
     # _zip_path: Path = field(init=False)
@@ -99,14 +102,20 @@ class TAKDataPackage:
         )
 
     @classmethod
-    def get_ephemeral_byteskey(cls) -> bytes:
+    def get_ephemeral_aes_key(cls) -> bytes:
         """Return key for ephemeral file requests"""
-        if not cls.ephemeral_key:
-            cls.ephemeral_key = _get_secret_key_from_environ()
-            if not cls.ephemeral_key:
-                raise RuntimeError("Ephemeral key not set!")
+        if not cls._ephemeral_aes_key:
+            cls._ephemeral_aes_key = _get_secret_key_from_environ("AESKEY")
 
-        return cls.ephemeral_key
+        return cls._ephemeral_aes_key
+
+    @classmethod
+    def get_ephemeral_hmac_key(cls) -> bytes:
+        """Return key for ephemeral file requests"""
+        if not cls._ephemeral_hmac_key:
+            cls._ephemeral_hmac_key = _get_secret_key_from_environ("HMACKEY")
+
+        return cls._ephemeral_hmac_key
 
     @property
     def is_folder(self) -> bool:

@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.1.7-experimental
 ARG TEMURIN_VERSION="17"
-ARG TAKSERVER_IMAGE="pvarki/takserver:5.3-RELEASE-24"
+ARG TAKSERVER_IMAGE="pvarki/takserver:5.7-RELEASE-8"
 
 # The local reference tak_server is used in future stages
 FROM ${TAKSERVER_IMAGE} as tak_server
@@ -9,7 +9,7 @@ FROM ${TAKSERVER_IMAGE} as tak_server
 # Tox testsuite for multiple python version #
 #############################################
 FROM advian/tox-base:debian-bookworm as tox
-ARG PYTHON_VERSIONS="3.11 3.10 3.9 3.11"
+ARG PYTHON_VERSIONS="3.11 3.12 3.13 3.14"
 ARG POETRY_VERSION="2.2.1"
 RUN export RESOLVED_VERSIONS=`pyenv_resolve $PYTHON_VERSIONS` \
     && echo RESOLVED_VERSIONS=$RESOLVED_VERSIONS \
@@ -26,7 +26,7 @@ RUN export RESOLVED_VERSIONS=`pyenv_resolve $PYTHON_VERSIONS` \
 ######################
 # Base builder image #
 ######################
-FROM eclipse-temurin:${TEMURIN_VERSION}-jammy as builder_base
+FROM eclipse-temurin:${TEMURIN_VERSION}-noble as builder_base
 #FROM python:3.11-bookworm as builder_base
 ENV \
   # locale
@@ -54,8 +54,9 @@ RUN apt-get update && apt-get install -y \
         tini \
         openssh-client \
         cargo \
-        python3.10 \
+        python3 \
         python3-pip \
+        python3-virtualenv  \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/* \
     # githublab ssh
@@ -74,13 +75,13 @@ SHELL ["/bin/bash", "-lc"]
 WORKDIR /pysetup
 COPY ./poetry.lock ./pyproject.toml /pysetup/
 # Install basic requirements (utilizing an internal docker wheelhouse if available)
-RUN --mount=type=ssh pip3 install wheel virtualenv \
-    && poetry self add poetry-plugin-pypi-mirror \
+RUN --mount=type=ssh \
+    poetry self add poetry-plugin-pypi-mirror \
     && poetry self add poetry-plugin-export \
     && poetry export -f requirements.txt --without-hashes -o /tmp/requirements.txt \
     && pip3 wheel --wheel-dir=/tmp/wheelhouse -r /tmp/requirements.txt \
     && virtualenv /.venv && source /.venv/bin/activate && echo 'source /.venv/bin/activate' >>/root/.profile \
-    && pip3 install --no-deps --find-links=/tmp/wheelhouse/ /tmp/wheelhouse/*.whl \
+    && pip3 install --break-system-packages --no-deps --find-links=/tmp/wheelhouse/ -r /tmp/requirements.txt \
     && true
 
 
@@ -108,7 +109,7 @@ RUN --mount=type=ssh source /.venv/bin/activate \
 #########################
 # Main production build #
 #########################
-FROM eclipse-temurin:${TEMURIN_VERSION}-jammy as production
+FROM eclipse-temurin:${TEMURIN_VERSION}-noble as production
 COPY --from=production_build /tmp/wheelhouse /tmp/wheelhouse
 COPY --from=production_build /ui_build /ui_build
 COPY --from=production_build /docker-entrypoint.sh /docker-entrypoint.sh
@@ -130,13 +131,13 @@ RUN --mount=type=ssh apt-get update && apt-get install -y \
         openssh-client \
         curl \
         jq \
-        python3.10 \
+        python3 \
         python3-pip \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/* \
     && chmod a+x /docker-entrypoint.sh \
     && WHEELFILE=`echo /tmp/wheelhouse/takrmap*.whl` \
-    && pip3 install --index-url https://nexus.dev.pvarki.fi/repository/python/simple --find-links=/tmp/wheelhouse/ "$WHEELFILE"[all] \
+    && pip3 install --break-system-packages --index-url https://nexus.dev.pvarki.fi/repository/python/simple --find-links=/tmp/wheelhouse/ "$WHEELFILE"[all] \
     && rm -rf /tmp/wheelhouse/ \
     # Make some directories
     && mkdir -p /opt/tak/data/certs \
@@ -190,7 +191,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y zsh \
     && sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" \
     && echo "source /root/.profile" >>/root/.zshrc \
-    && pip3 install git-up \
+    && pip3 --break-system-packages install git-up \
     && ln -s /app/docker/container-init.sh /container-init.sh \
     && curl https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh -o /usr/bin/wait-for-it.sh \
     && chmod a+x /usr/bin/wait-for-it.sh \

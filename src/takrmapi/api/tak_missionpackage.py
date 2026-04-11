@@ -9,7 +9,7 @@ import time
 import os
 import json
 import secrets
-from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives import hashes, hmac
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
@@ -28,17 +28,13 @@ router = APIRouter(dependencies=[Depends(MTLSHeader(auto_error=True))])
 ephemeral_router = APIRouter()
 
 
-def hash_from_str(hash_from: str) -> str:
+def hash_from_str(hash_from: str, hmac_key: bytes) -> str:
     """Return checksum string from given string"""
-    ct_digest = hashes.Hash(hashes.SHA256())
+    # ct_digest = hashes.Hash(hashes.SHA256())
+    ct_digest = hmac.HMAC(hmac_key, hashes.SHA256())
     ct_digest.update(hash_from.encode("ascii"))
     ct_dig = ct_digest.finalize()
-    try:
-        ct_dig_str = binascii.hexlify(ct_dig).decode()
-    except binascii.Error as e:
-        LOGGER.info("Unable to convert digest bin to string. Possible malformed query.")
-        LOGGER.debug(e)
-        return "err"
+    ct_dig_str = binascii.hexlify(ct_dig).decode()
 
     return ct_dig_str
 
@@ -132,19 +128,20 @@ def generate_encrypted_ephemeral_url_fragment(
     user_callsign: str, user_uuid: str, variant: str, request_time: float
 ) -> str:
     """Return encrypted ephemeral url"""
-    plaintext_str: str = json.dumps({"callsign": user_callsign, "uuid": user_uuid, "variant": variant})
+    plaintext_str: str = json.dumps(
+        {"callsign": user_callsign, "uuid": user_uuid, "variant": variant, "request_time": request_time}
+    )
     iv = os.urandom(12)
-    encryptor = Cipher(algorithms.AES(TAKDataPackage.get_ephemeral_byteskey()), modes.GCM(iv)).encryptor()
+    encryptor = Cipher(algorithms.AES(TAKDataPackage.get_ephemeral_aes_key()), modes.GCM(iv)).encryptor()
     user_payload: bytes = encryptor.update(plaintext_str.encode("ascii")) + encryptor.finalize()
     user_payload_b64: str = base64.b64encode(user_payload).decode("ascii")
     iv_b64: str = base64.b64encode(iv).decode("ascii")
-    payload_digest: str = hash_from_str(user_payload_b64 + iv_b64 + str(request_time))
+    payload_digest: str = hash_from_str(user_payload_b64 + iv_b64, TAKDataPackage.get_ephemeral_hmac_key())
     encode: str = base64.b64encode(
         json.dumps(
             {
                 "payload_b64": user_payload_b64,
                 "iv_b64": iv_b64,
-                "request_time": request_time,
                 "digest": payload_digest,
             }
         ).encode("ascii")
@@ -166,13 +163,9 @@ def parse_encrypted_ephemeral_url_fragment(ephemeral_str: str) -> tuple[str, str
         raise HTTPException(status_code=404, detail="User data not found") from exc
 
     ephemeral_json = json.loads(e_decoded)
-    if ephemeral_json["request_time"] + 300 < int(time.time()):
-        LOGGER.info("Ephemeral link has expired.")
-        raise HTTPException(status_code=404, detail="User data not found")
 
-    # TODO: probably should be a keyed hash to catch attempts to pass an incorrect link early
     payload_digest: str = hash_from_str(
-        ephemeral_json["payload_b64"] + ephemeral_json["iv_b64"] + str(ephemeral_json["request_time"])
+        ephemeral_json["payload_b64"] + ephemeral_json["iv_b64"], TAKDataPackage.get_ephemeral_hmac_key()
     )
     if payload_digest != ephemeral_json["digest"]:
         LOGGER.info(
@@ -185,7 +178,7 @@ def parse_encrypted_ephemeral_url_fragment(ephemeral_str: str) -> tuple[str, str
     iv: bytes = base64.b64decode(ephemeral_json["iv_b64"].encode("ascii"))
     user_payload: bytes = base64.b64decode(ephemeral_json["payload_b64"].encode("ascii"))
 
-    decryptor = Cipher(algorithms.AES(TAKDataPackage.get_ephemeral_byteskey()), modes.GCM(iv)).encryptor()
+    decryptor = Cipher(algorithms.AES(TAKDataPackage.get_ephemeral_aes_key()), modes.GCM(iv)).encryptor()
     decrypted_payload = decryptor.update(user_payload) + decryptor.finalize()
 
     try:
@@ -197,6 +190,10 @@ def parse_encrypted_ephemeral_url_fragment(ephemeral_str: str) -> tuple[str, str
     variant = decrypted_json["variant"]
     callsign = decrypted_json["callsign"]
     user_uuid = decrypted_json["uuid"]
+    link_generation_time = decrypted_json["request_time"]
+    if link_generation_time + 300 < int(time.time()):
+        LOGGER.audit("Ephemeral link has expired.")  # type: ignore[attr-defined]
+        raise HTTPException(status_code=404, detail="User data not found")
 
     LOGGER.debug("Got the following data in ephemeral user payload: {}".format(decrypted_json))
 
