@@ -15,13 +15,14 @@ from jinja2 import Template
 
 from libpvarki.mtlshelp.pkcs12 import convert_pem_to_pkcs12
 from takrmapi import config
+from takrmapi.takutils.env_helpers import env_float
 from takrmapi.takutils.tak_helpers import UserCRUD, Helpers
 from takrmapi.takutils.tak_pkg_vars import TAKDataPackagePathVars, TAKViteAssetVars, UserTAKTemplateVars
 
 
 LOGGER = logging.getLogger(__name__)
 SHELL_TIMEOUT = 5.0
-KEYPAIR_TIMEOUT = 5.0
+KEYPAIR_TIMEOUT = env_float("TAK_RMAPI_KEYPAIR_TIMEOUT", 5.0, max_value=600.0)
 
 
 @dataclass
