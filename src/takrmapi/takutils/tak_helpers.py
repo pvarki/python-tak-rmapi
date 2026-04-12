@@ -21,8 +21,8 @@ from takrmapi import config
 
 
 LOGGER = logging.getLogger(__name__)
-SHELL_TIMEOUT = 5.0
-KEYPAIR_TIMEOUT = 5.0
+SHELL_TIMEOUT = os.getenv("TAK_RMAPI_SHELL_TIMEOUT", 5.0)
+KEYPAIR_TIMEOUT = os.getenv("TAK_RMAPI_KEYPAIR_TIMEOUT", 5.0)
 
 # FIXME: Convert the helpers to dataclasses
 
