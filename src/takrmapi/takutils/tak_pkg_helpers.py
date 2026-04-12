@@ -21,7 +21,6 @@ from takrmapi.takutils.tak_pkg_vars import TAKDataPackagePathVars, TAKViteAssetV
 
 
 LOGGER = logging.getLogger(__name__)
-SHELL_TIMEOUT = 5.0
 KEYPAIR_TIMEOUT = env_float("TAK_RMAPI_KEYPAIR_TIMEOUT", 5.0, max_value=600.0)
 
 

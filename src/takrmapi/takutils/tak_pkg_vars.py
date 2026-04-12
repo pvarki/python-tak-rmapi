@@ -11,8 +11,6 @@ from takrmapi.takutils.tak_helpers import UserCRUD
 
 
 LOGGER = logging.getLogger(__name__)
-SHELL_TIMEOUT = 5.0
-KEYPAIR_TIMEOUT = 5.0
 
 
 @dataclass
