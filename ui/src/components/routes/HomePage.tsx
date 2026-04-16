@@ -70,7 +70,7 @@ export const HomePage = () => {
   }, [platform, data?.tak_zips]);
 
   return (
-    <div className="max-w-3xl mx-auto p-4">
+    <div data-testid="home-page" className="max-w-3xl mx-auto p-4">
       <div>
         <h1 className="text-2xl font-bold text-center">{t("intro.title")}</h1>
         <div className="text-muted-foreground text-center mt-2">
@@ -83,23 +83,38 @@ export const HomePage = () => {
           <p className="text-center">{t("platform.choose")}</p>
           <div className="w-full mt-2">
             <Select value={platform} onValueChange={handlePlatformChange}>
-              <SelectTrigger className="w-full">
+              <SelectTrigger
+                data-testid="platform-select-trigger"
+                className="w-full"
+              >
                 <SelectValue placeholder={t("platform.select_placeholder")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={Platform.Android}>
+                <SelectItem
+                  data-testid="platform-option-android"
+                  value={Platform.Android}
+                >
                   <img src="/ui/tak/android.svg" className="h-4 inline mr-2" />{" "}
                   {t("platform.android")}
                 </SelectItem>
-                <SelectItem value={Platform.iOS}>
+                <SelectItem
+                  data-testid="platform-option-ios"
+                  value={Platform.iOS}
+                >
                   <img src="/ui/tak/apple.svg" className="h-4 inline mr-2" />{" "}
                   {t("platform.ios")}
                 </SelectItem>
-                <SelectItem value={Platform.Windows}>
+                <SelectItem
+                  data-testid="platform-option-windows"
+                  value={Platform.Windows}
+                >
                   <img src="/ui/tak/windows.svg" className="h-4 inline mr-2" />{" "}
                   {t("platform.windows")}
                 </SelectItem>
-                <SelectItem value={Platform.Tracker}>
+                <SelectItem
+                  data-testid="platform-option-tracker"
+                  value={Platform.Tracker}
+                >
                   <img src="/ui/tak/android.svg" className="h-4 inline mr-1" />{" "}
                   / <img src="/ui/tak/apple.svg" className="h-4 inline ml-1" />{" "}
                   {t("platform.tracker")}
@@ -115,7 +130,10 @@ export const HomePage = () => {
           </div>
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center w-full mt-8">
+        <div
+          data-testid="home-loading"
+          className="flex flex-col items-center justify-center w-full mt-8"
+        >
           <Spinner className="size-8 mb-4" />
           <p className="text-accent-foreground">{t("loading.user_data")}</p>
         </div>

@@ -12,11 +12,12 @@ export function IosTab({ zip }: Props) {
   const { t } = useTranslation("tak");
 
   return (
-    <div className="mt-4">
+    <div data-testid="tab-ios" className="mt-4">
       <p className="text-lg font-semibold">{t("tabs.ios.title")}</p>
       <div className="font-normal">
         <p>{t("tabs.ios.step1_download")}</p>
         <ZipButton
+          data-testid="download-package-button-ios"
           data={zip.data}
           text={zip.title}
           filename={zip.filename}
@@ -27,7 +28,9 @@ export function IosTab({ zip }: Props) {
         <p className="mb-2">{t("tabs.ios.instructions_short")}</p>
         <Button asChild variant="secondary">
           {/* eslint-disable-next-line */}
-          <Link to={"/ios/1" as any}>{t("tabs.ios.open_instructions")}</Link>
+          <Link data-testid="open-instructions-link" to={"/ios/1" as any}>
+            {t("tabs.ios.open_instructions")}
+          </Link>
         </Button>
       </div>
     </div>

@@ -55,13 +55,16 @@ export const InstructionsWizard: React.FC<InstructionsWizardProps> = ({
   };
 
   return (
-    <div className="flex flex-col h-screen">
+    <div data-testid="instruction-wizard" className="flex flex-col h-screen">
       {/* Top bar */}
       <div className="px-6 pt-6 pb-4 space-y-2">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold">
             {showPhaseNumbers && (
-              <span className="text-sm text-muted-foreground">
+              <span
+                data-testid="wizard-step-counter"
+                className="text-sm text-muted-foreground"
+              >
                 {t("wizard.step_counter", {
                   current: currentPhaseIndex + 1,
                   total: phases.length,
@@ -73,7 +76,9 @@ export const InstructionsWizard: React.FC<InstructionsWizardProps> = ({
         <Progress value={progressPercentage} />
       </div>
 
-      <h1 className="text-2xl font-bold px-6">{currentPhase.title}</h1>
+      <h1 data-testid="wizard-title" className="text-2xl font-bold px-6">
+        {currentPhase.title}
+      </h1>
 
       <div className="px-6 py-6">
         <Outlet />
@@ -82,6 +87,7 @@ export const InstructionsWizard: React.FC<InstructionsWizardProps> = ({
       {/* Navigation  */}
       <div className="w-full bg-background border-t p-4 md:p-6 flex items-center justify-between gap-2">
         <Button
+          data-testid="wizard-previous"
           variant="outline"
           onClick={handlePrevious}
           disabled={currentPhaseIndex <= 0}
@@ -96,6 +102,7 @@ export const InstructionsWizard: React.FC<InstructionsWizardProps> = ({
           {phases.map((_, index) => (
             <button
               key={index}
+              data-testid={`wizard-phase-dot-${index + 1}`}
               onClick={() => handlePhaseClick(index)}
               className={`rounded-full transition-all ${
                 index === currentPhaseIndex
@@ -108,6 +115,7 @@ export const InstructionsWizard: React.FC<InstructionsWizardProps> = ({
         </div>
 
         <Button
+          data-testid="wizard-next"
           onClick={handleNext}
           className="gap-2 px-4 py-2 md:py-3 shrink-0"
         >

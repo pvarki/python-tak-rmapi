@@ -10,13 +10,14 @@ export function TrackerTab({ zip }: Props) {
   const { t } = useTranslation("tak");
 
   return (
-    <div className="mt-4">
+    <div data-testid="tab-tracker" className="mt-4">
       <p className="text-lg font-semibold">{t("tabs.tracker.title")}</p>
       <ol className="list-decimal list-inside space-y-4 mt-4">
         <li>
           {t("tabs.tracker.step1_download")}
           <br />
           <ZipButton
+            data-testid="download-package-button-tracker"
             data={zip.data}
             text={zip.title}
             filename={zip.filename}
