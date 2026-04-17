@@ -1,12 +1,16 @@
 import { test, expect } from "@fixtures/admin";
-import { gotoHome, setLanguage, suppressTakOnboarding } from "./helpers";
+import {
+  gotoProductRoute,
+  setLanguage,
+  suppressProductOnboarding,
+} from "@helpers/product";
 
 test.describe("android flow", () => {
   test.beforeEach(async ({ page }) => {
     await setLanguage(page, "en");
-    await suppressTakOnboarding(page);
+    await suppressProductOnboarding(page, "tak");
 
-    await gotoHome(page);
+    await gotoProductRoute(page, "tak");
     await page.getByTestId("platform-select-trigger").click();
     await page.getByTestId("platform-option-android").click();
     await expect(page.getByTestId("tab-android")).toBeVisible();

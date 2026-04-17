@@ -1,5 +1,9 @@
 import { test, expect } from "@fixtures/admin";
-import { gotoHome, setLanguage, suppressTakOnboarding } from "./helpers";
+import {
+  gotoProductRoute,
+  setLanguage,
+  suppressProductOnboarding,
+} from "@helpers/product";
 
 type PlatformExpectation = {
   platform: "android" | "ios" | "windows" | "tracker";
@@ -33,9 +37,9 @@ const PLATFORM_EXPECTATIONS: PlatformExpectation[] = [
 test.describe("home page", () => {
   test.beforeEach(async ({ page }) => {
     await setLanguage(page, "en");
-    await suppressTakOnboarding(page);
+    await suppressProductOnboarding(page, "tak");
 
-    await gotoHome(page);
+    await gotoProductRoute(page, "tak");
   });
 
   test("renders home and supports platform switching", async ({ page }) => {

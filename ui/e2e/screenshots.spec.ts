@@ -4,11 +4,15 @@ import type { Page, TestInfo } from "@playwright/test";
 import {
   SCREENSHOTS_ENABLED,
   THEME,
-  LANGUAGES,
+  SCREENSHOT_LANGUAGES,
   SCREENSHOT_DIR,
   captureFullPage,
 } from "@helpers/screenshots";
-import { gotoTakRoute, setLanguage, suppressTakOnboarding } from "./helpers";
+import {
+  gotoProductRoute,
+  setLanguage,
+  suppressProductOnboarding,
+} from "@helpers/product";
 
 type PlatformName = "android" | "ios" | "windows";
 
@@ -35,16 +39,10 @@ const PLATFORM_SCREENSHOTS: Array<{
 ];
 
 const screenshotPath = (testInfo: TestInfo, lang: string, name: string) =>
-  path.join(
-    SCREENSHOT_DIR,
-    THEME,
-    `takintegration-${testInfo.project.name}`,
-    lang,
-    `${name}.png`,
-  );
+  path.join(SCREENSHOT_DIR, THEME, testInfo.project.name, lang, `${name}.png`);
 
 async function reloadWithOnboardingSuppressed(page: Page): Promise<void> {
-  await suppressTakOnboarding(page);
+  await suppressProductOnboarding(page, "tak");
   await page.reload();
   await expect(page.getByTestId("home-page")).toBeVisible();
 }
@@ -62,12 +60,12 @@ async function selectPlatform(
 test.describe("screenshots", () => {
   test.skip(!SCREENSHOTS_ENABLED, "set SCREENSHOTS=1 to capture screenshots");
 
-  for (const lang of LANGUAGES) {
+  for (const lang of SCREENSHOT_LANGUAGES) {
     test.describe(`language: ${lang}`, () => {
       test("core screenshots", async ({ page }, testInfo) => {
         await setLanguage(page, lang);
 
-        await gotoTakRoute(page);
+        await gotoProductRoute(page, "tak");
         await expect(page.getByTestId("home-page")).toBeVisible();
         await expect(page.getByTestId("onboarding-dialog")).toBeVisible();
 
