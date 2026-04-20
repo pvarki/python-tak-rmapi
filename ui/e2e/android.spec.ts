@@ -6,7 +6,11 @@ import {
 } from "@helpers/product";
 
 test.describe("android flow", () => {
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async ({ page, adminMeta }) => {
+    test.skip(
+      adminMeta.compose_project !== "rmlocal",
+      "android quick-import flow requires the rmlocal stack",
+    );
     await setLanguage(page, "en");
     await suppressProductOnboarding(page, "tak");
 
@@ -16,7 +20,7 @@ test.describe("android flow", () => {
     await expect(page.getByTestId("tab-android")).toBeVisible();
   });
 
-  test("android quick-import flow works", async ({ page }) => {
+  test("android quick-import flow loads", async ({ page }) => {
     await expect(
       page.getByTestId("download-package-button-android"),
     ).toBeVisible();

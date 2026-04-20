@@ -62,7 +62,7 @@ test.describe("screenshots", () => {
 
   for (const lang of SCREENSHOT_LANGUAGES) {
     test.describe(`language: ${lang}`, () => {
-      test("core screenshots", async ({ page }, testInfo) => {
+      test("core screenshots", async ({ page, adminMeta }, testInfo) => {
         await setLanguage(page, lang);
 
         await gotoProductRoute(page, "tak");
@@ -90,6 +90,11 @@ test.describe("screenshots", () => {
               `${platform.name}-package-download-tab`,
             ),
           );
+        }
+
+        // Quick-import needs rmlocal
+        if (adminMeta.compose_project !== "rmlocal") {
+          return;
         }
 
         await selectPlatform(page, "android", "tab-android");
