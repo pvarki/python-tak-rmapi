@@ -48,5 +48,5 @@
     "preview": "npm run build && vite preview --port 4174"
   },
   "type": "module",
-  "version": "0.0.0"
+  "version": "1.12.1+260427"
 }
