@@ -6,5 +6,5 @@ then
   git add .
 fi
 set -e
-uv run pre-commit install --install-hooks
-uv run pre-commit run --all-files
+uv run prek install
+uv run prek run --all-files
