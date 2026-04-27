@@ -25,6 +25,7 @@ repos:
     -   id: check-added-large-files
         args:
         - --maxkb=999
+        exclude: 'uv.lock'
     -   id: check-case-conflict
     -   id: check-json
     -   id: check-merge-conflict
@@ -70,18 +71,17 @@ repos:
     hooks:
     -   id: detect-secrets
         language: system
-        exclude: "poetry\\.lock|tests/data/.*|ui/pnpm-lock\\.yaml"
+        exclude: "uv\\.lock|tests/data/.*|ui/pnpm-lock\\.yaml"
         # args: ['--baseline', '.secrets.baseline']
 -   repo: https://github.com/shellcheck-py/shellcheck-py
     rev: v0.9.0.6
     hooks:
     -   id: shellcheck
         args: ["--external-sources"]
--   repo: https://github.com/python-poetry/poetry
-    rev: '2.2.1'
+-   repo: https://github.com/astral-sh/uv-pre-commit
+    rev: '0.11.6'
     hooks:
-    -   id: poetry-check
-    -   id: poetry-lock
+    -   id: uv-lock
 -   repo: https://github.com/pre-commit/mirrors-prettier
     rev: v3.0.3
     hooks:
