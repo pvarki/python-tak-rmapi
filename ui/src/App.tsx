@@ -102,7 +102,7 @@ export default function App({ data, meta }: Props) {
 
   const { t, i18n } = useTranslation(PRODUCT_SHORTNAME);
   const router = useMemo(
-    () => createRouter({ routeTree, basepath: "/product/tak" }),
+    () => createRouter({ routeTree, basepath: "/product/tak", context: data }),
     [data],
   );
 

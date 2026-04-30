@@ -12,6 +12,16 @@ import {
   redirect,
 } from "@tanstack/react-router";
 
+async function enableMocking() {
+  if (import.meta.env.VITE_MOCK !== "true") return;
+  const { worker } = await import("./mocks/browser");
+  await worker.start({
+    onUnhandledRequest: "bypass",
+    serviceWorker: { url: "/mockServiceWorker.js" },
+  });
+  console.log("[MOCK] MSW enabled, TAK integration API calls are mocked");
+}
+
 const rootRoute = createRootRoute({
   component: () => (
     <>
@@ -24,12 +34,31 @@ const mtxRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "product/tak/$",
   component: () => {
-    const SAMPLE_DATA = {
-      data: {},
+    // Mock TAK zip data for each platform (Android/ATAK, iOS/ITAK, Tracker)
+    const MOCK_TAK_ZIPS = [
+      {
+        title: "ATAK Package (Demo)",
+        filename: "demo-atak.zip",
+        data: "data:application/zip;base64,UEsFBgAAAAAAAAAAAAAAAAAAAAAAAA==",
+      },
+      {
+        title: "iTAK Package (Demo)",
+        filename: "demo-itak.zip",
+        data: "data:application/zip;base64,UEsFBgAAAAAAAAAAAAAAAAAAAAAAAA==",
+      },
+      {
+        title: "Tracker Package (Demo)",
+        filename: "demo-tracker.zip",
+        data: "data:application/zip;base64,UEsFBgAAAAAAAAAAAAAAAAAAAAAAAA==",
+      },
+    ];
+
+    const MOCK_META = {
+      theme: "default",
+      callsign: "DemoUser",
     };
 
-    // @ts-ignore
-    return <App data={SAMPLE_DATA.data} />;
+    return <App data={{ tak_zips: MOCK_TAK_ZIPS }} meta={MOCK_META} />;
   },
 });
 
@@ -59,8 +88,10 @@ if (__USE_GLOBAL_CSS__ == true) {
   import("./index.css");
 }
 
-ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-  <React.StrictMode>
-    <RouterProvider router={router} />
-  </React.StrictMode>,
-);
+enableMocking().then(() => {
+  ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
+    <React.StrictMode>
+      <RouterProvider router={router} />
+    </React.StrictMode>,
+  );
+});

@@ -12,16 +12,32 @@ interface UserTypeContextProps {
   isValidUser: boolean;
 }
 
-export const UserTypeContext = createContext<UserTypeContextProps>({
-  userType: null,
-  isLoading: true,
-  error: null,
-  authType: null,
-  otpVerified: false,
-  setOtpVerified: () => {
-    // Placeholder function
-  },
-  redirectTo: null,
-  callsign: null,
-  isValidUser: false,
-});
+const isMock = import.meta.env.VITE_MOCK === "true";
+
+export const UserTypeContext = createContext<UserTypeContextProps>(
+  isMock
+    ? {
+        userType: "user",
+        isLoading: false,
+        error: null,
+        authType: "mtls",
+        otpVerified: true,
+        setOtpVerified: () => {},
+        redirectTo: null,
+        callsign: "Fighter01",
+        isValidUser: true,
+      }
+    : {
+        userType: null,
+        isLoading: true,
+        error: null,
+        authType: null,
+        otpVerified: false,
+        setOtpVerified: () => {
+          // Placeholder function
+        },
+        redirectTo: null,
+        callsign: null,
+        isValidUser: false,
+      },
+);
