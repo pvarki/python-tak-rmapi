@@ -359,7 +359,10 @@ export function OnboardingHandler() {
   const imageUrl = isMobile && step.mobileImage ? step.mobileImage : step.image;
 
   const contentComponent = (
-    <div className="flex flex-col h-full max-h-[85vh] w-full overflow-hidden">
+    <div
+      data-testid="onboarding-content"
+      className="flex flex-col h-full max-h-[85vh] w-full overflow-hidden"
+    >
       <div className="flex-1 overflow-y-auto min-h-0 p-4 md:p-6 space-y-6">
         <div className="space-y-1">
           <h2 className="text-xl font-bold leading-tight">{t(step.title)}</h2>
@@ -489,6 +492,7 @@ export function OnboardingHandler() {
     <>
       {!open && (
         <button
+          data-testid="onboarding-open-button"
           onClick={() => {
             const firstIncomplete = relevantSteps.findIndex(
               (s) => !completed.includes(s.id),
@@ -519,11 +523,16 @@ export function OnboardingHandler() {
 
       {isMobile ? (
         <Drawer open={open} onOpenChange={handleOpenChange}>
-          <DrawerContent>{contentComponent}</DrawerContent>
+          <DrawerContent data-testid="onboarding-dialog">
+            {contentComponent}
+          </DrawerContent>
         </Drawer>
       ) : (
         <Dialog open={open} onOpenChange={handleOpenChange}>
-          <DialogContent className="max-w-2xl max-h-[90vh] p-0 flex flex-col overflow-hidden outline-none">
+          <DialogContent
+            data-testid="onboarding-dialog"
+            className="max-w-2xl max-h-[90vh] p-0 flex flex-col overflow-hidden outline-none"
+          >
             {contentComponent}
           </DialogContent>
         </Dialog>

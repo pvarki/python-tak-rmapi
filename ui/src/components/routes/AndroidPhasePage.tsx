@@ -18,10 +18,11 @@ export const AndroidPhasePage = () => {
   const { phaseId } = useParams({ from: "/android/$phaseId" });
   const PhaseComponent = PHASE_MAP[phaseId];
 
-  if (!PhaseComponent) return <div>Invalid phase: {phaseId}</div>;
+  if (!PhaseComponent)
+    return <div data-testid="phase-invalid">Invalid phase: {phaseId}</div>;
 
   return (
-    <div className="max-w-5xl">
+    <div data-testid={`phase-android-${phaseId}`} className="max-w-5xl">
       <PhaseComponent />
     </div>
   );

@@ -47,10 +47,13 @@ export function AndroidTab({ zip }: Props) {
   };
 
   return (
-    <div className="mt-4">
+    <div data-testid="tab-android" className="mt-4">
       <p className="text-lg font-semibold">{t("tabs.android.title")}</p>
       <div className="font-normal">
-        <Button onClick={() => void handleOpenATAK()}>
+        <Button
+          data-testid="open-atak-button"
+          onClick={() => void handleOpenATAK()}
+        >
           {t("tabs.android.open_atak")}
         </Button>
 
@@ -58,6 +61,7 @@ export function AndroidTab({ zip }: Props) {
 
         <p>{t("tabs.android.step1_download")}</p>
         <ZipButton
+          data-testid="download-package-button-android"
           data={zip.data}
           text={zip.title}
           filename={zip.filename}
@@ -68,14 +72,14 @@ export function AndroidTab({ zip }: Props) {
         <p className="mb-2">{t("tabs.android.instructions_short")}</p>
         <Button asChild variant="secondary">
           {/* eslint-disable-next-line */}
-          <Link to={"/android/1" as any}>
+          <Link data-testid="open-instructions-link" to={"/android/1" as any}>
             {t("tabs.android.open_instructions")}
           </Link>
         </Button>
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent>
+        <DialogContent data-testid="atak-dialog">
           <DialogHeader>
             <DialogTitle className="mt-2">
               {t("tabs.android.open_atak_dialog.title")}
@@ -85,7 +89,11 @@ export function AndroidTab({ zip }: Props) {
             </DialogDescription>
           </DialogHeader>
           <Button asChild>
-            <Link to={takUrl} onClick={() => setIsDialogOpen(false)}>
+            <Link
+              data-testid="atak-dialog-open-link"
+              to={takUrl}
+              onClick={() => setIsDialogOpen(false)}
+            >
               {t("tabs.android.open_atak_dialog.open")}
             </Link>
           </Button>

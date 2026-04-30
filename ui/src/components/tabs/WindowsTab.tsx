@@ -12,11 +12,12 @@ export function WindowsTab({ zip }: Props) {
   const { t } = useTranslation("tak");
 
   return (
-    <div className="mt-4">
+    <div data-testid="tab-windows" className="mt-4">
       <p className="text-lg font-semibold">{t("tabs.windows.title")}</p>
       <div className="font-normal">
         <p>{t("tabs.windows.step1_download")}</p>
         <ZipButton
+          data-testid="download-package-button-windows"
           data={zip.data}
           text={zip.title}
           filename={zip.filename}
@@ -30,7 +31,7 @@ export function WindowsTab({ zip }: Props) {
       <div className="mt-4">
         <p className="mb-2">{t("tabs.windows.instructions_short")}</p>
         <Button asChild variant="secondary">
-          <Link to={"/windows/1" as any}>
+          <Link data-testid="open-instructions-link" to={"/windows/1" as any}>
             {t("tabs.windows.open_instructions")}
           </Link>
         </Button>

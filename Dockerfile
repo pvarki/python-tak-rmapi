@@ -191,7 +191,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y zsh \
     && sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" \
     && echo "source /root/.profile" >>/root/.zshrc \
-    && pip3 --break-system-packages install git-up \
+    && pip3 install --break-system-packages git-up \
     && ln -s /app/docker/container-init.sh /container-init.sh \
     && curl https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh -o /usr/bin/wait-for-it.sh \
     && chmod a+x /usr/bin/wait-for-it.sh \
