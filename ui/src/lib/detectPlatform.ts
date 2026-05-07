@@ -8,15 +8,16 @@ export enum Platform {
 export const detectPlatform = (): Platform => {
   if (typeof window === "undefined") return Platform.Android;
 
-  const ua =
+  const navWithOpera = window as Window & { opera?: string };
+  const ua: string =
     window.navigator.userAgent ||
     window.navigator.vendor ||
-    (window as any).opera;
+    navWithOpera.opera ||
+    "";
 
   if (/android/i.test(ua)) return Platform.Android;
   if (/iPad|iPhone|iPod/.test(ua)) return Platform.iOS;
   if (/Windows NT/.test(ua)) return Platform.Windows;
 
-  //Return most likely platform
   return Platform.Android;
 };

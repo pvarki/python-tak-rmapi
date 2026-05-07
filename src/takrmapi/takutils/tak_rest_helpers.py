@@ -75,11 +75,11 @@ class RestHelpers:  # pylint: disable=too-few-public-methods
         async with await self.helpers.tak_mtls_client() as session:
             try:
                 url = f"{self.helpers.tak_base_url()}/Marti/api/missions/\
-{ groupname }?\
+{groupname}?\
 group=default&\
-description={ description_urlencoded }&\
+description={description_urlencoded}&\
 tool=public&\
-defaultRole={ default_role }&\
+defaultRole={default_role}&\
 inviteOnly=false&\
 allowGroupChange=false"
                 headers = {"Content-Type": "application/json", "accept": "*/*"}
@@ -102,7 +102,7 @@ allowGroupChange=false"
 
         async with await self.helpers.tak_mtls_client() as session:
             try:
-                url = f"{self.helpers.tak_base_url()}/Marti/api/missions/{ groupname }/keywords"
+                url = f"{self.helpers.tak_base_url()}/Marti/api/missions/{groupname}/keywords"
 
                 resp = await session.put(url, json=keywords, ssl=await self.helpers.tak_mtls_client_sslcontext())
                 data = cast(Mapping[str, Union[Any, Mapping[str, Any]]], await resp.json(content_type=None))
@@ -236,7 +236,6 @@ allowGroupChange=false"
 
         async with await self.helpers.tak_mtls_client() as session:
             try:
-
                 url = f"{self.helpers.tak_base_url()}\
 /Marti/api/device/profile/{profile_name}/file?filename={datapackage.package_upload_dst_fname}"
 

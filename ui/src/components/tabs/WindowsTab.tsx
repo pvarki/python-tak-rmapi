@@ -1,8 +1,10 @@
-import { TAK_Zip } from "@/lib/interfaces";
-import { ZipButton } from "../ZipButton";
-import { useTranslation } from "react-i18next";
 import { Link } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
+
 import { Button } from "../ui/button";
+import { ZipButton } from "../ZipButton";
+
+import { TAK_Zip } from "@/lib/interfaces";
 
 interface Props {
   zip: TAK_Zip;
@@ -30,6 +32,7 @@ export function WindowsTab({ zip }: Props) {
       <div className="mt-4">
         <p className="mb-2">{t("tabs.windows.instructions_short")}</p>
         <Button asChild variant="secondary">
+          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           <Link to={"/windows/1" as any}>
             {t("tabs.windows.open_instructions")}
           </Link>

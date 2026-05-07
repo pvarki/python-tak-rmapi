@@ -1,5 +1,6 @@
-import { InstructionPhase, InstructionsWizard } from "../InstructionWizard";
 import { useTranslation } from "react-i18next";
+
+import { InstructionPhase, InstructionsWizard } from "../InstructionWizard";
 
 export const AndroidInstructionPage = () => {
   const { t } = useTranslation("tak");

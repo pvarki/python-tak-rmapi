@@ -65,10 +65,10 @@ RUN apt-get update && apt-get install -y \
     # githublab ssh
     && mkdir -p -m 0700 ~/.ssh && ssh-keyscan gitlab.com github.com | sort > ~/.ssh/known_hosts \
     && true
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash - \
     && apt-get install -y nodejs \
     && corepack enable \
-    && corepack prepare pnpm@latest --activate
+    && corepack prepare pnpm@11.1.0 --activate
 SHELL ["/bin/bash", "-lc"]
 # Copy only requirements, to cache them in docker layer:
 WORKDIR /pysetup
@@ -91,7 +91,7 @@ COPY ./uv.lock ./pyproject.toml ./README.rst /app/
 COPY ./src /app/src/
 COPY ./ui /ui/
 WORKDIR /ui
-RUN CI=true pnpm install && pnpm build
+RUN CI=true pnpm install --frozen-lockfile && pnpm build
 RUN mkdir -p /ui_build && cp -r dist/* /ui_build/
 WORKDIR /app
 # Build the wheel package with uv
@@ -151,9 +151,8 @@ ENTRYPOINT ["/usr/bin/tini", "--", "/docker-entrypoint.sh"]
 FROM builder_base as devel_build
 # Install deps
 COPY . /app
-COPY ./ui /ui/
-WORKDIR /ui
-RUN CI=true pnpm install && pnpm build
+WORKDIR /app/ui
+RUN CI=true pnpm install --frozen-lockfile && pnpm build
 WORKDIR /app
 RUN --mount=type=ssh source /.venv/bin/activate \
     && uv sync --frozen \
@@ -164,7 +163,7 @@ RUN --mount=type=ssh source /.venv/bin/activate \
 # Run tests #
 #############
 FROM devel_build as test
-WORKDIR /ui
+WORKDIR /app/ui
 RUN mkdir -p /ui_build && cp -r dist/* /ui_build/
 WORKDIR /app
 ENTRYPOINT ["/usr/bin/tini", "--", "docker/entrypoint-test.sh"]
@@ -181,14 +180,14 @@ RUN --mount=type=ssh source /.venv/bin/activate \
 ###########
 FROM devel_build as devel_shell
 # Copy everything to the image
-WORKDIR /ui
+WORKDIR /app/ui
 COPY --from=pvarki/kw_product_init:latest /kw_product_init /kw_product_init
 RUN mkdir -p /ui_build && cp -r dist/* /ui_build/
 WORKDIR /app
 RUN apt-get update && apt-get install -y zsh \
     && sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" \
     && echo "source /root/.profile" >>/root/.zshrc \
-    && pip3 --break-system-packages install git-up \
+    && pip3 install --break-system-packages git-up \
     && ln -s /app/docker/container-init.sh /container-init.sh \
     && curl https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh -o /usr/bin/wait-for-it.sh \
     && chmod a+x /usr/bin/wait-for-it.sh \
