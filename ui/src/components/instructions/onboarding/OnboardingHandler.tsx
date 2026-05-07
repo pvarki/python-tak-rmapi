@@ -1,16 +1,14 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
-import { Drawer, DrawerContent } from "@/components/ui/drawer";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { ChevronRight, ChevronLeft, Info } from "lucide-react";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { toast } from "sonner";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import useHealthCheck from "@/hooks/helpers/useHealthcheck";
-import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+
 import { AndroidDownload } from "./android/AndroidDownload";
 import { IosDownload } from "./ios/IosDownload";
-import { useMetadata } from "@/hooks/use-metadata";
+
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import {
   Select,
   SelectContent,
@@ -18,7 +16,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import useHealthCheck from "@/hooks/helpers/useHealthcheck";
+import { useMetadata } from "@/hooks/use-metadata";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { detectPlatform, Platform } from "@/lib/detectPlatform";
+import { cn } from "@/lib/utils";
 
 const hashString = (str: string): string => {
   let hash = 0;

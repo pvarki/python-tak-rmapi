@@ -1,8 +1,10 @@
-import { TAK_Zip } from "@/lib/interfaces";
-import { ZipButton } from "../ZipButton";
-import { useTranslation } from "react-i18next";
 import { Link } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
+
 import { Button } from "../ui/button";
+import { ZipButton } from "../ZipButton";
+
+import { TAK_Zip } from "@/lib/interfaces";
 
 interface Props {
   zip: TAK_Zip;

@@ -1,11 +1,12 @@
-import { useTranslation, Trans } from "react-i18next";
-import { Card, CardContent } from "@/components/ui/card";
+import { useTranslation } from "react-i18next";
+
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Card, CardContent } from "@/components/ui/card";
 
 export const IosPhase2 = () => {
   const { t } = useTranslation("tak");
