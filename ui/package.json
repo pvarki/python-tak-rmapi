@@ -52,5 +52,5 @@
     "format:check": "prettier --check ."
   },
   "type": "module",
-  "version": "1.12.1+260427"
+  "version": "1.13.0+260508"
 }
