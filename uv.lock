@@ -1681,19 +1681,6 @@ wheels = [
 ]
 
 [[package]]
-name = "pyopenssl"
-version = "25.3.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "cryptography" },
-    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/80/be/97b83a464498a79103036bc74d1038df4a7ef0e402cfaf4d5e113fb14759/pyopenssl-25.3.0.tar.gz", hash = "sha256:c981cb0a3fd84e8602d7afc209522773b94c1c2446a3c710a75b06fe1beae329", size = 184073, upload-time = "2025-09-17T00:32:21.037Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/d1/81/ef2b1dfd1862567d573a4fdbc9f969067621764fbb74338496840a1d2977/pyopenssl-25.3.0-py3-none-any.whl", hash = "sha256:1fda6fc034d5e3d179d39e59c1895c9faeaf40a79de5fc4cbbfbe0d36f4a77b6", size = 57268, upload-time = "2025-09-17T00:32:19.474Z" },
-]
-
-[[package]]
 name = "pyproject-api"
 version = "1.10.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1935,7 +1922,6 @@ dependencies = [
     { name = "jinja2" },
     { name = "libadvian" },
     { name = "libpvarki" },
-    { name = "pyopenssl" },
     { name = "uvicorn", extra = ["standard"] },
 ]
 
@@ -1954,7 +1940,6 @@ dev = [
     { name = "ruff" },
     { name = "tox" },
     { name = "tox-uv" },
-    { name = "types-pyopenssl" },
     { name = "wrapt" },
 ]
 
@@ -1966,7 +1951,6 @@ requires-dist = [
     { name = "jinja2", specifier = ">=3.1,<4.0" },
     { name = "libadvian", specifier = ">=1.4,<2.0" },
     { name = "libpvarki", specifier = ">=2.2,<3.0", index = "https://nexus.dev.pvarki.fi/repository/pypilocal/simple" },
-    { name = "pyopenssl", specifier = ">=25.3,<26.0" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.30,<1.0" },
 ]
 
@@ -1985,7 +1969,6 @@ dev = [
     { name = "ruff", specifier = ">=0.14,<1.0" },
     { name = "tox", specifier = ">=4.0,<5.0" },
     { name = "tox-uv", specifier = ">=1.0,<2.0" },
-    { name = "types-pyopenssl", specifier = ">=23.2,<24.0" },
     { name = "wrapt", specifier = ">=1.15,<2.0" },
 ]
 
@@ -2105,18 +2088,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/52/d8/d65653a00b3e438625a25b7c931e96dc9721d8d8a8b3372ceeb1f83e60e5/tox_uv_bare-1.35.1.tar.gz", hash = "sha256:ea4c3b5a4013e04ca31d99a1d930917b7cc5378e202739e600c8f4a15562e662", size = 32003, upload-time = "2026-04-10T16:13:01.265Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/7a/12/a5eca5cde48b06a9aef319bc2cd8b5629eb1bd9207b6e3449ae009ee4021/tox_uv_bare-1.35.1-py3-none-any.whl", hash = "sha256:0b8d12d45f195a521d4f6aac5e42869f0a733c80d86575da855494444f60be74", size = 22243, upload-time = "2026-04-10T16:12:59.735Z" },
-]
-
-[[package]]
-name = "types-pyopenssl"
-version = "23.3.0.20240106"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "cryptography" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/69/ec/378e4368ecabef95cc136d86d95ecf5098592fdfaa044774e20de90396d9/types-pyOpenSSL-23.3.0.20240106.tar.gz", hash = "sha256:3d6f3462bec0c260caadf93fbb377225c126661b779c7d9ab99b6dad5ca10db9", size = 8121, upload-time = "2024-01-06T02:23:16.745Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/16/63/c44743e26b7214c926a4ab9153d99f8cb5181520fa9169c56b232949b3ac/types_pyOpenSSL-23.3.0.20240106-py3-none-any.whl", hash = "sha256:47a7eedbd18b7bcad17efebf1c53416148f5a173918a6d75027e75e32fe039ae", size = 7390, upload-time = "2024-01-06T02:23:15.657Z" },
 ]
 
 [[package]]
