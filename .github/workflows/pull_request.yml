@@ -15,7 +15,9 @@ jobs:
           working-directory: ui
           node-version: "24"
           pnpm-version: "11"
-      - uses: j178/prek-action@v2
+      - name: Run pre-commit checks
+        run: |
+          uv run docker/pre_commit_init.sh
 
   bumpversion-check:
     runs-on: ubuntu-latest
