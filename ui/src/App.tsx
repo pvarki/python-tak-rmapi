@@ -17,6 +17,7 @@ import { WindowsInstructionPage } from "./components/routes/WindowsInstructionPa
 import { WindowsPhasePage } from "./components/routes/WindowsPhasePage";
 import { Spinner } from "./components/ui/spinner";
 import { MetaData, MetadataProvider } from "./hooks/use-metadata";
+import { DataProvider } from "./lib/data";
 import { TAK_Zip } from "./lib/interfaces";
 import enLang from "./locales/en.json";
 import fiLang from "./locales/fi.json";
@@ -132,7 +133,9 @@ export default function App({ data, meta }: Props) {
 
   return (
     <MetadataProvider meta={meta}>
-      <RouterProvider router={router} context={data} />
+      <DataProvider data={data}>
+        <RouterProvider router={router} />
+      </DataProvider>
     </MetadataProvider>
   );
 }

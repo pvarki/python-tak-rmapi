@@ -1,4 +1,3 @@
-import { useRouter } from "@tanstack/react-router";
 import { useState, useMemo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -16,12 +15,8 @@ import {
 } from "../ui/select";
 import { Spinner } from "../ui/spinner";
 
+import { useData } from "@/lib/data";
 import { detectPlatform, Platform } from "@/lib/detectPlatform";
-import { TAK_Zip } from "@/lib/interfaces";
-
-interface Data {
-  tak_zips: TAK_Zip[];
-}
 
 const platformToIndex: Record<Platform, number> = {
   [Platform.Android]: 0, // ATAK
@@ -33,16 +28,12 @@ const platformToIndex: Record<Platform, number> = {
 const PRODUCT_SHORTNAME = "tak";
 
 export const HomePage = () => {
-  const router = useRouter();
+  const data = useData();
 
   const defaultPlatform = useMemo(() => detectPlatform(), []);
   const [platform, setPlatform] = useState<Platform>(defaultPlatform);
 
   const { t } = useTranslation(PRODUCT_SHORTNAME);
-
-  const data = router.options.context
-    ? (router.options.context as Data)
-    : undefined;
 
   const handlePlatformChange = useCallback((value: string) => {
     setPlatform(value as Platform);
