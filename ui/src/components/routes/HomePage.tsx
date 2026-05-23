@@ -1,7 +1,11 @@
-import { detectPlatform, Platform } from "@/lib/detectPlatform";
-import { TAK_Zip } from "@/lib/interfaces";
 import { useState, useMemo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
+
+import { OnboardingHandler } from "../instructions/onboarding/OnboardingHandler";
+import { AndroidTab } from "../tabs/AndroidTab";
+import { IosTab } from "../tabs/IosTab";
+import { TrackerTab } from "../tabs/TrackerTab";
+import { WindowsTab } from "../tabs/WindowsTab";
 import {
   Select,
   SelectContent,
@@ -9,17 +13,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { AndroidTab } from "../tabs/AndroidTab";
-import { TrackerTab } from "../tabs/TrackerTab";
 import { Spinner } from "../ui/spinner";
-import { IosTab } from "../tabs/IosTab";
-import { useRouter } from "@tanstack/react-router";
-import { WindowsTab } from "../tabs/WindowsTab";
-import { OnboardingHandler } from "../instructions/onboarding/OnboardingHandler";
 
-interface Data {
-  tak_zips: TAK_Zip[];
-}
+import { useData } from "@/lib/data";
+import { detectPlatform, Platform } from "@/lib/detectPlatform";
 
 const platformToIndex: Record<Platform, number> = {
   [Platform.Android]: 0, // ATAK
@@ -31,16 +28,12 @@ const platformToIndex: Record<Platform, number> = {
 const PRODUCT_SHORTNAME = "tak";
 
 export const HomePage = () => {
-  const router = useRouter();
+  const data = useData();
 
   const defaultPlatform = useMemo(() => detectPlatform(), []);
   const [platform, setPlatform] = useState<Platform>(defaultPlatform);
 
   const { t } = useTranslation(PRODUCT_SHORTNAME);
-
-  const data = router.options.context
-    ? (router.options.context as Data)
-    : undefined;
 
   const handlePlatformChange = useCallback((value: string) => {
     setPlatform(value as Platform);

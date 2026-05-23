@@ -146,3 +146,4 @@ dmypy.json
 ui/.__mf__temp
 ui/node_modules
 !ui/dist/*.md
+.prettier_cache

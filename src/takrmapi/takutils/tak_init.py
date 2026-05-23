@@ -178,7 +178,6 @@ async def tak_setup_profile_files(t_rest_helper: RestHelpers, tak_missionpkg: TA
     if len(upload_bundles) > 0:
         await tak_missionpkg.create_zip_bundles(datapackages=upload_bundles)
         for dp in upload_bundles:
-
             await t_rest_helper.tak_api_upload_file_to_profile(profile_name="Default-ATAK", datapackage=dp)
             await tak_missionpkg.helpers.remove_tmp_dir(dp.zip_tmp_folder)
 

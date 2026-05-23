@@ -1,10 +1,11 @@
-import React from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { Outlet } from "@tanstack/react-router";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import React from "react";
 import { useTranslation } from "react-i18next";
+
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 
 export interface InstructionPhase {
   id: number;
@@ -26,9 +27,10 @@ export const InstructionsWizard: React.FC<InstructionsWizardProps> = ({
 }) => {
   const { t } = useTranslation("tak");
   const navigate = useNavigate();
-  //@ts-ignore
-  const params = useParams({ from: `${basePath}/$phaseId` });
-  //@ts-ignore
+  const params: { phaseId?: string } = useParams({
+    // @ts-expect-error dynamic basePath isn't representable in the router's typed param map
+    from: `${basePath}/$phaseId`,
+  });
   const phaseIdParam = params.phaseId;
   const phaseId = phaseIdParam ? parseInt(phaseIdParam, 10) : phases[0].id;
 
@@ -38,20 +40,24 @@ export const InstructionsWizard: React.FC<InstructionsWizardProps> = ({
 
   const handleNext = () => {
     if (currentPhaseIndex < phases.length - 1) {
-      navigate({ to: `${basePath}/${phases[currentPhaseIndex + 1].id}` });
+      void navigate({
+        to: `${basePath}/${phases[currentPhaseIndex + 1].id}`,
+      });
     } else {
-      navigate({ to: onCompleteRedirect });
+      void navigate({ to: onCompleteRedirect });
     }
   };
 
   const handlePrevious = () => {
     if (currentPhaseIndex > 0) {
-      navigate({ to: `${basePath}/${phases[currentPhaseIndex - 1].id}` });
+      void navigate({
+        to: `${basePath}/${phases[currentPhaseIndex - 1].id}`,
+      });
     }
   };
 
   const handlePhaseClick = (index: number) => {
-    navigate({ to: `${basePath}/${phases[index].id}` });
+    void navigate({ to: `${basePath}/${phases[index].id}` });
   };
 
   return (

@@ -9,7 +9,7 @@ from pathlib import Path
 import ssl
 
 import aiohttp
-from OpenSSL import crypto  # FIXME: Move to python-cryptography for cert parsing
+from cryptography import x509
 
 from libpvarki.schemas.product import UserCRUDRequest
 from libpvarki.mtlshelp.session import get_session as libsession
@@ -236,9 +236,9 @@ class Helpers:
             with open(cert_file_name, "rb") as cert_file:
                 cert_content = cert_file.read()
 
-            cert = crypto.load_certificate(crypto.FILETYPE_PEM, cert_content)
-            _ = cert.get_subject()
-            _ = cert.get_issuer()
+            cert = x509.load_pem_x509_certificate(cert_content)
+            _ = cert.subject
+            _ = cert.issuer
             return True
         except Exception as err:  # pylint: disable=broad-except
             LOGGER.warning("User '{}' certificate check failed ::: {}".format(self.user.callsign, err))

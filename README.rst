@@ -44,13 +44,13 @@ pre-commit considerations
 
 If working in Docker instead of native env you need to run the pre-commit checks in docker too::
 
-    docker exec -i takrmapi_devel /bin/bash -c "pre-commit install --install-hooks"
-    docker exec -i takrmapi_devel /bin/bash -c "pre-commit run --all-files"
+    docker exec -i takrmapi_devel /bin/bash -c "uv run prek install --install-hooks"
+    docker exec -i takrmapi_devel /bin/bash -c "uv run prek run --all-files"
 
 You need to have the container running, see above. Or alternatively use the docker run syntax but using
 the running container is faster::
 
-    docker run --rm -it -v `pwd`":/app" takrmapi:devel_shell -c "pre-commit run --all-files"
+    docker run --rm -it -v `pwd`":/app" takrmapi:devel_shell -c "uv run prek run --all-files"
 
 Test suite
 ^^^^^^^^^^
@@ -83,14 +83,23 @@ TLDR:
 
     git checkout -b my_branch
 
-- install Poetry: https://python-poetry.org/docs/#installation
+- install uv: https://docs.astral.sh/uv/getting-started/installation/
 - Install project deps and pre-commit hooks::
 
-    poetry install
-    pre-commit install --install-hooks
-    pre-commit run --all-files
+    uv sync
+    uv run prek install
+    uv run prek run --all-files
 
 - Ready to go.
 
 Remember to activate your virtualenv whenever working on the repo, this is needed
 because pylint and mypy pre-commit hooks use the "system" python for now (because reasons).
+
+Versioning
+----------
+
+Versioning is handled with bump-my-version_. To increment, use ``bump-my-version bump <patch/minor/major>``.
+
+You can use ``bump-my-version show-bump`` to see how each option would affect the version.
+
+.. _bump-my-version: https://github.com/callowayproject/bump-my-version

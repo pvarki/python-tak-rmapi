@@ -1,6 +1,7 @@
 # AGENTS.md — python-rasenmaeher-takintegration
 
 ## Purpose
+
 The Deploy App (RASENMAEHER) integration bridge for TAK Server. Handles the full TAK user
 lifecycle: when a user is enrolled in Deploy App, this service provisions their TAK
 certificate, registers them in TAK Server via the REST API, and manages their access.
@@ -8,6 +9,7 @@ Also provides a React-based TAK admin web UI embedded in the Deploy App UI. Runs
 sidecar on the same Docker network as TAK Server.
 
 ## Stack & Key Technologies
+
 - **Language:** Python 3.10
 - **Framework:** FastAPI + Uvicorn
 - **Key libs:** httpx (TAK REST API calls), libpvarki, cryptography
@@ -18,6 +20,7 @@ sidecar on the same Docker network as TAK Server.
 - **Startup time:** 120+ seconds (certificate generation on first start)
 
 ## Development Setup
+
 ```bash
 export DOCKER_BUILDKIT=1
 # Linux:
@@ -37,6 +40,7 @@ takrmapi healthcheck
 ```
 
 ## Running Tests
+
 ```bash
 # Via tox (CI)
 docker build --ssh default --target tox -t rasenmaeher_takapi:tox .
@@ -51,16 +55,19 @@ pre-commit run --all-files
 ```
 
 ## Code Conventions
+
 - Env vars: `TAK_` prefix
 - Health check binary: `takrmapi healthcheck` (compose uses this)
 - Follow pylint rules from root `pylintrc`
 - 25% coverage threshold is intentional — TAK integration tests require a live TAK instance
 
 ## Architecture Notes
+
 **Network:** `takrmapi` runs in both `taknet` (shares network with TAK containers) and
 `productnet` (accessible to `productsnginx` for the product integration API).
 
 **User lifecycle callbacks** (called by `rmapi` via mTLS through `productsnginx`):
+
 - `POST /api/v1/users/created` — Generates TAK certificate, registers user in TAK Server
 - `POST /api/v1/users/revoked` — Revokes TAK certificate, removes user from TAK Server
 - `POST /api/v1/users/promoted` — Grants TAK admin role
@@ -72,6 +79,7 @@ delivery to the user's ATAK/WinTAK device.
 
 **User CRUD via shell scripts:** User registration, admin promotion, and deletion are
 performed by calling shell scripts mounted from the TAK Server container at `/opt/scripts/`:
+
 - `enable_user.sh` — registers a user cert in TAK (called with `USER_CERT_NAME=<callsign>`)
 - `enable_admin.sh` — grants admin role (called with `ADMIN_CERT_NAME=<callsign>`)
 - `delete_user.sh` — removes user cert from TAK (called with `USER_CERT_NAME=<callsign>`)
@@ -93,6 +101,7 @@ The health check will not pass until initialization is complete. Do not reduce t
 health-check start period without testing.
 
 ## Common Agent Pitfalls
+
 1. **User CRUD uses shell scripts, not pure REST.** `add_user_to_tak_with_cert`,
    `add_admin_to_tak_with_cert`, and `delete_user_with_cert` call shell scripts at
    `/opt/scripts/` inside the TAK container. These scripts must be present (they come
@@ -100,18 +109,19 @@ health-check start period without testing.
    the scripts exist and are executable in the running container.
 2. **120+ second startup is normal.** Do not set health-check timeouts below 180 seconds for
    this service. CI pipelines that wait for this service to be healthy need patience.
-2. **TAK certificate changes require TAK volume deletion.** If `TAKSERVER_CERT_PASS` changes,
+3. **TAK certificate changes require TAK volume deletion.** If `TAKSERVER_CERT_PASS` changes,
    delete the TAK volumes — stale JKS files in the volume will cause cert errors that look
    like network failures.
-3. **This service shares `taknet` with TAK Server containers.** Direct calls to `takconfig`
+4. **This service shares `taknet` with TAK Server containers.** Direct calls to `takconfig`
    by hostname are expected. These are not public — they only work inside `taknet`.
-4. **Coverage threshold is only 25%.** This reflects the difficulty of mocking the TAK
+5. **Coverage threshold is only 25%.** This reflects the difficulty of mocking the TAK
    REST API, not a quality shortcut. New code should still include tests where feasible.
-5. **mTLS from `productsnginx` is required.** User lifecycle callbacks arrive with a client
+6. **mTLS from `productsnginx` is required.** User lifecycle callbacks arrive with a client
    certificate from `rmapi`. If you bypass `productsnginx` in testing, callbacks will arrive
    without certs and be rejected with `403`.
 
 ## Related Repos
+
 - https://github.com/pvarki/docker-rasenmaeher-integration (orchestration root)
 - https://github.com/pvarki/docker-rasenmaeher-takserver (TAK Server this bridges)
 - https://github.com/pvarki/python-rasenmaeher-api (sends user lifecycle callbacks)

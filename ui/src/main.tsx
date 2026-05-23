@@ -1,8 +1,3 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-import App from "./App";
-import "./i18n";
-
 import {
   Outlet,
   RouterProvider,
@@ -11,6 +6,11 @@ import {
   createRoute,
   redirect,
 } from "@tanstack/react-router";
+import React from "react";
+import ReactDOM from "react-dom/client";
+
+import App from "./App";
+import "./i18n";
 
 const rootRoute = createRootRoute({
   component: () => (
@@ -28,7 +28,7 @@ const mtxRoute = createRoute({
       data: {},
     };
 
-    // @ts-ignore
+    // @ts-expect-error App's data prop typing isn't satisfied by the empty stand-alone sample
     return <App data={SAMPLE_DATA.data} />;
   },
 });
@@ -38,7 +38,7 @@ const indexRoute = createRoute({
   path: "/",
   beforeLoad: () => {
     throw redirect({
-      //@ts-ignore
+      // @ts-expect-error standalone target path isn't in the typed route tree
       to: "/product/tak",
     });
   },

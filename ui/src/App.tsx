@@ -1,11 +1,3 @@
-import { TAK_Zip } from "./lib/interfaces";
-import { useEffect, useMemo, useState } from "react";
-import { useTranslation } from "react-i18next";
-
-import enLang from "./locales/en.json";
-import fiLang from "./locales/fi.json";
-import svLang from "./locales/sv.json";
-
 import {
   createRootRoute,
   createRoute,
@@ -13,15 +5,23 @@ import {
   Outlet,
   RouterProvider,
 } from "@tanstack/react-router";
-import { HomePage } from "./components/routes/HomePage";
-import { AndroidPhasePage } from "./components/routes/AndroidPhasePage";
+import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
+
 import { AndroidInstructionPage } from "./components/routes/AndroidInstructionPage";
-import { Spinner } from "./components/ui/spinner";
-import { IosPhasePage } from "./components/routes/IosPhasePage";
+import { AndroidPhasePage } from "./components/routes/AndroidPhasePage";
+import { HomePage } from "./components/routes/HomePage";
 import { IosInstructionPage } from "./components/routes/IosInstructionPage";
+import { IosPhasePage } from "./components/routes/IosPhasePage";
 import { WindowsInstructionPage } from "./components/routes/WindowsInstructionPage";
 import { WindowsPhasePage } from "./components/routes/WindowsPhasePage";
+import { Spinner } from "./components/ui/spinner";
 import { MetaData, MetadataProvider } from "./hooks/use-metadata";
+import { DataProvider } from "./lib/data";
+import { TAK_Zip } from "./lib/interfaces";
+import enLang from "./locales/en.json";
+import fiLang from "./locales/fi.json";
+import svLang from "./locales/sv.json";
 
 const RootLayoutComponent = () => (
   <div className="max-w-5xl mx-auto p-6">
@@ -100,10 +100,10 @@ const PRODUCT_SHORTNAME = "tak";
 export default function App({ data, meta }: Props) {
   const [ready, setReady] = useState(false);
 
-  const { t, i18n } = useTranslation(PRODUCT_SHORTNAME);
+  const { i18n } = useTranslation(PRODUCT_SHORTNAME);
   const router = useMemo(
     () => createRouter({ routeTree, basepath: "/product/tak" }),
-    [data],
+    [],
   );
 
   useEffect(() => {
@@ -133,7 +133,9 @@ export default function App({ data, meta }: Props) {
 
   return (
     <MetadataProvider meta={meta}>
-      <RouterProvider router={router} context={data} />
+      <DataProvider data={data}>
+        <RouterProvider router={router} />
+      </DataProvider>
     </MetadataProvider>
   );
 }
