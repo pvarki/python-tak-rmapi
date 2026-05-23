@@ -41,9 +41,9 @@ ENV \
   PIP_NO_CACHE_DIR=off \
   PIP_DISABLE_PIP_VERSION_CHECK=on \
   PIP_DEFAULT_TIMEOUT=100 \
-  PIP_INDEX_URL=https://nexus.dev.pvarki.fi/repository/python/simple \
+#  PIP_INDEX_URL=https://nexus.dev.pvarki.fi/repository/python/simple \
   # uv:
-  UV_DEFAULT_INDEX=https://nexus.dev.pvarki.fi/repository/python/simple \
+#  UV_DEFAULT_INDEX=https://nexus.dev.pvarki.fi/repository/python/simple \
   UV_PROJECT_ENVIRONMENT=/.venv \
   UV_LINK_MODE=copy
 RUN apt-get update && apt-get install -y \
@@ -73,10 +73,11 @@ SHELL ["/bin/bash", "-lc"]
 # Copy only requirements, to cache them in docker layer:
 WORKDIR /pysetup
 COPY ./uv.lock ./pyproject.toml ./README.rst /pysetup/
-# Install runtime dependencies into /.venv (without the project itself)
+# Cache and install runtime deps into the project venv (without installing the project itself yet)
 RUN --mount=type=ssh uv venv /.venv \
     && echo 'source /.venv/bin/activate' >>/root/.profile \
-    && uv sync --frozen --no-install-project --no-dev \
+    && uv export --frozen --no-dev --format requirements.txt --no-hashes --output-file  /tmp/requirements.txt \
+    && pip3 wheel --extra-index-url https://nexus.dev.pvarki.fi/repository/python/simple --wheel-dir=/tmp/wheelhouse -r /tmp/requirements.txt \
     && true
 
 
@@ -86,6 +87,7 @@ RUN --mount=type=ssh uv venv /.venv \
 FROM builder_base as production_build
 # Copy entrypoint script
 COPY ./docker/entrypoint.sh /docker-entrypoint.sh
+COPY --from=builder_base /tmp/wheelhouse /tmp/wheelhouse
 # Only files needed by production setup
 COPY ./uv.lock ./pyproject.toml ./README.rst /app/
 COPY ./src /app/src/
@@ -134,7 +136,7 @@ RUN --mount=type=ssh apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/* \
     && chmod a+x /docker-entrypoint.sh \
     && WHEELFILE=`echo /tmp/wheelhouse/takrmapi-*.whl` \
-    && pip3 install --break-system-packages --index-url https://nexus.dev.pvarki.fi/repository/python/simple "$WHEELFILE" \
+    && pip3 install --break-system-packages --find-links=/tmp/wheelhouse/ "$WHEELFILE" \
     && rm -rf /tmp/wheelhouse/ \
     # Make some directories
     && mkdir -p /opt/tak/data/certs \
