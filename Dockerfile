@@ -1,6 +1,7 @@
 # syntax=docker/dockerfile:1.1.7-experimental
 ARG TEMURIN_VERSION="17"
 ARG TAKSERVER_IMAGE="pvarki/takserver:5.7-RELEASE-8"
+ARG PYPI_INDEX_URL=https://pypi.org/simple
 
 # The local reference tak_server is used in future stages
 FROM ${TAKSERVER_IMAGE} as tak_server
@@ -28,6 +29,7 @@ RUN export RESOLVED_VERSIONS=`pyenv_resolve $PYTHON_VERSIONS` \
 ######################
 FROM eclipse-temurin:${TEMURIN_VERSION}-noble as builder_base
 #FROM python:3.11-bookworm as builder_base
+ARG PYPI_INDEX_URL
 ENV \
   # locale
   LC_ALL=C.UTF-8 \
@@ -39,8 +41,8 @@ ENV \
   PIP_NO_CACHE_DIR=off \
   PIP_DISABLE_PIP_VERSION_CHECK=on \
   PIP_DEFAULT_TIMEOUT=100 \
-  PIP_INDEX_URL=https://nexus.dev.pvarki.fi/repository/python/simple \
-  POETRY_PYPI_MIRROR_URL=https://nexus.dev.pvarki.fi/repository/python/simple \
+  PIP_INDEX_URL=${PYPI_INDEX_URL} \
+  POETRY_PYPI_MIRROR_URL=${PYPI_INDEX_URL} \
   # poetry:
   POETRY_VERSION=2.2.1
 RUN apt-get update && apt-get install -y \
@@ -110,6 +112,7 @@ RUN --mount=type=ssh source /.venv/bin/activate \
 # Main production build #
 #########################
 FROM eclipse-temurin:${TEMURIN_VERSION}-noble as production
+ARG PYPI_INDEX_URL
 COPY --from=production_build /tmp/wheelhouse /tmp/wheelhouse
 COPY --from=production_build /ui_build /ui_build
 COPY --from=production_build /docker-entrypoint.sh /docker-entrypoint.sh
@@ -137,7 +140,7 @@ RUN --mount=type=ssh apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/* \
     && chmod a+x /docker-entrypoint.sh \
     && WHEELFILE=`echo /tmp/wheelhouse/takrmap*.whl` \
-    && pip3 install --break-system-packages --index-url https://nexus.dev.pvarki.fi/repository/python/simple --find-links=/tmp/wheelhouse/ "$WHEELFILE"[all] \
+    && pip3 install --break-system-packages --index-url ${PYPI_INDEX_URL} --find-links=/tmp/wheelhouse/ "$WHEELFILE"[all] \
     && rm -rf /tmp/wheelhouse/ \
     # Make some directories
     && mkdir -p /opt/tak/data/certs \
@@ -175,7 +178,7 @@ ENTRYPOINT ["/usr/bin/tini", "--", "docker/entrypoint-test.sh"]
 RUN --mount=type=ssh source /.venv/bin/activate \
     && poetry install --no-interaction --no-ansi \
     && ln -s /app/docker/container-init.sh /container-init.sh \
-    && SKIP="poetry-lock" poetry run docker/pre_commit_init.sh \
+    && SKIP="poetry-lock" PIP_EXTRA_INDEX_URL= poetry run docker/pre_commit_init.sh \
     && true
 
 

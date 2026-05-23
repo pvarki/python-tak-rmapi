@@ -18,11 +18,12 @@ from libpvarki.shell import call_cmd
 
 
 from takrmapi import config
-
+from takrmapi.takutils.env_helpers import env_float
 
 LOGGER = logging.getLogger(__name__)
-SHELL_TIMEOUT = 5.0
-KEYPAIR_TIMEOUT = 5.0
+
+SHELL_TIMEOUT = env_float("TAK_RMAPI_SHELL_TIMEOUT", 5.0, max_value=600.0)
+KEYPAIR_TIMEOUT = env_float("TAK_RMAPI_KEYPAIR_TIMEOUT", 5.0, max_value=600.0)
 
 # FIXME: Convert the helpers to dataclasses
 

@@ -14,8 +14,6 @@ from takrmapi.takutils.tak_pkg_helpers import TAKDataPackage
 
 
 LOGGER = logging.getLogger(__name__)
-SHELL_TIMEOUT = 5.0
-KEYPAIR_TIMEOUT = 5.0
 
 # FIXME: Convert the helpers to dataclasses
 
