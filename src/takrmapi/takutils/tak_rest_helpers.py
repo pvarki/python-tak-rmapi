@@ -4,6 +4,7 @@ from typing import Any, Mapping, Union, cast, List, Dict
 import logging
 import time
 import urllib.parse
+import json
 import aiohttp
 
 
@@ -37,6 +38,16 @@ class RestHelpers:  # pylint: disable=too-few-public-methods
         """Output response to log"""
         resp_text = await resp.text()
         LOGGER.info("Response status : {}, Response text : {}".format(resp.status, resp_text))
+
+    async def response_payload(self, resp: aiohttp.ClientResponse) -> Mapping[str, Any]:
+        """Read response payload, tolerating empty bodies."""
+        try:
+            return cast(Mapping[str, Any], await resp.json(content_type=None))
+        except (aiohttp.ContentTypeError, json.JSONDecodeError):
+            text = await resp.text()
+            if not text:
+                return {}
+            return {"text": text}
 
     async def tak_api_user_list(self) -> Mapping[str, Any]:
         """Get list of users from TAK"""
@@ -265,3 +276,63 @@ allowGroupChange=false"
 
             except aiohttp.ClientError:
                 return {"success": False, "data": []}
+
+    async def tak_api_video_list(self) -> Mapping[str, Any]:
+        """List TAK video connections."""
+        async with await self.helpers.tak_mtls_client() as session:
+            try:
+                url = f"{self.helpers.tak_base_url()}/Marti/api/video"
+                resp = await session.get(url, ssl=await self.helpers.tak_mtls_client_sslcontext())
+                data = await self.response_payload(resp)
+                if resp.status == 200:
+                    return {"success": True, "data": data}
+                LOGGER.info("Unable to list TAK video connections")
+                await self.output_response_to_output(resp)
+                return {"success": False, "data": data}
+            except aiohttp.ClientError:
+                return {"success": False, "data": {}}
+
+    async def tak_api_video_create(self, payload: Mapping[str, Any]) -> Mapping[str, Any]:
+        """Create TAK video connections."""
+        async with await self.helpers.tak_mtls_client() as session:
+            try:
+                url = f"{self.helpers.tak_base_url()}/Marti/api/video"
+                resp = await session.post(url, json=payload, ssl=await self.helpers.tak_mtls_client_sslcontext())
+                data = await self.response_payload(resp)
+                if resp.status in (200, 201, 204):
+                    return {"success": True, "data": data}
+                LOGGER.info("Unable to create TAK video connection(s)")
+                await self.output_response_to_output(resp)
+                return {"success": False, "data": data}
+            except aiohttp.ClientError:
+                return {"success": False, "data": {}}
+
+    async def tak_api_video_update(self, uid: str, payload: Mapping[str, Any]) -> Mapping[str, Any]:
+        """Update a TAK video connection."""
+        async with await self.helpers.tak_mtls_client() as session:
+            try:
+                url = f"{self.helpers.tak_base_url()}/Marti/api/video/{uid}"
+                resp = await session.put(url, json=payload, ssl=await self.helpers.tak_mtls_client_sslcontext())
+                data = await self.response_payload(resp)
+                if resp.status in (200, 204):
+                    return {"success": True, "data": data}
+                LOGGER.info("Unable to update TAK video connection '{}'".format(uid))
+                await self.output_response_to_output(resp)
+                return {"success": False, "data": data}
+            except aiohttp.ClientError:
+                return {"success": False, "data": {}}
+
+    async def tak_api_video_delete(self, uid: str) -> Mapping[str, Any]:
+        """Delete a TAK video connection."""
+        async with await self.helpers.tak_mtls_client() as session:
+            try:
+                url = f"{self.helpers.tak_base_url()}/Marti/api/video/{uid}"
+                resp = await session.delete(url, ssl=await self.helpers.tak_mtls_client_sslcontext())
+                data = await self.response_payload(resp)
+                if resp.status in (200, 204):
+                    return {"success": True, "data": data}
+                LOGGER.info("Unable to delete TAK video connection '{}'".format(uid))
+                await self.output_response_to_output(resp)
+                return {"success": False, "data": data}
+            except aiohttp.ClientError:
+                return {"success": False, "data": {}}
