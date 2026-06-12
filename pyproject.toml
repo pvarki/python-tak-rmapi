@@ -42,6 +42,7 @@ dev = [
     "wrapt>=1.15,<2.0",
     "tox>=4.0,<5.0",
     "tox-uv>=1.0,<2.0",
+    "pre-commit>=4.6,<5.0",
 ]
 
 [[tool.uv.index]]
