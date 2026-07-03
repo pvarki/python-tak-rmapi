@@ -112,7 +112,7 @@ ARG PYPI_INDEX_URL
 COPY --from=production_build /tmp/wheelhouse /tmp/wheelhouse
 COPY --from=production_build /ui_build /ui_build
 COPY --from=production_build /docker-entrypoint.sh /docker-entrypoint.sh
-COPY --from=pvarki/kw_product_init:latest /kw_product_init /kw_product_init
+COPY --from=ghcr.io/pvarki/kraftwerk-helper-tool:1.3.0-260513 /kw_product_init /kw_product_init
 # FIXME: Figure out exactly which jars we need and copy only those
 COPY --from=tak_server /opt/tak /opt/tak
 COPY --from=tak_server /opt/scripts /opt/scripts
@@ -183,7 +183,7 @@ RUN --mount=type=ssh source /.venv/bin/activate \
 FROM devel_build as devel_shell
 # Copy everything to the image
 WORKDIR /app/ui
-COPY --from=pvarki/kw_product_init:latest /kw_product_init /kw_product_init
+COPY --from=ghcr.io/pvarki/kraftwerk-helper-tool:1.3.0-260513 /kw_product_init /kw_product_init
 RUN mkdir -p /ui_build && cp -r dist/* /ui_build/
 WORKDIR /app
 RUN apt-get update && apt-get install -y zsh \
