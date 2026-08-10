@@ -4,13 +4,11 @@ import { useTranslation } from "react-i18next";
 import { Button } from "../ui/button";
 import { ZipButton } from "../ZipButton";
 
-import { TAK_Zip } from "@/lib/interfaces";
-
 interface Props {
-  zip: TAK_Zip;
+  variant: string;
 }
 
-export function WindowsTab({ zip }: Props) {
+export function WindowsTab({ variant }: Props) {
   const { t } = useTranslation("tak");
 
   return (
@@ -18,12 +16,7 @@ export function WindowsTab({ zip }: Props) {
       <p className="text-lg font-semibold">{t("tabs.windows.title")}</p>
       <div className="font-normal">
         <p>{t("tabs.windows.step1_download")}</p>
-        <ZipButton
-          data={zip.data}
-          text={zip.title}
-          filename={zip.filename}
-          className="p-2"
-        />
+        <ZipButton zipVariant={variant} className="p-2" />
 
         <p className="text-xs mt-2 text-muted-foreground pl-2 border-l-2 border-muted-foreground">
           {t("tabs.windows.step1_note")}
