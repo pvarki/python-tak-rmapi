@@ -41,6 +41,11 @@ def read_deployment_name() -> str:
     return str(load_manifest()["deployment"])
 
 
+def read_rm_certcn() -> str:
+    """Read the expected CN for RASENMAEHERs mTLS cert from manifest"""
+    return str(load_manifest()["rasenmaeher"]["certcn"])
+
+
 cfg = Config(
     env_prefix="TI_"
 )  # not supporting .env files anymore because https://github.com/encode/starlette/discussions/2446

@@ -9,6 +9,7 @@ from libpvarki.logging import init_logging
 import pytest
 from fastapi.testclient import TestClient
 
+from takrmapi import config
 from takrmapi.app import get_app
 
 # Default is "ecs" and it's not great for tests
@@ -25,6 +26,18 @@ def mtlsclient() -> Generator[TestClient, None, None]:
         APP,
         headers={
             "X-ClientCert-DN": "CN=harjoitus1.pvarki.fi,O=harjoitus1.pvarki.fi,L=KeskiSuomi,ST=Jyvaskyla,C=FI",
+        },
+    )
+    yield client
+
+
+@pytest.fixture
+def rmclient() -> Generator[TestClient, None, None]:
+    """Fake header with RASENMAEHERs DN"""
+    client = TestClient(
+        APP,
+        headers={
+            "X-ClientCert-DN": f"CN={config.read_rm_certcn()},O=N/A",
         },
     )
     yield client

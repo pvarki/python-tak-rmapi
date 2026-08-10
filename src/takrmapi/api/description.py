@@ -3,11 +3,13 @@
 from typing import Optional, Literal
 import logging
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel, Field, Extra
 from libpvarki.schemas.product import ProductDescription
 from libpvarki.middleware import MTLSHeader
 from takrmapi.config import read_tak_fqdn
+
+from .usercrud import comes_from_rm
 
 
 LOGGER = logging.getLogger(__name__)
@@ -119,8 +121,9 @@ async def return_product_description_extended(language: str) -> ProductDescripti
     "/{language}",
     response_model=ProductDescriptionExtended,
 )
-async def return_admin_product_description_extended(language: str) -> ProductDescriptionExtended:
+async def return_admin_product_description_extended(language: str, request: Request) -> ProductDescriptionExtended:
     """Fetch admin description from each product in manifest"""
+    comes_from_rm(request)
 
     if language == "fi":
         return ProductDescriptionExtended(
