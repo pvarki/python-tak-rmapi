@@ -17,8 +17,6 @@ import { WindowsInstructionPage } from "./components/routes/WindowsInstructionPa
 import { WindowsPhasePage } from "./components/routes/WindowsPhasePage";
 import { Spinner } from "./components/ui/spinner";
 import { MetaData, MetadataProvider } from "./hooks/use-metadata";
-import { DataProvider } from "./lib/data";
-import { TAK_Zip } from "./lib/interfaces";
 import enLang from "./locales/en.json";
 import fiLang from "./locales/fi.json";
 import svLang from "./locales/sv.json";
@@ -89,15 +87,13 @@ const routeTree = rootRoute.addChildren([
 ]);
 
 interface Props {
-  data: {
-    tak_zips: TAK_Zip[];
-  };
+  data: unknown;
   meta: MetaData;
 }
 
 const PRODUCT_SHORTNAME = "tak";
 
-export default function App({ data, meta }: Props) {
+export default function App({ meta }: Props) {
   const [ready, setReady] = useState(false);
 
   const { i18n } = useTranslation(PRODUCT_SHORTNAME);
@@ -133,9 +129,7 @@ export default function App({ data, meta }: Props) {
 
   return (
     <MetadataProvider meta={meta}>
-      <DataProvider data={data}>
-        <RouterProvider router={router} />
-      </DataProvider>
+      <RouterProvider router={router} />
     </MetadataProvider>
   );
 }

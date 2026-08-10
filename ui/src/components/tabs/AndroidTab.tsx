@@ -12,26 +12,23 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { TAK_Zip } from "@/lib/interfaces";
-
 interface Props {
-  zip: TAK_Zip;
+  variant: string;
 }
 
 interface EphemeralUrl {
   ephemeral_url: string;
 }
 
-export function AndroidTab({ zip }: Props) {
+export function AndroidTab({ variant }: Props) {
   const { t } = useTranslation("tak");
-  const baseUrl = `${window.location.protocol}//${window.location.host}`;
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [takUrl, setTakUrl] = useState("");
 
   const handleOpenATAK = async () => {
     try {
       const response = await fetch(
-        `${baseUrl}/api/v1/product/proxy/tak/api/v1/tak-missionpackages/ephemeral/atak.zip`,
+        `/api/v1/product/proxy/tak/api/v1/tak-missionpackages/ephemeral/${variant}.zip`,
       );
 
       if (!response.ok) {
@@ -59,12 +56,7 @@ export function AndroidTab({ zip }: Props) {
         <p className="pt-8 pb-2">{t("tabs.android.open_atak_manual_note")}</p>
 
         <p>{t("tabs.android.step1_download")}</p>
-        <ZipButton
-          data={zip.data}
-          text={zip.title}
-          filename={zip.filename}
-          className="p-2"
-        />
+        <ZipButton zipVariant={variant} className="p-2" />
       </div>
       <div className="mt-4">
         <p className="mb-2">{t("tabs.android.instructions_short")}</p>

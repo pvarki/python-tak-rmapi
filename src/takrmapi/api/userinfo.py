@@ -17,7 +17,7 @@ LOGGER = logging.getLogger(__name__)
 router = APIRouter(dependencies=[Depends(MTLSHeader(auto_error=True))])
 
 
-@router.post("/data", response_model=ClientInstructionResponse)
+@router.post("/data", response_model=ClientInstructionResponse, deprecated=True)
 async def client_instruction_fragment(
     user: UserCRUDRequest, background_tasks: BackgroundTasks
 ) -> ClientInstructionResponse:

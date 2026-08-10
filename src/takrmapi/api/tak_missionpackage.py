@@ -52,7 +52,7 @@ async def return_tak_zip(user: UserCRUDRequest, variant: str, background_tasks: 
     return FileResponse(
         path=target_pkg.zip_path,
         media_type="application/zip",
-        filename=f"{localuser.callsign}_{variant}.zip",
+        filename=f"{localuser.callsign}_{config.TAK_SERVER_NAME}_{variant}.zip",
     )
 
 

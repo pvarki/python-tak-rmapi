@@ -2,13 +2,11 @@ import { useTranslation } from "react-i18next";
 
 import { ZipButton } from "../ZipButton";
 
-import { TAK_Zip } from "@/lib/interfaces";
-
 interface Props {
-  zip: TAK_Zip;
+  variant: string;
 }
 
-export function TrackerTab({ zip }: Props) {
+export function TrackerTab({ variant }: Props) {
   const { t } = useTranslation("tak");
 
   return (
@@ -18,12 +16,7 @@ export function TrackerTab({ zip }: Props) {
         <li>
           {t("tabs.tracker.step1_download")}
           <br />
-          <ZipButton
-            data={zip.data}
-            text={zip.title}
-            filename={zip.filename}
-            className="p-2"
-          />
+          <ZipButton zipVariant={variant} className="p-2" />
         </li>
         <li>{t("tabs.tracker.step2_install")}</li>
         <li>{t("tabs.tracker.step3_done")}</li>

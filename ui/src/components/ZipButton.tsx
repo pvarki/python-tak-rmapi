@@ -1,17 +1,22 @@
 import { Button } from "./ui/button";
 
+import useHealthCheck from "@/hooks/helpers/useHealthcheck";
+
 interface Props extends React.ComponentProps<typeof Button> {
-  text: string;
-  data: string;
-  filename: string;
+  zipVariant: string;
 }
 
-export function ZipButton({ text, data, filename, ...other }: Props) {
+export function ZipButton({ zipVariant, ...other }: Props) {
+  const { deployment } = useHealthCheck();
+
+  const title = deployment
+    ? `${deployment}_${zipVariant}.zip`
+    : `${zipVariant}.zip`;
+
   const handleDownload = () => {
     try {
       const link = document.createElement("a");
-      link.href = data;
-      link.download = filename;
+      link.href = `/api/v1/product/proxy/tak/api/v1/tak-missionpackages/client-zip/${zipVariant}.zip`;
       link.click();
     } catch (err) {
       console.error("Error downloading file:", err);
@@ -20,7 +25,7 @@ export function ZipButton({ text, data, filename, ...other }: Props) {
 
   return (
     <Button onClick={handleDownload} {...other}>
-      {text}
+      {title}
     </Button>
   );
 }
