@@ -94,7 +94,6 @@ jobs:
         with:
           product: tak
           component: integration
-          platforms: linux/amd64
           dockerhub-username: ${{ vars.DOCKERHUB_USERNAME }}
           dockerhub-token: ${{ secrets.DOCKERHUB_TOKEN }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
