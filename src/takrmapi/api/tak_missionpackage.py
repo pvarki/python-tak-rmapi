@@ -77,7 +77,7 @@ async def create_mission_package(
     return target_pkg
 
 
-@router.post("/ephemeral/{variant}.zip")
+@router.post("/ephemeral/{variant}")
 async def return_ephemeral_dl_link(user: UserCRUDRequest, variant: str) -> dict[str, str]:
     """Return an ephemeral download link to get the TAK client zip file"""
     localuser = tak_helpers.UserCRUD(user)
@@ -92,7 +92,7 @@ async def return_ephemeral_dl_link(user: UserCRUDRequest, variant: str) -> dict[
     nonce = secrets.token_hex(8)
 
     ephemeral_url = (
-        f"https://{config.read_tak_fqdn()}:{config.PRODUCT_HTTPS_EPHEMERAL_PORT}/"
+        f"https://{config.PRODUCT_HTTPS_EPHEMERAL_FQDN if config.PRODUCT_HTTPS_EPHEMERAL_FQDN else config.read_tak_fqdn()}:{config.PRODUCT_HTTPS_EPHEMERAL_PORT}/"
         f"ephemeral/api/v1/tak-missionpackages/ephemeral/"
         f"{urllib.parse.quote_plus(encrypted_url)}/{config.read_deployment_name()}_{nonce}_{variant}.zip"
     )
