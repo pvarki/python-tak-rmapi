@@ -32,7 +32,7 @@ jobs:
       - uses: pvarki/config-ci-library/.github/actions/validate-bumpversion@main
 
   test:
-    runs-on: ubuntu-latest
+    runs-on: arc-runner-set
     permissions:
       contents: write
       pull-requests: write
@@ -67,9 +67,9 @@ jobs:
           snyk-org: deployapp-products
           snyk-token: ${{ secrets.SNYK_TOKEN }}
 
-  docker_builds:
-    name: Build Docker images
-    runs-on: ubuntu-latest
+  docker_build_test:
+    name: Test Docker image builds
+    runs-on: arc-runner-set
     steps:
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
@@ -85,7 +85,7 @@ jobs:
   publish:
     name: Publish Docker image
     runs-on: arc-runner-set
-    needs: [pre-commit, bumpversion-check, test, docker_builds]
+    needs: [pre-commit, bumpversion-check, test, docker_build_test]
     permissions:
       contents: read
       packages: write
