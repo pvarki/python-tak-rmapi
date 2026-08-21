@@ -65,6 +65,8 @@ def get_app() -> FastAPI:
     """Returns the FastAPI application."""
     add_trace_and_audit()
     init_logging(LOG_LEVEL)
+    # Set logger levels on modules imported before logging init
+    tak_init.LOGGER.setLevel(LOG_LEVEL)
     app = get_app_no_init()
     LOGGER.info("API init done, setting log verbosity to '{}'.".format(logging.getLevelName(LOG_LEVEL)))
     return app
