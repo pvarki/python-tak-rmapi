@@ -5,7 +5,7 @@ import logging
 import time
 import urllib.parse
 import aiohttp
-
+import json
 
 from libpvarki.schemas.product import UserCRUDRequest
 
@@ -43,11 +43,15 @@ class RestHelpers:  # pylint: disable=too-few-public-methods
                 url = f"{self.helpers.tak_base_url()}/user-management/api/list-users"
                 resp = await session.get(url, ssl=await self.helpers.tak_mtls_client_sslcontext())
                 data = cast(Mapping[str, Union[Any, Mapping[str, Any]]], await resp.json(content_type=None))
-            except aiohttp.ClientError:
+                LOGGER.debug("tak_api_user_list={}".format(data))
+                return {"success": True, "data": data}
+            except aiohttp.ClientError as exc:
+                LOGGER.exception(f"aiohttp error: {exc}")
                 return {"success": False, "data": []}
-        LOGGER.info("tak_api_user_list={}".format(data))
-
-        return {"success": True, "data": data}
+            except json.decoder.JSONDecodeError as exc:
+                LOGGER.exception(f"decode error: {exc}")
+                LOGGER.debug(f"respons: {await resp.text()}")
+                return {"success": False, "data": []}
 
     async def tak_api_mission_get(self, groupname: str) -> Mapping[str, Any]:
         """Get mission from TAK"""
@@ -64,8 +68,12 @@ class RestHelpers:  # pylint: disable=too-few-public-methods
                 LOGGER.info("Unable to find requested mission '{}' from TAK".format(groupname))
                 await self.output_response_to_output(resp)
                 return {"success": True, "data": data}
-            except aiohttp.ClientError as e:
-                LOGGER.exception(e)
+            except aiohttp.ClientError as exc:
+                LOGGER.exception(f"aiohttp error: {exc}")
+                return {"success": False, "data": []}
+            except json.decoder.JSONDecodeError as exc:
+                LOGGER.exception(f"decode error: {exc}")
+                LOGGER.debug(f"respons: {await resp.text()}")
                 return {"success": False, "data": []}
 
     async def tak_api_mission_put(self, groupname: str, description: str, default_role: str) -> Mapping[str, Any]:
@@ -94,7 +102,13 @@ allowGroupChange=false"
                 LOGGER.info("Unable to add requested mission '{}' to TAK".format(groupname))
                 await self.output_response_to_output(resp)
                 return {"success": True, "data": data}
-            except aiohttp.ClientError:
+
+            except aiohttp.ClientError as exc:
+                LOGGER.exception(f"aiohttp error: {exc}")
+                return {"success": False, "data": []}
+            except json.decoder.JSONDecodeError as exc:
+                LOGGER.exception(f"decode error: {exc}")
+                LOGGER.debug(f"respons: {await resp.text()}")
                 return {"success": False, "data": []}
 
     async def tak_api_mission_keywords(self, groupname: str, keywords: List[str]) -> Mapping[str, Any]:
@@ -114,7 +128,12 @@ allowGroupChange=false"
                 await self.output_response_to_output(resp)
                 return {"success": True, "data": data}
 
-            except aiohttp.ClientError:
+            except aiohttp.ClientError as exc:
+                LOGGER.exception(f"aiohttp error: {exc}")
+                return {"success": False, "data": []}
+            except json.decoder.JSONDecodeError as exc:
+                LOGGER.exception(f"decode error: {exc}")
+                LOGGER.debug(f"respons: {await resp.text()}")
                 return {"success": False, "data": []}
 
     async def tak_api_get_device_profile(self, profile_name: str) -> Mapping[str, Any]:
@@ -125,11 +144,15 @@ allowGroupChange=false"
 
                 resp = await session.get(url, ssl=await self.helpers.tak_mtls_client_sslcontext(), json="{}")
                 data = cast(Mapping[str, Union[Any, Mapping[str, Any]]], await resp.json(content_type=None))
+                return {"success": True, "data": data}
 
-            except aiohttp.ClientError:
-                return {"success": False, "data": {}}
-
-            return {"success": True, "data": data}
+            except aiohttp.ClientError as exc:
+                LOGGER.exception(f"aiohttp error: {exc}")
+                return {"success": False, "data": []}
+            except json.decoder.JSONDecodeError as exc:
+                LOGGER.exception(f"decode error: {exc}")
+                LOGGER.debug(f"respons: {await resp.text()}")
+                return {"success": False, "data": []}
 
     async def tak_api_get_device_profile_files(self, profile_name: str) -> Mapping[str, Any]:
         """Get device profile from TAK"""
@@ -139,10 +162,14 @@ allowGroupChange=false"
 
                 resp = await session.get(url, ssl=await self.helpers.tak_mtls_client_sslcontext(), json="{}")
                 data = cast(Mapping[str, Union[Any, Mapping[str, Any]]], await resp.json(content_type=None))
-            except aiohttp.ClientError:
+                return {"success": True, "data": data}
+            except aiohttp.ClientError as exc:
+                LOGGER.exception(f"aiohttp error: {exc}")
                 return {"success": False, "data": []}
-
-            return {"success": True, "data": data}
+            except json.decoder.JSONDecodeError as exc:
+                LOGGER.exception(f"decode error: {exc}")
+                LOGGER.debug(f"respons: {await resp.text()}")
+                return {"success": False, "data": []}
 
     async def tak_api_add_device_profile(self, profile_name: str, groups: List[str]) -> Mapping[str, Any]:
         """Add device profile to TAK"""
@@ -162,7 +189,12 @@ allowGroupChange=false"
                 await self.output_response_to_output(resp)
                 return {"success": True, "data": data}
 
-            except aiohttp.ClientError:
+            except aiohttp.ClientError as exc:
+                LOGGER.exception(f"aiohttp error: {exc}")
+                return {"success": False, "data": []}
+            except json.decoder.JSONDecodeError as exc:
+                LOGGER.exception(f"decode error: {exc}")
+                LOGGER.debug(f"respons: {await resp.text()}")
                 return {"success": False, "data": []}
 
     async def tak_api_update_device_profile(self, profile_name: str, profile_vars: Dict[Any, Any]) -> Mapping[str, Any]:
@@ -200,7 +232,12 @@ allowGroupChange=false"
                 await self.output_response_to_output(resp)
                 return {"success": True, "data": data}
 
-            except aiohttp.ClientError:
+            except aiohttp.ClientError as exc:
+                LOGGER.exception(f"aiohttp error: {exc}")
+                return {"success": False, "data": []}
+            except json.decoder.JSONDecodeError as exc:
+                LOGGER.exception(f"decode error: {exc}")
+                LOGGER.debug(f"respons: {await resp.text()}")
                 return {"success": False, "data": []}
 
     async def check_file_in_profile_files(
@@ -260,5 +297,10 @@ allowGroupChange=false"
                 await self.output_response_to_output(resp)
                 return {"success": True, "data": data}
 
-            except aiohttp.ClientError:
+            except aiohttp.ClientError as exc:
+                LOGGER.exception(f"aiohttp error: {exc}")
+                return {"success": False, "data": []}
+            except json.decoder.JSONDecodeError as exc:
+                LOGGER.exception(f"decode error: {exc}")
+                LOGGER.debug(f"respons: {await resp.text()}")
                 return {"success": False, "data": []}
