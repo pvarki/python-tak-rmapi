@@ -40,7 +40,7 @@ class RestHelpers:  # pylint: disable=too-few-public-methods
         """Get list of users from TAK"""
         async with await self.helpers.tak_mtls_client() as session:
             try:
-                url = f"{self.helpers.tak_base_url()}/user-management/api/list-users"
+                url = f"{self.helpers.tak_base_url()}/Marti/api/user-management/api/list-users"
                 resp = await session.get(url, ssl=await self.helpers.tak_mtls_client_sslcontext())
                 data = cast(Mapping[str, Union[Any, Mapping[str, Any]]], await resp.json(content_type=None))
                 LOGGER.debug("tak_api_user_list={}".format(data))
