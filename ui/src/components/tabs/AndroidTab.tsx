@@ -28,7 +28,7 @@ export function AndroidTab({ variant }: Props) {
   const handleOpenATAK = async () => {
     try {
       const response = await fetch(
-        `/api/v1/product/proxy/tak/api/v1/tak-missionpackages/ephemeral/${variant}.zip`,
+        `/api/v1/product/proxy/tak/api/v1/tak-missionpackages/ephemeral/${variant}`,
       );
 
       if (!response.ok) {
