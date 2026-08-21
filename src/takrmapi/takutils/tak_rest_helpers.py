@@ -46,11 +46,11 @@ class RestHelpers:  # pylint: disable=too-few-public-methods
                 LOGGER.debug("tak_api_user_list={}".format(data))
                 return {"success": True, "data": data}
             except aiohttp.ClientError as exc:
-                LOGGER.exception(f"aiohttp error: {exc}")
+                LOGGER.exception(f"aiohttp error from {url}: {exc}")
                 return {"success": False, "data": []}
             except json.decoder.JSONDecodeError as exc:
-                LOGGER.exception(f"decode error: {exc}")
-                LOGGER.debug(f"respons: {await resp.text()}")
+                LOGGER.exception(f"decode error from {url}: {exc}")
+                LOGGER.debug(f"{url} response: {await resp.text()}")
                 return {"success": False, "data": []}
 
     async def tak_api_mission_get(self, groupname: str) -> Mapping[str, Any]:
@@ -69,11 +69,11 @@ class RestHelpers:  # pylint: disable=too-few-public-methods
                 await self.output_response_to_output(resp)
                 return {"success": True, "data": data}
             except aiohttp.ClientError as exc:
-                LOGGER.exception(f"aiohttp error: {exc}")
+                LOGGER.exception(f"aiohttp error from {url}: {exc}")
                 return {"success": False, "data": []}
             except json.decoder.JSONDecodeError as exc:
-                LOGGER.exception(f"decode error: {exc}")
-                LOGGER.debug(f"respons: {await resp.text()}")
+                LOGGER.exception(f"decode error from {url}: {exc}")
+                LOGGER.debug(f"{url} response: {await resp.text()}")
                 return {"success": False, "data": []}
 
     async def tak_api_mission_put(self, groupname: str, description: str, default_role: str) -> Mapping[str, Any]:
@@ -104,11 +104,11 @@ allowGroupChange=false"
                 return {"success": True, "data": data}
 
             except aiohttp.ClientError as exc:
-                LOGGER.exception(f"aiohttp error: {exc}")
+                LOGGER.exception(f"aiohttp error from {url}: {exc}")
                 return {"success": False, "data": []}
             except json.decoder.JSONDecodeError as exc:
-                LOGGER.exception(f"decode error: {exc}")
-                LOGGER.debug(f"respons: {await resp.text()}")
+                LOGGER.exception(f"decode error from {url}: {exc}")
+                LOGGER.debug(f"{url} response: {await resp.text()}")
                 return {"success": False, "data": []}
 
     async def tak_api_mission_keywords(self, groupname: str, keywords: List[str]) -> Mapping[str, Any]:
@@ -129,11 +129,11 @@ allowGroupChange=false"
                 return {"success": True, "data": data}
 
             except aiohttp.ClientError as exc:
-                LOGGER.exception(f"aiohttp error: {exc}")
+                LOGGER.exception(f"aiohttp error from {url}: {exc}")
                 return {"success": False, "data": []}
             except json.decoder.JSONDecodeError as exc:
-                LOGGER.exception(f"decode error: {exc}")
-                LOGGER.debug(f"respons: {await resp.text()}")
+                LOGGER.exception(f"decode error from {url}: {exc}")
+                LOGGER.debug(f"{url} response: {await resp.text()}")
                 return {"success": False, "data": []}
 
     async def tak_api_get_device_profile(self, profile_name: str) -> Mapping[str, Any]:
@@ -147,11 +147,11 @@ allowGroupChange=false"
                 return {"success": True, "data": data}
 
             except aiohttp.ClientError as exc:
-                LOGGER.exception(f"aiohttp error: {exc}")
+                LOGGER.exception(f"aiohttp error from {url}: {exc}")
                 return {"success": False, "data": []}
             except json.decoder.JSONDecodeError as exc:
-                LOGGER.exception(f"decode error: {exc}")
-                LOGGER.debug(f"respons: {await resp.text()}")
+                LOGGER.exception(f"decode error from {url}: {exc}")
+                LOGGER.debug(f"{url} response: {await resp.text()}")
                 return {"success": False, "data": []}
 
     async def tak_api_get_device_profile_files(self, profile_name: str) -> Mapping[str, Any]:
@@ -164,11 +164,11 @@ allowGroupChange=false"
                 data = cast(Mapping[str, Union[Any, Mapping[str, Any]]], await resp.json(content_type=None))
                 return {"success": True, "data": data}
             except aiohttp.ClientError as exc:
-                LOGGER.exception(f"aiohttp error: {exc}")
+                LOGGER.exception(f"aiohttp error from {url}: {exc}")
                 return {"success": False, "data": []}
             except json.decoder.JSONDecodeError as exc:
-                LOGGER.exception(f"decode error: {exc}")
-                LOGGER.debug(f"respons: {await resp.text()}")
+                LOGGER.exception(f"decode error from {url}: {exc}")
+                LOGGER.debug(f"{url} response: {await resp.text()}")
                 return {"success": False, "data": []}
 
     async def tak_api_add_device_profile(self, profile_name: str, groups: List[str]) -> Mapping[str, Any]:
@@ -190,11 +190,11 @@ allowGroupChange=false"
                 return {"success": True, "data": data}
 
             except aiohttp.ClientError as exc:
-                LOGGER.exception(f"aiohttp error: {exc}")
+                LOGGER.exception(f"aiohttp error from {url}: {exc}")
                 return {"success": False, "data": []}
             except json.decoder.JSONDecodeError as exc:
-                LOGGER.exception(f"decode error: {exc}")
-                LOGGER.debug(f"respons: {await resp.text()}")
+                LOGGER.exception(f"decode error from {url}: {exc}")
+                LOGGER.debug(f"{url} response: {await resp.text()}")
                 return {"success": False, "data": []}
 
     async def tak_api_update_device_profile(self, profile_name: str, profile_vars: Dict[Any, Any]) -> Mapping[str, Any]:
@@ -233,11 +233,11 @@ allowGroupChange=false"
                 return {"success": True, "data": data}
 
             except aiohttp.ClientError as exc:
-                LOGGER.exception(f"aiohttp error: {exc}")
+                LOGGER.exception(f"aiohttp error from {url}: {exc}")
                 return {"success": False, "data": []}
             except json.decoder.JSONDecodeError as exc:
-                LOGGER.exception(f"decode error: {exc}")
-                LOGGER.debug(f"respons: {await resp.text()}")
+                LOGGER.exception(f"decode error from {url}: {exc}")
+                LOGGER.debug(f"{url} response: {await resp.text()}")
                 return {"success": False, "data": []}
 
     async def check_file_in_profile_files(
@@ -298,9 +298,9 @@ allowGroupChange=false"
                 return {"success": True, "data": data}
 
             except aiohttp.ClientError as exc:
-                LOGGER.exception(f"aiohttp error: {exc}")
+                LOGGER.exception(f"aiohttp error from {url}: {exc}")
                 return {"success": False, "data": []}
             except json.decoder.JSONDecodeError as exc:
-                LOGGER.exception(f"decode error: {exc}")
-                LOGGER.debug(f"respons: {await resp.text()}")
+                LOGGER.exception(f"decode error from {url}: {exc}")
+                LOGGER.debug(f"{url} response: {await resp.text()}")
                 return {"success": False, "data": []}
