@@ -186,7 +186,7 @@ WORKDIR /app/ui
 COPY --from=ghcr.io/pvarki/kraftwerk-helper-tool:1.3.0-260513 /kw_product_init /kw_product_init
 RUN mkdir -p /ui_build && cp -r dist/* /ui_build/
 WORKDIR /app
-RUN apt-get update && apt-get install -y zsh \
+RUN apt-get update && apt-get install -y zsh vim jq \
     && sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" \
     && echo "source /root/.profile" >>/root/.zshrc \
     && pip3 install --break-system-packages git-up \
