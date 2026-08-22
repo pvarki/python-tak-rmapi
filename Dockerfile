@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.1.7-experimental
 ARG TEMURIN_VERSION="17"
-ARG TAKSERVER_IMAGE="pvarki/tak-server:5.8-RELEASE-69"
+ARG TAKSERVER_IMAGE="${PVARKI_DOCKER_REPO:-ghcr.io/}pvarki/tak-server:5.8-RELEASE-69"
 ARG PYPI_INDEX_URL=https://pypi.org/simple
 
 # The local reference tak_server is used in future stages
