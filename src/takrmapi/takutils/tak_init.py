@@ -119,10 +119,12 @@ async def tak_setup_default_profiles(t_rest_helper: RestHelpers) -> None:
     payload = default_profile_available.get("data")
     if not payload:
         LOGGER.error("Did not get profiles: {}".format(payload))
+        LOGGER.info("Full response: {}".format(default_profile_available))
         return
     status = payload.get("status")
     if not status:
         LOGGER.error("Did not get status: {}".format(payload))
+        LOGGER.info("Full response: {}".format(default_profile_available))
         return
     if status != "NOT_FOUND":
         LOGGER.debug("Got good status: {}".format(status))
