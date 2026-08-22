@@ -250,15 +250,26 @@ allowGroupChange=false"
         if f.endswith(".tpl"):
             f = f.replace(".tpl", "")
 
-        if len(tak_profile_files["data"]["data"]) > 0:
-            for file in tak_profile_files["data"]["data"]:
-                if file["name"] == f:
-                    LOGGER.info(
-                        "File '{}' is already attached to profile. No need to add again.".format(
-                            datapackage.package_name
-                        )
-                    )
-                    return True
+        if not isinstance(tak_profile_files, dict):
+            LOGGER.error("tak_profile_files is not dict: {}".format(repr(tak_profile_files)))
+            return False
+        data1 = tak_profile_files.get("data")
+        if not isinstance(data1, dict):
+            LOGGER.error("tak_profile_files['data'] is not dict: {}".format(repr(data1)))
+            return False
+        data2 = data1.get("data")
+        if not isinstance(data2, (list, tuple)):
+            LOGGER.error("tak_profile_files['data']['data'] is not list|tuple: {}".format(repr(data2)))
+            return False
+        if not data2:
+            LOGGER.error("tak_profile_files['data']['data'] is falsy: {}".format(repr(data2)))
+            return False
+        for file in data2:
+            if file["name"] == f:
+                LOGGER.info(
+                    "File '{}' is already attached to profile. No need to add again.".format(datapackage.package_name)
+                )
+                return True
         return False
 
     async def tak_api_upload_file_to_profile(self, profile_name: str, datapackage: TAKDataPackage) -> Mapping[str, Any]:
