@@ -110,25 +110,36 @@ async def tak_setup_default_profiles(t_rest_helper: RestHelpers) -> None:
     # Check that the "TAK-Defaults" profile is in place
     default_profile_available = await t_rest_helper.tak_api_get_device_profile(profile_name="Default-ATAK")
     LOGGER.debug("Available TAK profiles: {}".format(default_profile_available))
-    if (
-        default_profile_available
-        and "data" in default_profile_available
-        and "status" in default_profile_available["data"]
-        and default_profile_available["data"]["status"] == "NOT_FOUND"
-    ):
-        LOGGER.info("Default-ATAK profile missing. Adding profile.")
-        await t_rest_helper.tak_api_add_device_profile(profile_name="Default-ATAK", groups=["default"])
-        await t_rest_helper.tak_api_update_device_profile(
-            profile_name="Default-ATAK",
-            profile_vars={
-                "profile_active": True,
-                "apply_on_connect": True,
-                "apply_on_enrollment": False,
-                "profile_type": "Connection",
-                "tool": None,
-                "groups": ["default"],
-            },
-        )
+    if not default_profile_available:
+        LOGGER.error("Got completely empty response from tak_api_get_device_profile")
+        return
+    if not isinstance(default_profile_available, dict):
+        LOGGER.error("Response is not a dict: {}".format(repr(default_profile_available)))
+        return
+    payload = default_profile_available.get("data")
+    if not payload:
+        LOGGER.error("Did not get profiles: {}".format(payload))
+        return
+    status = payload.get("status")
+    if not status:
+        LOGGER.error("Did not get status: {}".format(payload))
+        return
+    if status != "NOT_FOUND":
+        LOGGER.debug("Got good status: {}".format(status))
+        return
+    LOGGER.info("Default-ATAK profile missing. Adding profile.")
+    await t_rest_helper.tak_api_add_device_profile(profile_name="Default-ATAK", groups=["default"])
+    await t_rest_helper.tak_api_update_device_profile(
+        profile_name="Default-ATAK",
+        profile_vars={
+            "profile_active": True,
+            "apply_on_connect": True,
+            "apply_on_enrollment": False,
+            "profile_type": "Connection",
+            "tool": None,
+            "groups": ["default"],
+        },
+    )
 
 
 async def tak_setup_profile_files(t_rest_helper: RestHelpers, tak_missionpkg: TAKPackageZip) -> None:
