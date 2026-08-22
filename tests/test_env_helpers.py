@@ -6,7 +6,6 @@ from pathlib import Path
 from takrmapi.takutils.env_helpers import env_float
 
 
-@pytest.mark.skip(reason="In CI we can't muck the ENV correctly")
 def test_tak_version_text(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     """Env var set to a valid float string is returned as float."""
     coreconfig_path = tmp_path / "opt" / "tak" / "data" / "CoreConfig.xml"
