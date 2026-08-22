@@ -102,7 +102,7 @@ class UserCRUD:
         certpath = self.userdata / f"{certcn}.pem"
 
         LOGGER.info("Creating TAK specific keypair: {} -> {} ".format(certcn, privpath))
-        ckp = await async_create_keypair(privpath, pubpath)
+        ckp = await async_create_keypair(privpath, pubpath, ktype=config.TAK_CERTS_KTYPE)
         LOGGER.debug("async_create_keypair awaited {} exists: {}".format(privpath, privpath.exists()))
         csrpem = await async_create_client_csr(ckp, csrpath, {"CN": self.certcn})
         LOGGER.debug(
