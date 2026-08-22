@@ -9,8 +9,9 @@ import json
 
 from libpvarki.schemas.product import UserCRUDRequest
 
-from takrmapi.takutils.tak_helpers import UserCRUD, Helpers
-from takrmapi.takutils.tak_pkg_helpers import TAKDataPackage
+from .tak_helpers import UserCRUD, Helpers
+from .tak_pkg_helpers import TAKDataPackage
+from .env_helpers import tak_version
 
 
 LOGGER = logging.getLogger(__name__)
@@ -38,9 +39,13 @@ class RestHelpers:  # pylint: disable=too-few-public-methods
 
     async def tak_api_user_list(self) -> Mapping[str, Any]:
         """Get list of users from TAK"""
+        vparts = tak_version()
+        if vparts[0] == 5 and vparts[1] >= 8:
+            url = f"{self.helpers.tak_base_url()}/Marti/api/user-management/api/list-users"
+        else:
+            url = f"{self.helpers.tak_base_url()}/user-management/api/list-users"
         async with await self.helpers.tak_mtls_client() as session:
             try:
-                url = f"{self.helpers.tak_base_url()}/Marti/api/user-management/api/list-users"
                 resp = await session.get(url, ssl=await self.helpers.tak_mtls_client_sslcontext())
                 data = cast(Mapping[str, Union[Any, Mapping[str, Any]]], await resp.json(content_type=None))
                 LOGGER.debug("tak_api_user_list={}".format(data))
