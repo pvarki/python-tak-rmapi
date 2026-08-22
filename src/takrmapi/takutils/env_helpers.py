@@ -2,6 +2,9 @@
 
 import os
 import logging
+import functools
+
+from ..config import TAKCL_CORECONFIG_PATH
 
 LOGGER = logging.getLogger(__name__)
 
@@ -22,3 +25,16 @@ def env_float(key: str, default: float, min_value: float = 0.0, max_value: float
     except (TypeError, ValueError):
         LOGGER.warning("Invalid value for %s, using default %s", key, default)
         return default
+
+
+@functools.cache
+def tak_version() -> tuple[int, int, int]:
+    """Read /opt/tak/version.txt and return the parts"""
+    fpath = TAKCL_CORECONFIG_PATH.parent.parent / "version.txt"
+    if not fpath.exists():
+        LOGGER.error("{} does not exist".format(fpath))
+        return -1, -1, -1
+    version_str = fpath.read_text(encoding="utf-8")
+    mainver, release = version_str.split("-RELEASE-")
+    parts = mainver.split(".")
+    return int(parts[0]), int(parts[1]), int(release)
