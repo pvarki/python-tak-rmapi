@@ -151,6 +151,7 @@ ENTRYPOINT ["/usr/bin/tini", "--", "/docker-entrypoint.sh"]
 # Base stage for development builds #
 #####################################
 FROM builder_base as devel_build
+COPY --from=tak_server /opt/tak/version.txt /opt/tak/version.txt
 # Install deps
 COPY . /app
 WORKDIR /app/ui
