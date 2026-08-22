@@ -267,10 +267,13 @@ allowGroupChange=false"
             LOGGER.error("tak_profile_files['data']['data'] is not list|tuple: {}".format(repr(data2)))
             return False
         if not data2:
-            LOGGER.error("tak_profile_files['data']['data'] is falsy: {}".format(repr(data2)))
+            LOGGER.info("tak_profile_files['data']['data'] is falsy: {}".format(repr(data2)))
             return False
         for file in data2:
-            if file["name"] == f:
+            if not isinstance(file, dict):
+                LOGGER.error("file is not dict: {}".format(repr(file)))
+                continue
+            if file.get("name") == f:
                 LOGGER.info(
                     "File '{}' is already attached to profile. No need to add again.".format(datapackage.package_name)
                 )
