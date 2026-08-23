@@ -961,8 +961,8 @@ name = "httpcore2"
 version = "2.12.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "h11", marker = "python_full_version < '3.12' or python_full_version >= '3.15' or sys_platform != 'emscripten'" },
-    { name = "truststore", marker = "python_full_version < '3.12' or python_full_version >= '3.15' or sys_platform != 'emscripten'" },
+    { name = "h11" },
+    { name = "truststore" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/be/ad/f4f0e57345f1870f3e8cb624e058d7eca6e5a27d33bcc3311d9b618734cd/httpcore2-2.12.0.tar.gz", hash = "sha256:9293522bba0aa7c4c8e9e3f040c16575bd8868e155a77fa30c7a9085a5eae648", size = 67548, upload-time = "2026-08-18T13:22:08.211Z" }
 wheels = [
@@ -1103,7 +1103,7 @@ wheels = [
 
 [[package]]
 name = "libpvarki"
-version = "2.3.0"
+version = "2.4.0"
 source = { registry = "https://nexus.dev.pvarki.fi/repository/pypilocal/simple" }
 dependencies = [
     { name = "aiodns" },
@@ -1114,9 +1114,9 @@ dependencies = [
     { name = "fastapi" },
     { name = "pydantic" },
 ]
-sdist = { url = "https://nexus.dev.pvarki.fi/repository/pypilocal/packages/libpvarki/2.3.0/libpvarki-2.3.0.tar.gz", hash = "sha256:1db367b5b60e0ef8e6c81ab21e620569f5a60845e9cda078621918add12dacfe" }
+sdist = { url = "https://nexus.dev.pvarki.fi/repository/pypilocal/packages/libpvarki/2.4.0/libpvarki-2.4.0.tar.gz", hash = "sha256:9a11a18cb855b1840cf3a1a4933c53138aaf0f031ef5a645bf85d8e731c93b0f" }
 wheels = [
-    { url = "https://nexus.dev.pvarki.fi/repository/pypilocal/packages/libpvarki/2.3.0/libpvarki-2.3.0-py3-none-any.whl", hash = "sha256:3b6bb0c75e29c39a0b82141ac4dc8cb9d16490087f0ab74d9d4cbbe84a5f0f83" },
+    { url = "https://nexus.dev.pvarki.fi/repository/pypilocal/packages/libpvarki/2.4.0/libpvarki-2.4.0-py3-none-any.whl", hash = "sha256:575a93aaa9b0e09901f832d76234919082a2bde6f451378039722b40097945a0" },
 ]
 
 [[package]]
@@ -2209,7 +2209,7 @@ requires-dist = [
     { name = "gunicorn", specifier = ">=23.0,<24.0" },
     { name = "jinja2", specifier = ">=3.1,<4.0" },
     { name = "libadvian", specifier = ">=1.4,<2.0" },
-    { name = "libpvarki", specifier = ">=2.2,<3.0", index = "https://nexus.dev.pvarki.fi/repository/pypilocal/simple" },
+    { name = "libpvarki", specifier = ">=2.4,<3.0", index = "https://nexus.dev.pvarki.fi/repository/pypilocal/simple" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.30,<1.0" },
 ]
 
