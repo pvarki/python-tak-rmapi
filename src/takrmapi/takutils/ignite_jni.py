@@ -63,6 +63,7 @@ class TAKIgniteOps:
     _profile: Any = field(default=None, init=False)
     _ofa_module: Any = field(default=None, init=False)
     _ssl_helper: Any = field(default=None, init=False)
+    _user_manager: Any = field(default=None, init=False)
     _lock: filelock.FileLock = field(default=filelock.FileLock(config.TAK_CERTS_FOLDER / "pjnius_ignite.lock"))
     _singleton: ClassVar[Optional["TAKIgniteOps"]] = None
 
@@ -123,12 +124,24 @@ class TAKIgniteOps:
                 LOGGER.exception("JNI addAdminCertificates({}) failed: {}".format(path_arg, exc))
                 return False
 
-    def remove_admin(self, certpath: Path) -> bool:
-        """Remove cert as admin"""
-        # FIXME: Use setUserRole
-        username = self.resolve_cert_username(certpath)
-        self.remove_user(username)
-        return self.add_user(certpath)
+    def remove_admin(self, path_arg: Path | str) -> bool:
+        """Remove admin privileges, underneath works with username so pass that or cert path"""
+        if isinstance(path_arg, Path):
+            username = self.resolve_cert_username(path_arg)
+        else:
+            username = path_arg
+        with self._lock.acquire():
+            try:
+                result = self._user_manager.setUserRole(username, None)
+                LOGGER.debug("result; {}".format(repr(result)))
+                if not result:
+                    LOGGER.error("Result is falsy: {}".format(repr(result)))
+                    return False
+                self._user_manager.saveChanges(None)
+                return True
+            except Exception as exc:
+                LOGGER.exception("JNI setUserRole({}, None) failed: {}".format(path_arg, exc))
+                return False
 
     def add_user(self, certpath: Path) -> bool:
         """Add cert as user"""
@@ -219,10 +232,16 @@ class TAKIgniteOps:
         LOGGER.debug("Instantiating OnlineFileAuthModule")
         self._ofa_module = OnlineFileAuthModule()
 
+        LOGGER.debug("Instantiating TakclIgniteHelper")
+        TakclIgniteHelper = autoclass("com.bbn.marti.takcl.TakclIgniteHelper")
+
         # FIXME: Handle TAK messaging not being ready for us yet somehow
         LOGGER.info("Initializing {}".format(self._ofa_module))
         self._ofa_module.init(self._profile)
         LOGGER.info("DONE initializing {}".format(self._ofa_module))
+
+        LOGGER.debug("Getting user_manager via TakclIgniteHelper.getUserManager")
+        self._user_manager = TakclIgniteHelper.getUserManager(self._profile)
 
     def _configure_jvm(self) -> None:
         """Apply configs"""
