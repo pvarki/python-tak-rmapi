@@ -10,9 +10,10 @@ import filelock
 from fastapi import FastAPI
 from libpvarki.logging import init_logging, add_trace_and_audit
 
-from takrmapi import __version__
-from takrmapi import config
-from takrmapi.takutils import tak_init
+from . import __version__
+from . import config
+from .takutils import tak_init
+from .takutils.ignite_jni import TAKIgniteOps
 from .config import LOG_LEVEL
 from .api import all_routers, all_routers_v2, all_routers_ephemeral_v1
 
@@ -32,6 +33,10 @@ async def app_lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
     try:
         lock.acquire(timeout=0.0)
+        await tak_init.wait_for_rest_api()
+        # FIXME: Figure out a good way to determine if Ignite is up before calling
+        #        it should be safe to assume if REST responds Ignite is up too.
+        TAKIgniteOps.singleton()
         await tak_init.setup_tak_mgmt_conn()
         await tak_init.setup_tak_defaults()
     except filelock.Timeout:
