@@ -14,11 +14,11 @@ from cryptography import x509
 from libpvarki.schemas.product import UserCRUDRequest
 from libpvarki.mtlshelp.session import get_session as libsession
 from libpvarki.mtlshelp.csr import async_create_keypair, async_create_client_csr
-from libpvarki.shell import call_cmd
 
 
 from takrmapi import config
 from takrmapi.takutils.env_helpers import env_float
+from .ignite_jni import TAKIgniteOps
 
 LOGGER = logging.getLogger(__name__)
 
@@ -165,9 +165,7 @@ class UserCRUD:
         # TODO # THIS WORKS POORLY UNTIL PROPER REST IS FOUND OR SOME OTHER ALTERNATIVE
         # WE JUST RECREATE THE USER HERE AND GET RID OF THE ADMIN PERMISSIONS THAT WAY
         if await self._check_and_create_missing_user():
-            if not await self.helpers.delete_user_with_cert():
-                return False
-            return await self.helpers.add_user_to_tak_with_cert()
+            return await self.helpers.demote_user_with_cert()
         return False
 
     async def update_user(self) -> bool:
@@ -250,108 +248,55 @@ class Helpers:
         return (self.user.callsign, f"{self.user.callsign}_rm")
 
     async def add_user_to_tak_with_cert(self) -> bool:
-        """Add user to TAK. Certificate with callsign should be available by now..."""
-        #
-        # THIS SHOULD BE CHANGED TO BE DONE THROUGH REST IF POSSIBLE
-        # Or via Pyjnius, or via PyIgnite
-        #
+        """Add user to TAK via Ignite"""
         if not await self.user_cert_validate():
             LOGGER.error("User {} TAK certs not valid".format(self.user.callsign))
             return False
-        tasks = []
+        ignite = TAKIgniteOps.singleton()
+        ret = True
         for certname in self.enable_user_cert_names:
-            tasks.append(
-                asyncio.shield(
-                    call_cmd(
-                        f"USER_CERT_NAME={certname} /opt/scripts/enable_user.sh",
-                        timeout=SHELL_TIMEOUT,
-                        stderr_warn=False,
-                    )
-                )
-            )
-        try:
-            results = await asyncio.gather(*tasks)
-            for code, _stdout, _stderr in results:
-                if code != 0:
-                    return False
-        except asyncio.TimeoutError:
-            LOGGER.error("Shell command timed out")
-            return False
-        except asyncio.CancelledError:
-            LOGGER.info("Cancellation shielded, just wait")
-        except Exception as err:  # pylint: disable=W0718
-            LOGGER.exception(err)
-            return False
-        return True
+            certpath = config.TAK_CERTS_FOLDER / certname
+            if not ignite.add_user(certpath):
+                ret = False
+        return ret
 
     async def add_admin_to_tak_with_cert(self) -> bool:
-        """Add admin user to TAK using shell"""
-        #
-        # THIS SHOULD BE CHANGED TO BE DONE THROUGH REST IF POSSIBLE
-        # Or via Pyjnius, or via PyIgnite
-        #
+        """Add admin user to TAK using Ignite"""
         if not await self.user_cert_validate():
             LOGGER.error("User {} TAK certs not valid".format(self.user.callsign))
             return False
-        tasks = []
+        ignite = TAKIgniteOps.singleton()
+        ret = True
         for certname in self.enable_user_cert_names:
             if certname == "mtlsclient_rm":
                 continue
-            tasks.append(
-                asyncio.shield(
-                    call_cmd(
-                        f"ADMIN_CERT_NAME={certname} /opt/scripts/enable_admin.sh",
-                        timeout=SHELL_TIMEOUT,
-                        stderr_warn=False,
-                    )
-                )
-            )
-        try:
-            results = await asyncio.gather(*tasks)
-            for code, _stdout, _stderr in results:
-                if code != 0:
-                    return False
-        except asyncio.TimeoutError:
-            LOGGER.error("Shell command timed out")
-            return False
-        except asyncio.CancelledError:
-            LOGGER.info("Cancellation shielded, just wait")
-        except Exception as err:  # pylint: disable=W0718
-            LOGGER.exception(err)
-            return False
-        return True
+            certpath = config.TAK_CERTS_FOLDER / certname
+            if not ignite.remove_user(certpath):
+                ret = False
+        return ret
 
     async def delete_user_with_cert(self) -> bool:
-        """Remove user from TAK using shell"""
-        #
-        # THIS SHOULD BE CHANGED TO BE DONE THROUGH REST IF POSSIBLE
-        # Or via Pyjnius, or via PyIgnite
-        #
+        """Remove user from TAK using Ignite"""
         if not await self.user_cert_validate():
             LOGGER.error("User {} TAK certs not valid".format(self.user.callsign))
             return False
-        tasks = []
+        ignite = TAKIgniteOps.singleton()
+        ret = True
         for certname in self.enable_user_cert_names:
-            tasks.append(
-                asyncio.shield(
-                    call_cmd(
-                        f"USER_CERT_NAME={certname} /opt/scripts/delete_user.sh",
-                        timeout=SHELL_TIMEOUT,
-                        stderr_warn=False,
-                    )
-                )
-            )
-        try:
-            results = await asyncio.gather(*tasks)
-            for code, _stdout, _stderr in results:
-                if code != 0:
-                    return False
-        except asyncio.TimeoutError:
-            LOGGER.error("Shell command timed out")
+            certpath = config.TAK_CERTS_FOLDER / certname
+            if not ignite.add_admin(certpath):
+                ret = False
+        return ret
+
+    async def demote_user_with_cert(self) -> bool:
+        """Remove user from TAK using ignite"""
+        if not await self.user_cert_validate():
+            LOGGER.error("User {} TAK certs not valid".format(self.user.callsign))
             return False
-        except asyncio.CancelledError:
-            LOGGER.info("Cancellation shielded, just wait")
-        except Exception as err:  # pylint: disable=W0718
-            LOGGER.exception(err)
-            return False
-        return True
+        ignite = TAKIgniteOps.singleton()
+        ret = True
+        for certname in self.enable_user_cert_names:
+            certpath = config.TAK_CERTS_FOLDER / certname
+            if not ignite.remove_admin(certpath):
+                ret = False
+        return ret
