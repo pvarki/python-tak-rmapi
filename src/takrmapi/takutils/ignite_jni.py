@@ -34,8 +34,7 @@ class TAKCLConfig:
         # Write the file
         LOGGER.debug("Writing TAKCLConfig.xml")
         self.cfgfile.write_text(
-            f"""
-<?xml version="1.0" encoding="UTF-8"?>
+            f"""<?xml version="1.0" encoding="UTF-8"?>
 <TAKCLConfiguration xmlns="http://bbn.com/marti/takcl/config" xmlns:c="http://bbn.com/marti/takcl/config/common">
     <c:TemporaryDirectory>{self.tmpdir}</c:TemporaryDirectory>
     <c:FallbackTemporaryDirectory>{self.fb_tmpdir}</c:FallbackTemporaryDirectory>
@@ -48,7 +47,7 @@ class TAKCLConfig:
         certToolDirectory="{self.certs_dir.parent}"
     />
 </TAKCLConfiguration>
-""",
+""".lstrip(),
             encoding="utf-8",
         )
 
