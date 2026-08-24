@@ -22,12 +22,9 @@ LOGGER = logging.getLogger(__name__)
 # CHECK FOR mtlsclient cert in tak cert folder /opt/tak/cert/files
 
 
-async def setup_tak_mgmt_conn() -> None:
-    """Setup required credentials to manage TAK"""
-    # FIXME: Refactor to separate helpers not requiring a dummy user
-
+async def wait_for_rest_api() -> None:
+    """Wait for REST to come up"""
     user: UserCRUD = UserCRUD(UserCRUDRequest(uuid="not_needed", callsign="mtlsclient", x509cert="not_needed"))
-    t_helpers = tak_helpers.Helpers(user)
     t_rest_helper = RestHelpers(user)
 
     # Wait for the TAK API to start responding
@@ -41,6 +38,16 @@ async def setup_tak_mgmt_conn() -> None:
         else:
             LOGGER.info("TAK API responding, moving on...")
             break
+
+
+async def setup_tak_mgmt_conn() -> None:
+    """Setup required credentials to manage TAK"""
+    # FIXME: Refactor to separate helpers not requiring a dummy user
+    await wait_for_rest_api()
+
+    user: UserCRUD = UserCRUD(UserCRUDRequest(uuid="not_needed", callsign="mtlsclient", x509cert="not_needed"))
+    t_helpers = tak_helpers.Helpers(user)
+    t_rest_helper = RestHelpers(user)
 
     # Move mtlsclient.pem in place if not there already
     if not await t_helpers.user_cert_exists():
