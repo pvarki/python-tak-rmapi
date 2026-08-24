@@ -67,15 +67,20 @@ class TAKIgniteOps:
     _singleton: ClassVar[Optional["TAKIgniteOps"]] = None
 
     @classmethod
+    def singleton_teardown(cls) -> None:
+        """Handle teardown cleanly even if singleton was not instanced before"""
+        if cls._singleton is None:
+            LOGGER.info("Singleton was not instantiated, aborting")
+            return
+        cls._singleton._teardown()
+        cls._singleton = None
+
+    @classmethod
     def singleton(cls, **kwargs: Any) -> "TAKIgniteOps":
         """Return singleton"""
         if not TAKIgniteOps._singleton:
             TAKIgniteOps._singleton = TAKIgniteOps(**kwargs)
         return TAKIgniteOps._singleton
-
-    def __del__(self) -> None:
-        """Do clean teardown"""
-        self.teardown()
 
     def __post_init__(self) -> None:
         """Whatever more we need"""
@@ -302,9 +307,10 @@ class TAKIgniteOps:
         )
         LOGGER.info("DONE Configuring PyJNIus")
 
-    def teardown(self) -> None:
+    def _teardown(self) -> None:
         """Do teardown things"""
         if self._ofa_module is not None:
             LOGGER.info("Halting {}".format(self._ofa_module))
             self._ofa_module.halt()
             LOGGER.info("DONE Halting {}".format(self._ofa_module))
+            self._ofa_module = None
