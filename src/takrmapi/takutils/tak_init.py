@@ -6,6 +6,10 @@ import logging
 import shutil
 import secrets
 import string
+import ssl
+
+import aiohttp
+
 
 from libpvarki.schemas.product import UserCRUDRequest
 from takrmapi import config
@@ -24,20 +28,27 @@ LOGGER = logging.getLogger(__name__)
 
 async def wait_for_rest_api() -> None:
     """Wait for REST to come up"""
-    user: UserCRUD = UserCRUD(UserCRUDRequest(uuid="not_needed", callsign="mtlsclient", x509cert="not_needed"))
-    t_rest_helper = RestHelpers(user)
-
-    # Wait for the TAK API to start responding
+    url = (
+        f"{config.TAK_MESSAGING_API_HOST}:{config.TAK_MESSAGING_API_PORT}/Marti/api/user-management/api/list-groupnames"
+    )
+    sslcontext = ssl.create_default_context()
+    sslcontext.check_hostname = False
+    sslcontext.verify_mode = ssl.CERT_NONE
+    sslcontext.load_cert_chain(
+        config.RMAPI_PERSISTENT_FOLDER / "public" / "mtlsclient.pem",
+        config.RMAPI_PERSISTENT_FOLDER / "private" / "mtlsclient.key",
+    )
     for _ in range(60):
-        data = await t_rest_helper.tak_api_user_list()
-
-        if not data["success"]:
-            LOGGER.info("TAK API not ready yet. Waiting...")
-            LOGGER.info(data)
-            await asyncio.sleep(5)  # nosec
-        else:
-            LOGGER.info("TAK API responding, moving on...")
-            break
+        async with aiohttp.ClientSession() as session:
+            try:
+                LOGGER.info("Trying to load {}".format(url))
+                async with session.get(url, ssl=sslcontext) as resp:
+                    LOGGER.debug("response status: {}".format(resp.status))
+                    LOGGER.info("TAK API responding, moving on...")
+            except aiohttp.ClientError as exc:
+                LOGGER.debug(f"aiohttp error from {url}: {exc}")
+                LOGGER.info("No response, sleeping a bit")
+                await asyncio.sleep(5)
 
 
 async def setup_tak_mgmt_conn() -> None:
