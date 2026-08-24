@@ -87,7 +87,6 @@ class TAKIgniteOps:
         if self._ofa_module is not None:
             raise RuntimeError("Do not call twice")
 
-        LOGGER.debug("Acquiring filelock")
         with self._lock.acquire():
             self.cl_cfg.write_takcl_config()
             self._configure_jvm()
@@ -103,7 +102,6 @@ class TAKIgniteOps:
     def add_admin(self, certpath: Path) -> bool:
         """Add cert as admin"""
         # Avoid races
-        LOGGER.debug("Acquiring filelock")
         with self._lock.acquire():
             path_arg = str(certpath.resolve())
             try:
@@ -130,6 +128,7 @@ class TAKIgniteOps:
             username = self.resolve_cert_username(path_arg)
         else:
             username = path_arg
+        # Avoid races
         with self._lock.acquire():
             try:
                 result = self._user_manager.setUserRole(username, None)
@@ -169,6 +168,7 @@ class TAKIgniteOps:
     def remove_user(self, cert_cn: str | Path) -> bool:
         """Remove user (also removes all privileges)"""
         # FIXME: Should we do what delete_user.sh actually does and set the group to "revoked" instead ?
+        #        probably should use the group setting method for that though and leave this as is
         # Avoid races
         with self._lock.acquire():
             if isinstance(cert_cn, Path):
@@ -186,6 +186,7 @@ class TAKIgniteOps:
                 if not result.startswith("Removed Users") or cert_cn not in result:  # Is this really the best way ?
                     LOGGER.error("Unexpected result: {}".format(repr(result)))
                     return False
+                # TODO: Also kick the users session if removeUsers does not do it
                 return True
             except Exception as exc:
                 LOGGER.exception("JNI removeUsers({}) failed: {}".format(cert_cn, exc))
