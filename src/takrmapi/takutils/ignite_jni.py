@@ -1,12 +1,12 @@
 """Use Ignite service proxies via PuJNIus"""
 
-from typing import Any, ClassVar, Optional
+from typing import Any, ClassVar, Optional, cast
 from pathlib import Path
 from dataclasses import dataclass, field
 import filelock
 import logging
 
-import jnius_config
+import jnius_config  # type: ignore[import-untyped]
 
 from .. import config
 
@@ -16,10 +16,10 @@ LOGGER = logging.getLogger(__name__)
 @dataclass
 class TAKCLConfig:
     base_dir: Path = field(
-        default=config.TAK_BASE_DIR,
+        default=config.TAKCL_CORECONFIG_PATH.parent.parent,
     )
     certs_dir: Path = field(
-        default=config.TAK_CERTS_DIR,
+        default=config.TAK_CERTS_FOLDER,
     )
     cfgfile: Path = field(default=Path("/tmp/TAKCLConfig.xml"))  # nosec
     tmpdir: Path = field(default=Path("/tmp/takcl"))  # nosec
@@ -67,7 +67,7 @@ class TAKIgniteOps:
     _singleton: ClassVar[Optional["TAKIgniteOps"]] = None
 
     @classmethod
-    def singleton(cls, **kwargs) -> "TAKIgniteOps":
+    def singleton(cls, **kwargs: Any) -> "TAKIgniteOps":
         """Return singleton"""
         if not TAKIgniteOps._singleton:
             TAKIgniteOps._singleton = TAKIgniteOps(**kwargs)
@@ -98,7 +98,7 @@ class TAKIgniteOps:
             raise RuntimeError("Do not call twice")
 
         # This needs to be imported **after** configuring classpath
-        from jnius import autoclass
+        from jnius import autoclass  # type: ignore[import-untyped]
 
         CLIProfiles = autoclass("com.bbn.marti.test.shared.data.servers.CLIImmutableServerProfiles")
 
@@ -164,7 +164,7 @@ class TAKIgniteOps:
         path_arg = str(certpath.resolve())
         # FIXME: Add error handling
         cert = self._ssl_helper.getCertificate(path_arg)
-        return self._ssl_helper.getCertificateUserName(cert)
+        return cast(str, self._ssl_helper.getCertificateUserName(cert))
 
     def remove_admin(self, certpath: Path) -> bool:
         """Remove cert as admin"""
