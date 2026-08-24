@@ -8,6 +8,7 @@ tests/data
 .cache
 .venv
 .devspace
+.pnpm-store
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
