@@ -92,57 +92,21 @@ class TAKIgniteOps:
             self._configure_jvm()
             self._load_classes()
 
-    def _load_classes(self) -> None:
-        """Start JVM and load classes"""
-        if self._ofa_module is not None:
-            raise RuntimeError("Do not call twice")
-
-        # This needs to be imported **after** configuring classpath
-        from jnius import autoclass  # type: ignore[import-untyped]
-
-        CLIProfiles = autoclass("com.bbn.marti.test.shared.data.servers.CLIImmutableServerProfiles")
-
-        MutableServerProfileBuilder = autoclass("com.bbn.marti.test.shared.data.servers.MutableServerProfile$Builder")
-
-        OnlineFileAuthModule = autoclass("com.bbn.marti.takcl.AppModules.OnlineFileAuthModule")
-        profile_base = CLIProfiles.SERVER_CLI.getServer()
-
-        LOGGER.debug(f"profile_base: {profile_base}")
-        LOGGER.debug(f"host: {profile_base.getHost()}")
-        LOGGER.debug(f"discovery: {profile_base.getIgniteDiscoveryPort()}")
-        LOGGER.debug(f"discovery count: {profile_base.getIgniteDiscoveryPortCount()}")
-        LOGGER.debug(f"communication: {profile_base.getIgniteCommunicationPort()}")
-        LOGGER.debug(f"communication count: {profile_base.getIgniteCommunicationPortCount()}")
-
-        self._profile = (
-            MutableServerProfileBuilder.build(profile_base).setHost(self.ignite_host).setIdentifier("").create()
-        )
-
-        LOGGER.debug(f"profile: {self._profile}")
-        LOGGER.debug(f"TAK host: {self._profile.getHost()}")
-        LOGGER.debug(f"Ignite discovery port: {self._profile.getIgniteDiscoveryPort()}")
-        LOGGER.debug(f"Ignite communication port: {self._profile.getIgniteCommunicationPort()}")
-        LOGGER.debug(f"Ignite config path: {self._profile.getTAKIgniteConfigFilePath()}")
-
-        self._ofa_module = OnlineFileAuthModule()
-        self._ssl_helper = autoclass("com.bbn.marti.takcl.SSLHelper")
-
-        # FIXME: Handle TAK messaging not being ready for us yet somehow
-        LOGGER.info("Initializing {}".format(self._ofa_module))
-        self._ofa_module.init(self._profile)
-        LOGGER.info("DONE initializing {}".format(self._ofa_module))
-
-    def teardown(self) -> None:
-        """Do teardown things"""
-        if self._ofa_module is not None:
-            self._ofa_module.halt()
+    def resolve_cert_username(self, certpath: Path) -> str:
+        """Resolve cert username"""
+        path_arg = str(certpath.resolve())
+        # FIXME: Add error handling
+        cert = self._ssl_helper.getCertificate(path_arg)
+        return cast(str, self._ssl_helper.getCertificateUserName(cert))
 
     def add_admin(self, certpath: Path) -> bool:
         """Add cert as admin"""
         # Avoid races
+        LOGGER.debug("Acquiring filelock")
         with self._lock.acquire():
             path_arg = str(certpath.resolve())
             try:
+                LOGGER.debug("Calling addAdminCertificates({})".format(path_arg))
                 result = self._ofa_module.addAdminCertificates(path_arg)
                 LOGGER.debug("result; {}".format(repr(result)))
                 if not result:
@@ -158,13 +122,6 @@ class TAKIgniteOps:
             except Exception as exc:
                 LOGGER.exception("JNI addAdminCertificates({}) failed: {}".format(path_arg, exc))
                 return False
-
-    def resolve_cert_username(self, certpath: Path) -> str:
-        """Resolve cert username"""
-        path_arg = str(certpath.resolve())
-        # FIXME: Add error handling
-        cert = self._ssl_helper.getCertificate(path_arg)
-        return cast(str, self._ssl_helper.getCertificateUserName(cert))
 
     def remove_admin(self, certpath: Path) -> bool:
         """Remove cert as admin"""
@@ -179,7 +136,8 @@ class TAKIgniteOps:
         with self._lock.acquire():
             path_arg = str(certpath.resolve())
             try:
-                result = self._ofa_module.addAdminCertificates(path_arg)
+                LOGGER.debug("Calling addCertificates({})".format(path_arg))
+                result = self._ofa_module.addCertificates(path_arg)
                 LOGGER.debug("result; {}".format(repr(result)))
                 if not result:
                     LOGGER.error("Result is falsy: {}".format(repr(result)))
@@ -195,12 +153,15 @@ class TAKIgniteOps:
                 LOGGER.exception("JNI addAdminCertificates({}) failed: {}".format(path_arg, exc))
                 return False
 
-    def remove_user(self, cert_cn: str) -> bool:
+    def remove_user(self, cert_cn: str | Path) -> bool:
         """Remove user (also removes all privileges)"""
-        # FIXME: we do what delete_user.sh actually does and set the group to "revoked" instead ?
+        # FIXME: Should we do what delete_user.sh actually does and set the group to "revoked" instead ?
         # Avoid races
         with self._lock.acquire():
+            if isinstance(cert_cn, Path):
+                cert_cn = self.resolve_cert_username(cert_cn)
             try:
+                LOGGER.debug("Calling removeUsers({})".format(cert_cn))
                 result = self._ofa_module.removeUsers(cert_cn)
                 LOGGER.debug("result; {}".format(repr(result)))
                 if not result:
@@ -217,13 +178,62 @@ class TAKIgniteOps:
                 LOGGER.exception("JNI removeUsers({}) failed: {}".format(cert_cn, exc))
                 return False
 
+    def _load_classes(self) -> None:
+        """Start JVM and load classes"""
+        if self._ofa_module is not None:
+            raise RuntimeError("Do not call twice")
+
+        # JNI init stuff from LLM: https://chatgpt.com/share/6a8bfe2d-4884-83eb-80d1-326c6d28d9aa
+        LOGGER.info("Loading autoclass (starts JVM)")
+        # This needs to be imported **after** configuring classpath
+        from jnius import autoclass  # type: ignore[import-untyped]
+
+        LOGGER.debug("Loading CLIImmutableServerProfiles")
+        CLIProfiles = autoclass("com.bbn.marti.test.shared.data.servers.CLIImmutableServerProfiles")
+        LOGGER.debug("Loading MutableServerProfileBuilder")
+        MutableServerProfileBuilder = autoclass("com.bbn.marti.test.shared.data.servers.MutableServerProfile$Builder")
+        LOGGER.debug("Loading OnlineFileAuthModule")
+        OnlineFileAuthModule = autoclass("com.bbn.marti.takcl.AppModules.OnlineFileAuthModule")
+        LOGGER.debug("Loading SSLHelper")
+        self._ssl_helper = autoclass("com.bbn.marti.takcl.SSLHelper")
+
+        LOGGER.debug("Getting base profile")
+        profile_base = CLIProfiles.SERVER_CLI.getServer()
+        LOGGER.debug(f"profile_base: {profile_base}")
+        LOGGER.debug(f"host: {profile_base.getHost()}")
+        LOGGER.debug(f"discovery: {profile_base.getIgniteDiscoveryPort()}")
+        LOGGER.debug(f"discovery count: {profile_base.getIgniteDiscoveryPortCount()}")
+        LOGGER.debug(f"communication: {profile_base.getIgniteCommunicationPort()}")
+        LOGGER.debug(f"communication count: {profile_base.getIgniteCommunicationPortCount()}")
+
+        LOGGER.debug("Creating our profile")
+        self._profile = (
+            MutableServerProfileBuilder.build(profile_base).setHost(self.ignite_host).setIdentifier("").create()
+        )
+        LOGGER.debug(f"profile: {self._profile}")
+        LOGGER.debug(f"TAK host: {self._profile.getHost()}")
+        LOGGER.debug(f"Ignite discovery port: {self._profile.getIgniteDiscoveryPort()}")
+        LOGGER.debug(f"Ignite communication port: {self._profile.getIgniteCommunicationPort()}")
+        LOGGER.debug(f"Ignite config path: {self._profile.getTAKIgniteConfigFilePath()}")
+
+        LOGGER.debug("Instantiating OnlineFileAuthModule")
+        self._ofa_module = OnlineFileAuthModule()
+
+        # FIXME: Handle TAK messaging not being ready for us yet somehow
+        LOGGER.info("Initializing {}".format(self._ofa_module))
+        self._ofa_module.init(self._profile)
+        LOGGER.info("DONE initializing {}".format(self._ofa_module))
+
     def _configure_jvm(self) -> None:
         """Apply configs"""
+        if self._ofa_module is not None:
+            raise RuntimeError("Do not call twice")
         LOGGER.info("Configuring PyJNIus")
         jnius_config.set_classpath(
             "/opt/tak/utils/UserManager.jar",
         )
 
+        # JNI init stuff from LLM: https://chatgpt.com/share/6a8bfe2d-4884-83eb-80d1-326c6d28d9aa
         # Main configutation things
         jnius_config.add_options(
             "-Djava.net.preferIPv4Stack=true",
@@ -271,3 +281,11 @@ class TAKIgniteOps:
             "--add-opens=java.base/sun.security.provider=ALL-UNNAMED",
             "--add-opens=java.base/javax.security.auth.x500=ALL-UNNAMED",
         )
+        LOGGER.info("DONE Configuring PyJNIus")
+
+    def teardown(self) -> None:
+        """Do teardown things"""
+        if self._ofa_module is not None:
+            LOGGER.info("Halting {}".format(self._ofa_module))
+            self._ofa_module.halt()
+            LOGGER.info("DONE Halting {}".format(self._ofa_module))
