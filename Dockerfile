@@ -113,10 +113,7 @@ COPY --from=production_build /tmp/wheelhouse /tmp/wheelhouse
 COPY --from=production_build /ui_build /ui_build
 COPY --from=production_build /docker-entrypoint.sh /docker-entrypoint.sh
 COPY --from=ghcr.io/pvarki/kraftwerk-helper-tool:1.3.0-260513 /kw_product_init /kw_product_init
-# FIXME: Figure out exactly which jars we need and copy only those
-COPY --from=tak_server /opt/tak /opt/tak
-COPY --from=tak_server /opt/scripts /opt/scripts
-COPY --from=tak_server /opt/templates /opt/templates
+COPY --from=tak_server /opt/tak/utils/UserManager.jar /opt/tak/utils/UserManager.jar
 COPY docker/container-init.sh /container-init.sh
 
 WORKDIR /app
