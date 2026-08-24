@@ -13,7 +13,7 @@ from libpvarki.logging import init_logging, add_trace_and_audit
 from . import __version__
 from . import config
 from .takutils import tak_init
-from .takutils.ignite_jni import TAKIgniteOps
+from .takutils import ignite_jni
 from .config import LOG_LEVEL
 from .api import all_routers, all_routers_v2, all_routers_ephemeral_v1
 
@@ -33,11 +33,15 @@ async def app_lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
     try:
         lock.acquire(timeout=0.0)
+        LOGGER.info("Waiting for REST API")
         await tak_init.wait_for_rest_api()
         # FIXME: Figure out a good way to determine if Ignite is up before calling
         #        it should be safe to assume if REST responds Ignite is up too.
-        TAKIgniteOps.singleton()
+        LOGGER.info("TAKIgniteOps.singleton()")
+        ignite_jni.TAKIgniteOps.singleton()
+        LOGGER.info("tak_init.setup_tak_mgmt_conn()")
         await tak_init.setup_tak_mgmt_conn()
+        LOGGER.info("tak_init.setup_tak_defaults()")
         await tak_init.setup_tak_defaults()
     except filelock.Timeout:
         LOGGER.warning("Someone has already locked {}, leaving this init to them".format(lockpath))
@@ -55,6 +59,8 @@ async def app_lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     # App runs
     yield
     # Cleanup
+    LOGGER.info("TAKIgniteOps teardown")
+    ignite_jni.TAKIgniteOps.singleton().teardown()
 
 
 def get_app_no_init() -> FastAPI:
@@ -72,6 +78,7 @@ def get_app() -> FastAPI:
     init_logging(LOG_LEVEL)
     # Set logger levels on modules imported before logging init
     tak_init.LOGGER.setLevel(LOG_LEVEL)
+    ignite_jni.LOGGER.setLevel(LOG_LEVEL)
     app = get_app_no_init()
     LOGGER.info("API init done, setting log verbosity to '{}'.".format(logging.getLevelName(LOG_LEVEL)))
     return app
