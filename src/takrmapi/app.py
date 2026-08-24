@@ -31,7 +31,6 @@ async def app_lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     await asyncio.sleep(random.random() / 2)  # nosec
     lock = filelock.FileLock(lockpath)
 
-    igniteops_instance: ignite_jni.TAKIgniteOps | None = None
     try:
         lock.acquire(timeout=0.0)
         LOGGER.info("Waiting for REST API")
@@ -39,7 +38,7 @@ async def app_lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         # FIXME: Figure out a good way to determine if Ignite is up before calling
         #        it should be safe to assume if REST responds Ignite is up too.
         LOGGER.info("TAKIgniteOps.singleton() from locked tak_init")
-        igniteops_instance = ignite_jni.TAKIgniteOps.singleton()
+        ignite_jni.TAKIgniteOps.singleton()
         LOGGER.info("tak_init.setup_tak_mgmt_conn()")
         await tak_init.setup_tak_mgmt_conn()
         LOGGER.info("tak_init.setup_tak_defaults()")
@@ -54,9 +53,8 @@ async def app_lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         LOGGER.warning("tak_init has not yet completed. Waiting for {} to be relased.".format(lockpath))
         await asyncio.sleep(2)
 
-    if not igniteops_instance:
-        LOGGER.info("TAKIgniteOps.singleton() from other worker after tak_init")
-        igniteops_instance = ignite_jni.TAKIgniteOps.singleton()
+    LOGGER.info("TAKIgniteOps.singleton() after tak_init")
+    ignite_jni.TAKIgniteOps.singleton()
 
     await tak_init.get_tak_defaults()
 
@@ -64,9 +62,8 @@ async def app_lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     # App runs
     yield
     # Cleanup
-    if igniteops_instance:
-        LOGGER.info("TAKIgniteOps teardown")
-        igniteops_instance.teardown()
+    LOGGER.info("TAKIgniteOps teardown")
+    ignite_jni.TAKIgniteOps.singleton_teardown()
 
 
 def get_app_no_init() -> FastAPI:
