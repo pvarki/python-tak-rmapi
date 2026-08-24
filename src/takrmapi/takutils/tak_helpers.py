@@ -255,7 +255,10 @@ class Helpers:
         ignite = TAKIgniteOps.singleton()
         ret = True
         for certname in self.enable_user_cert_names:
-            certpath = config.TAK_CERTS_FOLDER / certname
+            certpath = config.TAK_CERTS_FOLDER / f"{certname}.pem"
+            if not certpath.exists():
+                LOGGER.error("{} does not exist".format(certpath))
+                return False
             if not ignite.add_user(certpath):
                 ret = False
         return ret
@@ -270,8 +273,11 @@ class Helpers:
         for certname in self.enable_user_cert_names:
             if certname == "mtlsclient_rm":
                 continue
-            certpath = config.TAK_CERTS_FOLDER / certname
-            if not ignite.remove_user(certpath):
+            certpath = config.TAK_CERTS_FOLDER / f"{certname}.pem"
+            if not certpath.exists():
+                LOGGER.error("{} does not exist".format(certpath))
+                return False
+            if not ignite.add_admin(certpath):
                 ret = False
         return ret
 
@@ -283,8 +289,11 @@ class Helpers:
         ignite = TAKIgniteOps.singleton()
         ret = True
         for certname in self.enable_user_cert_names:
-            certpath = config.TAK_CERTS_FOLDER / certname
-            if not ignite.add_admin(certpath):
+            certpath = config.TAK_CERTS_FOLDER / f"{certname}.pem"
+            if not certpath.exists():
+                LOGGER.error("{} does not exist".format(certpath))
+                return False
+            if not ignite.remove_user(certpath):
                 ret = False
         return ret
 
@@ -296,7 +305,10 @@ class Helpers:
         ignite = TAKIgniteOps.singleton()
         ret = True
         for certname in self.enable_user_cert_names:
-            certpath = config.TAK_CERTS_FOLDER / certname
+            certpath = config.TAK_CERTS_FOLDER / f"{certname}.pem"
+            if not certpath.exists():
+                LOGGER.error("{} does not exist".format(certpath))
+                return False
             if not ignite.remove_admin(certpath):
                 ret = False
         return ret

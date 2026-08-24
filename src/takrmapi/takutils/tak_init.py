@@ -45,6 +45,7 @@ async def wait_for_rest_api() -> None:
                 async with session.get(url, ssl=sslcontext) as resp:
                     LOGGER.debug("response status: {}".format(resp.status))
                     LOGGER.info("TAK API responding, moving on...")
+                    return
             except aiohttp.ClientError as exc:
                 LOGGER.debug(f"aiohttp error from {url}: {exc}")
                 LOGGER.info("No response, sleeping a bit")
