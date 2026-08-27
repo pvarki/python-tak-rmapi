@@ -50,3 +50,16 @@ class TAKAdminPackageListResponse(BaseModel):  # pylint: disable=too-few-public-
         """Pydantic configs"""
 
         extra = Extra.forbid
+
+
+# FIXME: Move to libpvarki, this is duplicated in rmapi and rmmtxauthz
+class ProductAddRequest(BaseModel):  # pylint: disable=too-few-public-methods
+    """Request to add product interoperability."""
+
+    certcn: str = Field(description="CN of the certificate")
+    x509cert: str = Field(description="Certificate encoded with CFSSL conventions (newlines escaped)")
+
+    class Config:  # pylint: disable=too-few-public-methods
+        """Pydantic configs"""
+
+        extra = Extra.forbid
