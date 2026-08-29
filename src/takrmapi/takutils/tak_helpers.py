@@ -377,7 +377,10 @@ async def enroll_peer_product_cert(certcn: str, certpem: str, group: str = "defa
 
     The group matters as much as the enrolment. certmod puts a user with no group options
     into __ANON__, and CoreConfig sets x509addAnonymous="false", so such a user connects
-    and is then dropped every few seconds.
+    and is then dropped every few seconds. That is also why this does not call
+    enable_user.sh first: that script is a bare certmod, so it resets a working
+    user to __ANON__ on every re-enrolment and depends on a second JVM call to
+    put the group back.
 
     -g sets the in- and out-group together. An out-group alone was the intent -- read
     CoT, cannot publish -- but it leaves __ANON__ as the in-group, which is the
@@ -395,21 +398,28 @@ async def enroll_peer_product_cert(certcn: str, certpem: str, group: str = "defa
     except Exception:  # pylint: disable=W0718
         LOGGER.exception("Could not store the certificate for %s", certcn)
         return False
-    # enable_user.sh takes no group options, so the group is set by a second call
-    setgroup = (
+    # One command, deliberately. enable_user.sh runs `certmod` with NO group
+    # options, and UserManager documents that as meaning the anonymous group:
+    # "If no groups are specified with this or other group options, the user
+    # will be added to the anonymous group." So calling it first RESETS an
+    # already-correct user to __ANON__, and the group is only restored if the
+    # second JVM call also succeeds. Every failure, timeout or restart in
+    # between left the peer in __ANON__, which x509addAnonymous="false" then
+    # refuses -- the peer enrols "successfully" and is dropped for ever after.
+    # certmod adds the user as readily as it modifies one, so the first call
+    # bought nothing and cost an outage window on every re-enrolment.
+    commands = (
         f"cd /opt/tak && . ./setenv.sh && TAKCL_CORECONFIG_PATH={config.TAKCL_CORECONFIG_PATH}"
-        f" java -jar /opt/tak/utils/UserManager.jar certmod -g {group} {cert_file}"
+        f" java -jar /opt/tak/utils/UserManager.jar certmod -g {group} {cert_file}",
     )
-    # Both steps run a JVM, so both get the longer budget.
-    commands = (f"USER_CERT_NAME={certcn} /opt/scripts/enable_user.sh", setgroup)
     async with _ENROL_LOCK:
         for cmd in commands:
             try:
                 code, _stdout, _stderr = await asyncio.shield(call_cmd(cmd, timeout=JVM_TIMEOUT, stderr_warn=False))
             except TimeoutError:
                 LOGGER.error(
-                    "Timed out after %ss while enrolling %s, command: %s. The user may now exist "
-                    "without a group, which TAK refuses; raise TAK_RMAPI_JVM_TIMEOUT if this host "
+                    "Timed out after %ss while enrolling %s, command: %s. The user keeps whatever "
+                    "group it already had; raise TAK_RMAPI_JVM_TIMEOUT if this host "
                     "is slow to start a JVM.",
                     JVM_TIMEOUT,
                     certcn,
