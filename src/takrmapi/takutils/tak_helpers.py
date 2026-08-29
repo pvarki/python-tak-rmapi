@@ -23,6 +23,11 @@ from takrmapi.takutils.env_helpers import env_float
 LOGGER = logging.getLogger(__name__)
 
 SHELL_TIMEOUT = env_float("TAK_RMAPI_SHELL_TIMEOUT", 5.0, max_value=600.0)
+# UserManager.jar starts a JVM, which on a loaded host takes far longer than the
+# general shell timeout. At 5s it timed out in production every time: the user was
+# created by enable_user.sh and then left in __ANON__ because the group call never
+# completed, which CoreConfig's x509addAnonymous="false" then refuses.
+JVM_TIMEOUT = env_float("TAK_RMAPI_JVM_TIMEOUT", 60.0, max_value=600.0)
 KEYPAIR_TIMEOUT = env_float("TAK_RMAPI_KEYPAIR_TIMEOUT", 5.0, max_value=600.0)
 
 # FIXME: Convert the helpers to dataclasses
@@ -357,6 +362,12 @@ class Helpers:
         return True
 
 
+# One enrolment at a time. The peer retries while it is failing and each attempt
+# spawns a JVM: production logged nine overlapping enrolments inside 0.7s, which is
+# the surest way to make the very timeout that caused the retries worse.
+_ENROL_LOCK = asyncio.Lock()
+
+
 async def enroll_peer_product_cert(certcn: str, certpem: str, group: str = "default") -> bool:
     """Write another product's client cert into TAK's cert store and enrol it as a TAK user.
 
@@ -366,8 +377,12 @@ async def enroll_peer_product_cert(certcn: str, certpem: str, group: str = "defa
 
     The group matters as much as the enrolment. certmod puts a user with no group options
     into __ANON__, and CoreConfig sets x509addAnonymous="false", so such a user connects
-    and is then dropped every few seconds. The peer gets an out-group only: it reads CoT
-    and cannot publish, which is what an ingest consumer should be able to do.
+    and is then dropped every few seconds.
+
+    -g sets the in- and out-group together. An out-group alone was the intent -- read
+    CoT, cannot publish -- but it leaves __ANON__ as the in-group, which is the
+    membership that check rejects, so the connection is dropped exactly as if nothing
+    had been set. The peer never writes to the socket, so the in-group is unused.
 
     Only takrmapi can do this, it needs the tak_data volume and the TAK utils jars.
     """
@@ -383,23 +398,32 @@ async def enroll_peer_product_cert(certcn: str, certpem: str, group: str = "defa
     # enable_user.sh takes no group options, so the group is set by a second call
     setgroup = (
         f"cd /opt/tak && . ./setenv.sh && TAKCL_CORECONFIG_PATH={config.TAKCL_CORECONFIG_PATH}"
-        f" java -jar /opt/tak/utils/UserManager.jar certmod -og {group} {cert_file}"
+        f" java -jar /opt/tak/utils/UserManager.jar certmod -g {group} {cert_file}"
     )
+    # Both steps run a JVM, so both get the longer budget.
     commands = (f"USER_CERT_NAME={certcn} /opt/scripts/enable_user.sh", setgroup)
-    for cmd in commands:
-        try:
-            code, _stdout, _stderr = await asyncio.shield(call_cmd(cmd, timeout=SHELL_TIMEOUT, stderr_warn=False))
-        except TimeoutError:
-            LOGGER.error("Shell command timed out while enrolling %s", certcn)
-            return False
-        except asyncio.CancelledError:
-            LOGGER.info("Cancellation shielded, just wait")
-            return True
-        except Exception:  # pylint: disable=W0718
-            LOGGER.exception("Could not enrol %s as a TAK user", certcn)
-            return False
-        if code != 0:
-            LOGGER.error("Enrolment step returned %s for %s: %s", code, certcn, cmd)
-            return False
+    async with _ENROL_LOCK:
+        for cmd in commands:
+            try:
+                code, _stdout, _stderr = await asyncio.shield(call_cmd(cmd, timeout=JVM_TIMEOUT, stderr_warn=False))
+            except TimeoutError:
+                LOGGER.error(
+                    "Timed out after %ss while enrolling %s, command: %s. The user may now exist "
+                    "without a group, which TAK refuses; raise TAK_RMAPI_JVM_TIMEOUT if this host "
+                    "is slow to start a JVM.",
+                    JVM_TIMEOUT,
+                    certcn,
+                    cmd,
+                )
+                return False
+            except asyncio.CancelledError:
+                LOGGER.info("Cancellation shielded, just wait")
+                return True
+            except Exception:  # pylint: disable=W0718
+                LOGGER.exception("Could not enrol %s as a TAK user", certcn)
+                return False
+            if code != 0:
+                LOGGER.error("Enrolment step returned %s for %s: %s", code, certcn, cmd)
+                return False
     LOGGER.info("Enrolled peer product cert %s as a TAK user reading group %s", certcn, group)
     return True
