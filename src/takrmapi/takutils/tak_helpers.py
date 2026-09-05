@@ -2,7 +2,9 @@
 
 from typing import Sequence, cast
 import os
+import re
 import asyncio
+import shlex
 import shutil
 import logging
 from pathlib import Path
@@ -368,6 +370,12 @@ class Helpers:
 _ENROL_LOCK = asyncio.Lock()
 
 
+# certcn becomes a filename AND part of a /bin/sh -c command line below. Anything outside
+# this charset is rejected rather than escaped: a CN is a DNS-ish name, so there is no
+# legitimate value containing a path separator, a space, or shell metacharacters.
+_SAFE_CERTCN = re.compile(r"^[A-Za-z0-9._-]{1,253}$")
+
+
 async def enroll_peer_product_cert(certcn: str, certpem: str, group: str = "default") -> bool:
     """Write another product's client cert into TAK's cert store and enrol it as a TAK user.
 
@@ -389,6 +397,9 @@ async def enroll_peer_product_cert(certcn: str, certpem: str, group: str = "defa
 
     Only takrmapi can do this, it needs the tak_data volume and the TAK utils jars.
     """
+    if not _SAFE_CERTCN.match(certcn):
+        LOGGER.error("Refusing to enrol %r: CN is not a plain DNS-style name", certcn)
+        return False
     cert_file = config.TAK_CERTS_FOLDER / f"{certcn}.pem"
     try:
         # x509cert arrives in CFSSL conventions, ie with the newlines escaped
@@ -410,7 +421,7 @@ async def enroll_peer_product_cert(certcn: str, certpem: str, group: str = "defa
     # bought nothing and cost an outage window on every re-enrolment.
     commands = (
         f"cd /opt/tak && . ./setenv.sh && TAKCL_CORECONFIG_PATH={config.TAKCL_CORECONFIG_PATH}"
-        f" java -jar /opt/tak/utils/UserManager.jar certmod -g {group} {cert_file}",
+        f" java -jar /opt/tak/utils/UserManager.jar certmod -g {shlex.quote(group)} {shlex.quote(str(cert_file))}",
     )
     async with _ENROL_LOCK:
         for cmd in commands:
