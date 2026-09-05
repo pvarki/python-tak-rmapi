@@ -9,6 +9,7 @@ from .admininfo import router as admininfo_router
 from .healthcheck import router as healthcheck_router
 from .description import router as description_router
 from .instructions import router as instructions_router
+from .interop import router as interop_router
 from .tak_datapackage import router as takdatapackage_router
 from .tak_missionpackage import router as takmissionpackage_router
 
@@ -26,6 +27,7 @@ all_routers.include_router(admininfo_router, prefix="/admins", tags=["admins"])
 all_routers.include_router(healthcheck_router, prefix="/healthcheck", tags=["healthcheck"])
 all_routers.include_router(description_router, prefix="/description", tags=["description"])
 all_routers.include_router(instructions_router, prefix="/instructions", tags=["instructions"])
+all_routers.include_router(interop_router, prefix="/interop", tags=["interop"])
 all_routers.include_router(takdatapackage_router, prefix="/tak-datapackages", tags=["tak-datapackages"])
 all_routers.include_router(takmissionpackage_router, prefix="/tak-missionpackages", tags=["tak-missionpackages"])
 

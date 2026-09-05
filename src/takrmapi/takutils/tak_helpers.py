@@ -2,7 +2,9 @@
 
 from typing import Sequence, cast
 import os
+import re
 import asyncio
+import shlex
 import shutil
 import logging
 from pathlib import Path
@@ -23,6 +25,11 @@ from takrmapi.takutils.env_helpers import env_float
 LOGGER = logging.getLogger(__name__)
 
 SHELL_TIMEOUT = env_float("TAK_RMAPI_SHELL_TIMEOUT", 5.0, max_value=600.0)
+# UserManager.jar starts a JVM, which on a loaded host takes far longer than the
+# general shell timeout. At 5s it timed out in production every time: the user was
+# created by enable_user.sh and then left in __ANON__ because the group call never
+# completed, which CoreConfig's x509addAnonymous="false" then refuses.
+JVM_TIMEOUT = env_float("TAK_RMAPI_JVM_TIMEOUT", 60.0, max_value=600.0)
 KEYPAIR_TIMEOUT = env_float("TAK_RMAPI_KEYPAIR_TIMEOUT", 5.0, max_value=600.0)
 
 # FIXME: Convert the helpers to dataclasses
@@ -355,3 +362,89 @@ class Helpers:
             LOGGER.exception(err)
             return False
         return True
+
+
+# One enrolment at a time. The peer retries while it is failing and each attempt
+# spawns a JVM: production logged nine overlapping enrolments inside 0.7s, which is
+# the surest way to make the very timeout that caused the retries worse.
+_ENROL_LOCK = asyncio.Lock()
+
+
+# certcn becomes a filename AND part of a /bin/sh -c command line below. Anything outside
+# this charset is rejected rather than escaped: a CN is a DNS-ish name, so there is no
+# legitimate value containing a path separator, a space, or shell metacharacters.
+_SAFE_CERTCN = re.compile(r"^[A-Za-z0-9._-]{1,253}$")
+
+
+async def enroll_peer_product_cert(certcn: str, certpem: str, group: str = "default") -> bool:
+    """Write another product's client cert into TAK's cert store and enrol it as a TAK user.
+
+    TAK already trusts anything signed by the RASENMAEHER CA for TLS, but it will reject a
+    client whose CN is not a known TAK user. This is what lets a peer product (BattleLog)
+    open a CoT stream on 8089. Idempotent: certmod is safe to re-run for an existing cert.
+
+    The group matters as much as the enrolment. certmod puts a user with no group options
+    into __ANON__, and CoreConfig sets x509addAnonymous="false", so such a user connects
+    and is then dropped every few seconds. That is also why this does not call
+    enable_user.sh first: that script is a bare certmod, so it resets a working
+    user to __ANON__ on every re-enrolment and depends on a second JVM call to
+    put the group back.
+
+    -g sets the in- and out-group together. An out-group alone was the intent -- read
+    CoT, cannot publish -- but it leaves __ANON__ as the in-group, which is the
+    membership that check rejects, so the connection is dropped exactly as if nothing
+    had been set. The peer never writes to the socket, so the in-group is unused.
+
+    Only takrmapi can do this, it needs the tak_data volume and the TAK utils jars.
+    """
+    if not _SAFE_CERTCN.match(certcn):
+        LOGGER.error("Refusing to enrol %r: CN is not a plain DNS-style name", certcn)
+        return False
+    cert_file = config.TAK_CERTS_FOLDER / f"{certcn}.pem"
+    try:
+        # x509cert arrives in CFSSL conventions, ie with the newlines escaped
+        pem = certpem.replace("\\n", "\n")
+        x509.load_pem_x509_certificate(pem.encode("utf-8"))
+        cert_file.write_text(pem.rstrip("\n") + "\n", encoding="utf-8")
+    except Exception:  # pylint: disable=W0718
+        LOGGER.exception("Could not store the certificate for %s", certcn)
+        return False
+    # One command, deliberately. enable_user.sh runs `certmod` with NO group
+    # options, and UserManager documents that as meaning the anonymous group:
+    # "If no groups are specified with this or other group options, the user
+    # will be added to the anonymous group." So calling it first RESETS an
+    # already-correct user to __ANON__, and the group is only restored if the
+    # second JVM call also succeeds. Every failure, timeout or restart in
+    # between left the peer in __ANON__, which x509addAnonymous="false" then
+    # refuses -- the peer enrols "successfully" and is dropped for ever after.
+    # certmod adds the user as readily as it modifies one, so the first call
+    # bought nothing and cost an outage window on every re-enrolment.
+    commands = (
+        f"cd /opt/tak && . ./setenv.sh && TAKCL_CORECONFIG_PATH={config.TAKCL_CORECONFIG_PATH}"
+        f" java -jar /opt/tak/utils/UserManager.jar certmod -g {shlex.quote(group)} {shlex.quote(str(cert_file))}",
+    )
+    async with _ENROL_LOCK:
+        for cmd in commands:
+            try:
+                code, _stdout, _stderr = await asyncio.shield(call_cmd(cmd, timeout=JVM_TIMEOUT, stderr_warn=False))
+            except TimeoutError:
+                LOGGER.error(
+                    "Timed out after %ss while enrolling %s, command: %s. The user keeps whatever "
+                    "group it already had; raise TAK_RMAPI_JVM_TIMEOUT if this host "
+                    "is slow to start a JVM.",
+                    JVM_TIMEOUT,
+                    certcn,
+                    cmd,
+                )
+                return False
+            except asyncio.CancelledError:
+                LOGGER.info("Cancellation shielded, just wait")
+                return True
+            except Exception:  # pylint: disable=W0718
+                LOGGER.exception("Could not enrol %s as a TAK user", certcn)
+                return False
+            if code != 0:
+                LOGGER.error("Enrolment step returned %s for %s: %s", code, certcn, cmd)
+                return False
+    LOGGER.info("Enrolled peer product cert %s as a TAK user reading group %s", certcn, group)
+    return True
