@@ -5,6 +5,7 @@ from pathlib import Path
 from dataclasses import dataclass, field
 import filelock
 import logging
+import tempfile
 
 import jnius_config  # type: ignore[import-untyped]
 
@@ -21,9 +22,9 @@ class TAKCLConfig:
     certs_dir: Path = field(
         default=config.TAK_CERTS_FOLDER,
     )
-    cfgfile: Path = field(default=Path("/tmp/TAKCLConfig.xml"))  # nosec
-    tmpdir: Path = field(default=Path("/tmp/takcl"))  # nosec
-    fb_tmpdir: Path = field(default=Path("/tmp/takcl-fallback"))  # nosec
+    cfgfile: Path = field(default=Path(tempfile.gettempdir()) / "/TAKCLConfig.xml")
+    tmpdir: Path = field(default=Path(tempfile.gettempdir()) / "takcl")
+    fb_tmpdir: Path = field(default=Path(tempfile.gettempdir()) / "takcl-fallback")
 
     def write_takcl_config(self) -> None:
         """Write takcl config XML"""
