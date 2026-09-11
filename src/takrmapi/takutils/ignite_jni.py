@@ -55,7 +55,12 @@ class TAKCLConfig:
 
 @dataclass
 class TAKIgniteOps:
-    """Use Ignite service proxies via PuJNIus"""
+    """Use Ignite service proxies via PuJNIus.
+
+    Until we can be certain about the safety of calling the Ignite services
+    concurrently from different workers we use a FileLock to ensure only one worker
+    calls them at a time.
+    """
 
     ignite_host: str = field(default="127.0.0.1")
     cl_cfg: TAKCLConfig = field(default_factory=TAKCLConfig)
