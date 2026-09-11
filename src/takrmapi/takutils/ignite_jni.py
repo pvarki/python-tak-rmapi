@@ -170,17 +170,19 @@ class TAKIgniteOps:
                 LOGGER.exception("JNI addAdminCertificates({}) failed: {}".format(path_arg, exc))
                 return False
 
-    def remove_user(self, cert_cn: str | Path) -> bool:
+    def remove_user(self, path_arg: str | Path) -> bool:
         """Remove user (also removes all privileges)"""
-        # FIXME: Should we do what delete_user.sh actually does and set the group to "revoked" instead ?
-        #        probably should use the group setting method for that though and leave this as is
+        if isinstance(path_arg, Path):
+            username = self.resolve_cert_username(path_arg)
+        else:
+            username = path_arg
+        # Just to be extra-sure
+        self.remove_admin(username)
         # Avoid races
         with self._lock.acquire():
-            if isinstance(cert_cn, Path):
-                cert_cn = self.resolve_cert_username(cert_cn)
             try:
-                LOGGER.debug("Calling removeUsers({})".format(cert_cn))
-                result = self._ofa_module.removeUsers(cert_cn)
+                LOGGER.debug("Calling removeUsers({})".format(username))
+                result = self._ofa_module.removeUsers(username)
                 LOGGER.debug("result; {}".format(repr(result)))
                 if not result:
                     LOGGER.error("Result is falsy: {}".format(repr(result)))
@@ -188,13 +190,13 @@ class TAKIgniteOps:
                 if not isinstance(result, str):
                     LOGGER.error("Result is not string: {}".format(repr(result)))
                     return False
-                if not result.startswith("Removed Users") or cert_cn not in result:  # Is this really the best way ?
+                if not result.startswith("Removed Users") or username not in result:  # Is this really the best way ?
                     LOGGER.error("Unexpected result: {}".format(repr(result)))
                     return False
                 # TODO: Also kick the users session if removeUsers does not do it
                 return True
             except Exception as exc:
-                LOGGER.exception("JNI removeUsers({}) failed: {}".format(cert_cn, exc))
+                LOGGER.exception("JNI removeUsers({}) failed: {}".format(username, exc))
                 return False
 
     def _load_classes(self) -> None:
