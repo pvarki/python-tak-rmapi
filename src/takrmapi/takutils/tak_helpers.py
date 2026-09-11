@@ -162,16 +162,12 @@ class UserCRUD:
 
     async def demote_user(self) -> bool:
         """Demote user from being admin"""
-        # TODO # THIS WORKS POORLY UNTIL PROPER REST IS FOUND OR SOME OTHER ALTERNATIVE
-        # WE JUST RECREATE THE USER HERE AND GET RID OF THE ADMIN PERMISSIONS THAT WAY
         if await self._check_and_create_missing_user():
             return await self.helpers.demote_user_with_cert()
         return False
 
     async def update_user(self) -> bool:
         """Update user certificate"""
-        # TODO # THIS NEED TO BE CHECKED WHAT IT ACTUALLY DOES IN BACKGROUND,
-        # DOES IT UPDATE THE CERTIFICATE OR ADD NEW USER OR WHAT??
         if await self._check_and_create_missing_user():
             # TODO check/find out if the user is admin and add as admin
             return await self.helpers.add_user_to_tak_with_cert()
