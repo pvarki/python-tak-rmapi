@@ -58,6 +58,13 @@ TAK_CERTS_KTYPE: str = cfg("TAK_CERTS_KTYPE", cast=str, default="EC")
 TAK_CA_CHAIN_PATH: Path = cfg("TAK_CA_CHAIN_PATH", cast=Path, default=Path("/ca_public/ca_chain.pem"))
 RMAPI_PERSISTENT_FOLDER: Path = cfg("RMAPI_PERSISTENT_FOLDER", cast=Path, default=Path("/data/persistent"))
 
+SUBSCRIPTION_GUARD_ENABLED: bool = cfg("SUBSCRIPTION_GUARD_ENABLED", cast=bool, default=True)
+SUBSCRIPTION_GUARD_REQUIRE_REGISTERED: bool = cfg("SUBSCRIPTION_GUARD_REQUIRE_REGISTERED", cast=bool, default=True)
+SUBSCRIPTION_GUARD_INTERVAL: float = cfg("SUBSCRIPTION_GUARD_INTERVAL", cast=float, default=5.0)
+SUBSCRIPTION_GUARD_HEARTBEAT: Path = cfg(
+    "SUBSCRIPTION_GUARD_HEARTBEAT", cast=Path, default=Path("/run/takrmapi/subscriptions.heartbeat")
+)
+
 PRODUCT_HTTPS_EPHEMERAL_PORT: int = cfg("PRODUCT_HTTPS_EPHEMERAL_PORT", cast=int, default=4627)
 PRODUCT_HTTPS_EPHEMERAL_FQDN: str = cfg("PRODUCT_HTTPS_EPHEMERAL_FQDN", cast=str, default="")
 

@@ -70,6 +70,23 @@ def dump_openapi(ctx: click.Context) -> None:
     ctx.exit(0)
 
 
+@cli_group.command(name="watch-subscriptions")
+def do_watch_subscriptions() -> None:
+    """Continuously disconnect revoked or unregistered CoT certificate identities."""
+    from takrmapi.runtime import watch_subscriptions
+
+    watch_subscriptions()
+
+
+@cli_group.command(name="serve")
+@click.pass_context
+def do_serve(ctx: click.Context) -> None:
+    """Run HTTP workers and supervise the subscription watcher."""
+    from takrmapi.runtime import serve
+
+    ctx.exit(serve())
+
+
 def takrmapi_cli() -> None:
     """rmfpapi"""
     init_logging(logging.WARNING)

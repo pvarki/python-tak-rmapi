@@ -17,6 +17,13 @@ and Let's Encrypt roots are not included in the CoT trust bundle.
 Docker
 ------
 
+Production uses ``eclipse-temurin:17-jre-noble`` and Python 3.12. The JDK and
+compilers remain in build and development stages for building PyJNIus wheels.
+Runtime wheels are installed offline with uv into ``/opt/venv``; neither uv nor
+the wheel archives are retained in the production image. ``JAVA_HOME`` points
+PyJNIus to the JRE, including ``libjvm.so``. The ``JAVA_RUNTIME_IMAGE`` build
+argument accepts a compatible Ubuntu Noble Java 17 runtime for testing.
+
 For more controlled deployments and to get rid of "works on my computer" -syndrome, we always
 make sure our software works under docker.
 
@@ -112,6 +119,15 @@ Mount its credentials volume at ``/data/persistent`` in this container too.
 ``container-init.sh`` checks for ``public/mtlsclient.pem`` and
 ``private/mtlsclient.key`` before starting; it does not consume the manifest's
 single-use CSR token. Start ``takinit`` before the TAK services and this bridge.
+
+CoT revocation enforcement
+--------------------------
+
+The default entrypoint supervises a JNI subscription watcher alongside the HTTP
+workers. It disconnects revoked or unregistered TLS certificate identities and
+persists both of each user's certificate fingerprints across restarts.
+See `subscription guard operation and limitations <docs/subscription-guard.md>`_
+for configuration, health reporting, and the asynchronous disconnect window.
 
 Versioning
 ----------

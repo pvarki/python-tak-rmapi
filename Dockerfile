@@ -1,10 +1,12 @@
-# syntax=docker/dockerfile:1.1.7-experimental
+# syntax=docker/dockerfile:1
 ARG TEMURIN_VERSION="17"
+ARG JAVA_RUNTIME_IMAGE="eclipse-temurin:${TEMURIN_VERSION}-jre-noble"
 ARG TAKSERVER_IMAGE="${PVARKI_DOCKER_REPO:-ghcr.io/}pvarki/tak-server:5.8-RELEASE-69"
 ARG PYPI_INDEX_URL=https://pypi.org/simple
 
 # The local reference tak_server is used in future stages
 FROM ${TAKSERVER_IMAGE} as tak_server
+FROM ghcr.io/astral-sh/uv:0.11.6 AS uv_tool
 
 #############################################
 # Tox testsuite for multiple python version #
@@ -26,9 +28,9 @@ RUN export RESOLVED_VERSIONS=`pyenv_resolve $PYTHON_VERSIONS` \
 ######################
 # Base builder image #
 ######################
-FROM eclipse-temurin:${TEMURIN_VERSION}-noble as builder_base
+FROM eclipse-temurin:${TEMURIN_VERSION}-jdk-noble as builder_base
 #FROM python:3.11-bookworm as builder_base
-COPY --from=ghcr.io/astral-sh/uv:0.11.6 /uv /uvx /usr/local/bin/
+COPY --from=uv_tool /uv /uvx /usr/local/bin/
 
 ENV \
   # locale
@@ -107,39 +109,43 @@ RUN --mount=type=ssh source /.venv/bin/activate \
 #########################
 # Main production build #
 #########################
-FROM eclipse-temurin:${TEMURIN_VERSION}-noble as production
-ARG PYPI_INDEX_URL
-COPY --from=production_build /tmp/wheelhouse /tmp/wheelhouse
+FROM ${JAVA_RUNTIME_IMAGE} as production
+ENV PATH="/opt/venv/bin:${PATH}" \
+    PYTHONFAULTHANDLER=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
 COPY --from=production_build /ui_build /ui_build
 COPY --from=production_build /docker-entrypoint.sh /docker-entrypoint.sh
 COPY --from=tak_server /opt/tak/utils/UserManager.jar /opt/tak/utils/UserManager.jar
+COPY --from=tak_server /opt/tak/version.txt /opt/tak/version.txt
 COPY docker/container-init.sh /container-init.sh
 
 WORKDIR /app
 # Install system level deps for running the package (not devel versions for building wheels)
 # and install the wheels we built in the previous step. generate default config
-RUN --mount=type=ssh apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
         bash \
         libffi8 \
         tini \
-        git \
-        openssh-client \
         curl \
         jq \
         python3 \
-        python3-pip \
+        openssl \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/* \
     && chmod a+x /docker-entrypoint.sh \
-    && WHEELFILE=`echo /tmp/wheelhouse/takrmapi-*.whl` \
-    && pip3 install --break-system-packages --find-links=/tmp/wheelhouse/ "$WHEELFILE" \
-    && rm -rf /tmp/wheelhouse/ \
     # Make some directories
     && mkdir -p /opt/tak/data/certs \
     # Get tool for waiting for ports
     && curl https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh -o /usr/bin/wait-for-it.sh \
     && chmod a+x /usr/bin/wait-for-it.sh \
     && true
+# Install offline without retaining the installer or wheel archives in image layers.
+RUN --mount=from=uv_tool,source=/uv,target=/usr/local/bin/uv \
+    --mount=from=production_build,source=/tmp/wheelhouse,target=/tmp/wheelhouse \
+    uv venv --python /usr/bin/python3 /opt/venv \
+    && uv pip install --no-cache --python /opt/venv/bin/python --no-index \
+        --find-links=/tmp/wheelhouse /tmp/wheelhouse/takrmapi-*.whl
 ENTRYPOINT ["/usr/bin/tini", "--", "/docker-entrypoint.sh"]
 
 
