@@ -95,6 +95,15 @@ TLDR:
 Remember to activate your virtualenv whenever working on the repo, this is needed
 because pylint and mypy pre-commit hooks use the "system" python for now (because reasons).
 
+Product credentials
+-------------------
+
+The TAK initializer provisions the product certificate through RMAPI and CFSSL.
+Mount its credentials volume at ``/data/persistent`` in this container too.
+``container-init.sh`` checks for ``public/mtlsclient.pem`` and
+``private/mtlsclient.key`` before starting; it does not consume the manifest's
+single-use CSR token. Start ``takinit`` before the TAK services and this bridge.
+
 Versioning
 ----------
 
