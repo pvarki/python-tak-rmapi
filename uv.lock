@@ -2209,7 +2209,7 @@ wheels = [
 
 [[package]]
 name = "takrmapi"
-version = "1.15.0+260824"
+version = "1.15.1+260912"
 source = { editable = "." }
 dependencies = [
     { name = "fastapi" },

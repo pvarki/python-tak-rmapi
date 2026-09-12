@@ -24,14 +24,12 @@ if [[ ! -L "${TR}/CoreConfig.xml"  ]];then
   ln -f -s "${TR}/data/CoreConfig.xml" "${TR}/CoreConfig.xml"
 fi
 
-if [ -f /data/persistent/firstrun.done ]
-then
-  echo "First run already done"
-else
-  # Do the normal init
-  if [ -f /pvarki/kraftwerk-init.json ]
-  then
-    /kw_product_init init /pvarki/kraftwerk-init.json
-    date -u +"%Y%m%dT%H%M" >/data/persistent/firstrun.done
+# takinit obtains the product identity once; its CSR token is single-use.
+# Both containers mount the same persistent credentials volume.
+if [ -f /pvarki/kraftwerk-init.json ]; then
+  if [ ! -s /data/persistent/public/mtlsclient.pem ] || [ ! -s /data/persistent/private/mtlsclient.key ]; then
+    echo "TAK product credentials are missing. Run takinit with the shared /data/persistent volume first." >&2
+    exit 1
   fi
+  echo "Using product credentials provisioned by takinit"
 fi
