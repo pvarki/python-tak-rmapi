@@ -75,6 +75,30 @@ class SubscriptionBackend:
             node, "com.bbn.marti.remote.SubscriptionManagerLite", self.constants.DISTRIBUTED_SUBSCRIPTION_MANAGER
         )
 
+    def _users(self, node: str) -> Any:
+        return self._service(
+            node,
+            "com.bbn.marti.remote.groups.FileUserManagementInterface",
+            self.constants.DISTRIBUTED_USER_FILE_MANAGER,
+        )
+
+    def remove_registration(self, username: str) -> bool:
+        """Use bounded RPCs instead of TAKCL's unbounded service proxy and text output."""
+        with self.ops._lock.acquire(timeout=5):
+            nodes = self._group().nodes().toArray()
+        if not len(nodes):
+            raise ConnectionError("No TAK messaging nodes available")
+        results = []
+        for node in nodes:
+            try:
+                with self.ops._lock.acquire(timeout=5):
+                    # removeUser also removes privileges and saves the auth file.
+                    results.append(self._users(str(node.id().toString())).removeUser(username) is not None)
+            except Exception:
+                LOGGER.exception("Registration removal failed on TAK node %s", node.id().toString())
+                results.append(False)
+        return all(results)
+
     def snapshot(self) -> list[Connection]:
         """Read live services rather than the delayed metrics cache in cluster mode."""
         with self.ops._lock.acquire(timeout=5):
@@ -104,7 +128,7 @@ class SubscriptionBackend:
             fingerprint = certificate.fingerprint(hashes.SHA256()).hex().upper()
             registered = any(
                 entry.getFingerprint() and entry.getFingerprint().replace(":", "").upper() == fingerprint
-                for entry in self.ops._user_manager.getUserAuthenticationFile().getUser().toArray()
+                for entry in self._users(connection.node).getUserAuthenticationFile().getUser().toArray()
             )
             return Identity(fingerprint, certificate.not_valid_after_utc.timestamp(), registered)
 

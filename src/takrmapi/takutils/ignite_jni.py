@@ -177,33 +177,21 @@ class TAKIgniteOps:
 
     def remove_user(self, path_arg: str | Path) -> bool:
         """Remove user (also removes all privileges)"""
+        from .subscription_jni import SubscriptionBackend
+
+        removed = False
+        try:
+            with self._lock.acquire(timeout=5):
+                username = self.resolve_cert_username(path_arg) if isinstance(path_arg, Path) else path_arg
+                backend = SubscriptionBackend(self)
+            removed = backend.remove_registration(username)
+        except Exception:
+            LOGGER.exception("JNI registration removal failed for %s", path_arg)
+        # Still disconnect when saving registrations times out during cluster recovery.
         if isinstance(path_arg, Path):
-            username = self.resolve_cert_username(path_arg)
-        else:
-            username = path_arg
-        # Just to be extra-sure
-        self.remove_admin(username)
-        # Avoid races
-        with self._lock.acquire():
-            try:
-                LOGGER.debug("Calling removeUsers({})".format(username))
-                result = self._ofa_module.removeUsers(username)
-                LOGGER.debug("result; {}".format(repr(result)))
-                if not result:
-                    LOGGER.error("Result is falsy: {}".format(repr(result)))
-                    return False
-                if not isinstance(result, str):
-                    LOGGER.error("Result is not string: {}".format(repr(result)))
-                    return False
-                if not result.startswith("Removed Users") or username not in result:  # Is this really the best way ?
-                    LOGGER.error("Unexpected result: {}".format(repr(result)))
-                    return False
-                if isinstance(path_arg, Path):
-                    return self.disconnect_user(path_arg)
-                return True
-            except Exception as exc:
-                LOGGER.exception("JNI removeUsers({}) failed: {}".format(username, exc))
-                return False
+            disconnected = self.disconnect_user(path_arg)
+            return removed and disconnected
+        return removed
 
     def disconnect_user(self, certpath: Path) -> bool:
         """Close this certificate's CoT connections on every messaging node."""
