@@ -8,6 +8,11 @@ User certificate keys default to EC P-256. Set ``TI_TAK_CERTS_KTYPE=RSA`` in
 the container environment to generate RSA user keys instead. Changing this setting
 does not rotate existing user keys or change the TAK server's JWT signing identity.
 
+TAK client packages trust the internal CFSSL intermediate and root from
+``/ca_public/ca_chain.pem``. Override this path with ``TI_TAK_CA_CHAIN_PATH``
+when using a different mount. The chain must include the root CA. HTTPS certificates
+and Let's Encrypt roots are not included in the CoT trust bundle.
+
 
 Docker
 ------

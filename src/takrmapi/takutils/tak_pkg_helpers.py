@@ -404,14 +404,8 @@ class TAKPackageZip:
         # FIXME: do the blocking IO in executor
         LOGGER.info("PKCS12 Got template %s, tmp folder %s...", row, tmp_folder)
         if "rasenmaeher_ca-public.p12" in row:
-            # FIXME: instead of adding the root key into the software, need a way to get full chain with Root CA
-            templates_folder = Path(__file__).parent.parent / "templates"
-            LOGGER.info("Searching keys from  %s...", templates_folder)
-            ca_files = templates_folder.rglob("*.pem")
-            srcdata = Path("/le_certs/rasenmaeher/fullchain.pem").read_bytes()
-            for ca_f in sorted(ca_files):
-                LOGGER.info("Adding PEM %s to CA bundle", ca_f.name)
-                srcdata = srcdata + ca_f.read_bytes()
+            # CoT uses the internal CFSSL CA, including its intermediate and root.
+            srcdata = config.TAK_CA_CHAIN_PATH.read_bytes()
 
             tgtfile = Path(tmp_folder) / "rasenmaeher_ca-public.p12"
             LOGGER.info("Creating %s", tgtfile)
