@@ -3,27 +3,23 @@
 import pytest
 from pathlib import Path
 
+from takrmapi.takutils import env_helpers
 from takrmapi.takutils.env_helpers import env_float
 
 
 def test_tak_version_text(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
-    """Env var set to a valid float string is returned as float."""
+    """Read the TAK version from a temporary image layout."""
     coreconfig_path = tmp_path / "opt" / "tak" / "data" / "CoreConfig.xml"
     version_path = coreconfig_path.parent.parent / "version.txt"
     assert str(version_path).endswith("/opt/tak/version.txt")
     version_path.parent.mkdir(parents=True, exist_ok=True)
     version_path.write_text("5.8-RELEASE-69", encoding="utf-8")
-    monkeypatch.setenv("TAKCL_CORECONFIG_PATH", str(coreconfig_path))
-    from takrmapi import config
-
-    monkeypatch.setattr(config, "TAKCL_CORECONFIG_PATH", coreconfig_path)
-    # Import after mucking with ENV
-    from takrmapi.takutils.env_helpers import tak_version
-
-    vparts = tak_version()
-    assert vparts[0] == 5
-    assert vparts[1] == 8
-    assert vparts[2] == 69
+    monkeypatch.setattr(env_helpers, "TAKCL_CORECONFIG_PATH", coreconfig_path)
+    env_helpers.tak_version.cache_clear()
+    try:
+        assert env_helpers.tak_version() == (5, 8, 69)
+    finally:
+        env_helpers.tak_version.cache_clear()
 
 
 def test_env_float_happy_float(monkeypatch: pytest.MonkeyPatch) -> None:
