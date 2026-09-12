@@ -198,11 +198,22 @@ class TAKIgniteOps:
                 if not result.startswith("Removed Users") or username not in result:  # Is this really the best way ?
                     LOGGER.error("Unexpected result: {}".format(repr(result)))
                     return False
-                # TODO: Also kick the users session if removeUsers does not do it
+                if isinstance(path_arg, Path):
+                    return self.disconnect_user(path_arg)
                 return True
             except Exception as exc:
                 LOGGER.exception("JNI removeUsers({}) failed: {}".format(username, exc))
                 return False
+
+    def disconnect_user(self, certpath: Path) -> bool:
+        """Close this certificate's CoT connections on every messaging node."""
+        from .subscription_jni import SubscriptionBackend
+
+        try:
+            return SubscriptionBackend(self).disconnect_certificate(certpath)
+        except Exception:
+            LOGGER.exception("Failed to disconnect certificate %s", certpath)
+            return False
 
     def _load_classes(self) -> None:
         """Start JVM and load classes"""

@@ -50,7 +50,8 @@ async def user_revoked(user: UserCRUDRequest, request: Request) -> OperationResu
     comes_from_rm(request)
     tak_usercrud = tak_helpers.UserCRUD(user)
     LOGGER.info("Removing user '{}' from TAK".format(user.callsign))
-    await tak_usercrud.revoke_user()
+    if not await tak_usercrud.revoke_user():
+        raise HTTPException(status_code=503, detail="Certificate revocation is incomplete; retry the request.")
     result = OperationResultResponse(success=True)
     return result
 
