@@ -54,7 +54,7 @@ LOG_LEVEL: int = cfg("LOG_LEVEL", default=10, cast=int)
 TEMPLATES_PATH: Path = cfg("TEMPLATES_PATH", cast=Path, default=Path(__file__).parent / "templates")
 
 TAK_CERTS_FOLDER: Path = cfg("TAK_CERTS_FOLDER", cast=Path, default=Path("/opt/tak/data/certs/files"))
-TAK_CERTS_KTYPE: str = cfg("TAK_CERTS_KTYPE", cast=str, default="RSA")
+TAK_CERTS_KTYPE: str = cfg("TAK_CERTS_KTYPE", cast=str, default="EC")
 RMAPI_PERSISTENT_FOLDER: Path = cfg("RMAPI_PERSISTENT_FOLDER", cast=Path, default=Path("/data/persistent"))
 
 PRODUCT_HTTPS_EPHEMERAL_PORT: int = cfg("PRODUCT_HTTPS_EPHEMERAL_PORT", cast=int, default=4627)
