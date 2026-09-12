@@ -169,7 +169,11 @@ class SubscriptionBackend:
             self.listener = Listener()
             query = self.autoclass("org.apache.ignite.cache.query.ContinuousQuery")()
             query.setLocalListener(self.listener)
-            query.setPageSize(1)
+            # Flush from Ignite's timer thread, not the cache-update thread. Sending
+            # immediately can hold a server topology lock while retrying a dead
+            # watcher and prevent its replacement from joining the cluster.
+            query.setPageSize(2**31 - 1)
+            query.setTimeInterval(25)
             query.setAutoUnsubscribe(True)
             self.cursor = cache.query(self.cast("org.apache.ignite.cache.query.Query", query))
 
