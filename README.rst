@@ -17,6 +17,13 @@ and Let's Encrypt roots are not included in the CoT trust bundle.
 Docker
 ------
 
+Production uses ``eclipse-temurin:17-jre-noble`` and Python 3.12. The JDK and
+compilers remain in build and development stages for building PyJNIus wheels.
+Runtime wheels are installed offline with uv into ``/opt/venv``; neither uv nor
+the wheel archives are retained in the production image. ``JAVA_HOME`` points
+PyJNIus to the JRE, including ``libjvm.so``. The ``JAVA_RUNTIME_IMAGE`` build
+argument accepts a compatible Ubuntu Noble Java 17 runtime for testing.
+
 For more controlled deployments and to get rid of "works on my computer" -syndrome, we always
 make sure our software works under docker.
 
