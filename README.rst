@@ -4,6 +4,10 @@ takrmapi
 
 RASENMAEHER integration API for TAK server
 
+User certificate keys default to EC P-256. Set ``TI_TAK_CERTS_KTYPE=RSA`` in
+the container environment to generate RSA user keys instead. Changing this setting
+does not rotate existing user keys or change the TAK server's JWT signing identity.
+
 
 Docker
 ------
