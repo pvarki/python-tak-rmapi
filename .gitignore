@@ -9,6 +9,7 @@ tests/data
 .venv
 .devspace
 .pnpm-store
+ui/.mf/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

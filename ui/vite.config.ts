@@ -5,6 +5,8 @@ import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
+import { dependencies } from "./package.json";
+
 export default defineConfig(() => {
   return {
     server: {
@@ -35,19 +37,19 @@ export default defineConfig(() => {
         remotes: {},
         shared: {
           react: {
-            requiredVersion: "18.3.1",
+            requiredVersion: dependencies.react,
             singleton: true,
           },
           i18next: {
-            requiredVersion: "25.6.2",
+            requiredVersion: dependencies.i18next,
             singleton: true,
           },
           "react-i18next": {
-            requiredVersion: "16.3.3",
+            requiredVersion: dependencies["react-i18next"],
             singleton: true,
           },
           "@tanstack/react-router": {
-            requiredVersion: "1.135.2",
+            requiredVersion: dependencies["@tanstack/react-router"],
             singleton: true,
           },
         },
