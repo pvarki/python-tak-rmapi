@@ -57,6 +57,6 @@ class Revocations:
             )
 
     def prune(self, now: float | None = None) -> None:
-        """Expired certificates are rejected by TAK itself, including after resumption."""
+        """The subscription guard independently rejects expired certificate identities."""
         with closing(self._connect()) as connection, connection:
             connection.execute("DELETE FROM revoked WHERE expires < ?", (time.time() if now is None else now,))
