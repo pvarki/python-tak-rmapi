@@ -1,7 +1,6 @@
 """Helper functions to manage tak"""
 
 from typing import Sequence, cast
-import os
 import asyncio
 import shutil
 import logging
@@ -19,6 +18,7 @@ from libpvarki.mtlshelp.csr import async_create_keypair, async_create_client_csr
 from takrmapi import config
 from takrmapi.takutils.env_helpers import env_float
 from .ignite_jni import TAKIgniteOps
+from .revocations import Revocations
 
 LOGGER = logging.getLogger(__name__)
 
@@ -129,7 +129,13 @@ class UserCRUD:
 
     async def revoke_user(self) -> bool:
         """Remove user from TAK"""
+        certificates = [self.rm_certpem]
+        if self.certpath.exists():
+            certificates.append(self.certpem)
+        # Commit before any remote operation: failure must never restore access.
+        Revocations().record(certificates)
         if await self.helpers.user_cert_validate():
+            removed = await self.helpers.delete_user_with_cert()
             async with await self.helpers.tak_mtls_client() as session:
                 url = f"{self.rm_base}api/v1/product/revoke/mtls"
                 LOGGER.debug("POSTing cert to {}".format(url))
@@ -138,9 +144,11 @@ class UserCRUD:
                 resp.raise_for_status()
                 payload = await resp.json()
                 LOGGER.debug("Got payload: {}".format(payload))
-            await self.helpers.delete_user_with_cert()
-            if (config.TAK_CERTS_FOLDER / f"{self.user.callsign}.pem").is_file():
-                os.remove(config.TAK_CERTS_FOLDER / f"{self.user.callsign}.pem")
+            if not payload.get("success") or not removed:
+                LOGGER.error("Certificate revocation or TAK removal is incomplete for %s", self.callsign)
+                return False
+            for name in self.helpers.enable_user_cert_names:
+                (config.TAK_CERTS_FOLDER / f"{name}.pem").unlink(missing_ok=True)
             return True
         return False
 

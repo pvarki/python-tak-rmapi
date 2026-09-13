@@ -120,6 +120,15 @@ Mount its credentials volume at ``/data/persistent`` in this container too.
 ``private/mtlsclient.key`` before starting; it does not consume the manifest's
 single-use CSR token. Start ``takinit`` before the TAK services and this bridge.
 
+CoT revocation enforcement
+--------------------------
+
+The default entrypoint supervises a JNI subscription watcher alongside the HTTP
+workers. It disconnects revoked or unregistered TLS certificate identities and
+persists both of each user's certificate fingerprints across restarts.
+See `subscription guard operation and limitations <docs/subscription-guard.md>`_
+for configuration, health reporting, and the asynchronous disconnect window.
+
 Versioning
 ----------
 

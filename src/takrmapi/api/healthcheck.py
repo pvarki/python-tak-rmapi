@@ -8,6 +8,9 @@ from fastapi import APIRouter, Depends, Request
 from libpvarki.middleware import MTLSHeader
 from libpvarki.schemas.product import ProductHealthCheckResponse
 
+from takrmapi import config
+from takrmapi.runtime import guard_healthy
+
 LOGGER = logging.getLogger(__name__)
 
 mtls_router = APIRouter(dependencies=[Depends(MTLSHeader(auto_error=True))])
@@ -31,5 +34,9 @@ async def get_healthcheck_delivery_status(
     if not ready_to_serve:
         reason = "Waiting for RM to give go ahead."
         LOGGER.info("{} : {}".format(request.url, reason))
+
+    if config.SUBSCRIPTION_GUARD_ENABLED and not guard_healthy():
+        ready_to_serve = False
+        reason = "Subscription guard is starting or unavailable."
 
     return ProductHealthCheckResponse(healthy=ready_to_serve, extra=reason)
