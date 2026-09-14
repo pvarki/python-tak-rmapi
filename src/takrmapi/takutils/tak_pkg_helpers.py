@@ -17,6 +17,7 @@ from jinja2 import Template
 from libpvarki.mtlshelp.pkcs12 import convert_pem_to_pkcs12
 from takrmapi import config
 from takrmapi.takutils.env_helpers import env_float
+from takrmapi.takutils.pkcs12_helpers import load_ca_certificates, serialize_java_ca_truststore
 from takrmapi.takutils.tak_helpers import UserCRUD, Helpers
 from takrmapi.takutils.tak_pkg_vars import TAKDataPackagePathVars, TAKViteAssetVars, UserTAKTemplateVars
 
@@ -423,7 +424,8 @@ class TAKPackageZip:
             # Keep whatever name the manifest asked for, it is deployment prefixed by the templates
             tgtfile = Path(tmp_folder) / Path(ca_match.group(0)).name
             LOGGER.info("Creating %s", tgtfile)
-            p12bytes = convert_pem_to_pkcs12(srcdata, None, "public", None, "ca-chains")
+            # Java based clients like ATAK only see trusted certificate entries, see pkcs12_helpers
+            p12bytes = serialize_java_ca_truststore(load_ca_certificates(srcdata), "public")
             tgtfile.parent.mkdir(parents=True, exist_ok=True)
             LOGGER.debug("{} exists: {}".format(tgtfile.parent, tgtfile.parent.exists()))
             tgtfile.write_bytes(p12bytes)
