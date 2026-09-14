@@ -8,7 +8,7 @@
    <Contents>
       <Content ignore="false" zipEntry="server.pref"/>
       <Content ignore="false" zipEntry="{{ v.ca_cert_name }}.p12"/>
-      <Content ignore="false" zipEntry="{{ v.client_cert_name }}.p12"/>
+      <Content ignore="false" zipEntry="{{ v.client_cert_file_name }}.p12"/>
       <Content ignore="false" zipEntry="TAK_defaults.pref"/>
       <Content ignore="false" zipEntry="TeamMember_Toolbar.pref"/>
       <Content ignore="false" zipEntry="MML_Peruskartta.xml"/>
