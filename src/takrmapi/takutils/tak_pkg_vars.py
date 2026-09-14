@@ -43,6 +43,11 @@ class UserTAKTemplateVars:
         return self.user.callsign
 
     @property
+    def client_cert_file_name(self) -> str:
+        """User cert file name, deployment prefixed so packages from different deployments do not clash."""
+        return f"{config.TAK_SERVER_NAME}_{self.user.callsign}"
+
+    @property
     def client_cert_password(self) -> str:
         """User pw mapping for cert in templates,"""
         return self.user.callsign
