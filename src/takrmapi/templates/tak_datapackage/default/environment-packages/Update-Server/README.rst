@@ -39,6 +39,6 @@ EUD config's to allow the update server to work server.pref file:
 
 <entry key="deviceProfileEnableOnConnect" class="class java.lang.Boolean">true</entry>
 <entry key="eud_api_sync_mapsources" class="class java.lang.Boolean">false</entry>
-<entry key="atakPluginScanninOnStartup" class="class java.lang.Boolean">true</entry>
+<entry key="atakPluginScanningOnStartup" class="class java.lang.Boolean">true</entry>
 <entry key="atakUpdateServerUrl" class="class java.lang.String">https://IP:8443/update</entry>
 <entry key="appMgmtEnableUpdateServer" class="class java.lang.Boolean">true</entry>
