@@ -10,7 +10,7 @@
         <entry key="displayServerConnectionWidget" class="class java.lang.Boolean">true</entry>
         <entry key="caLocation" class="class java.lang.String">cert/{{ v.ca_cert_name }}.p12</entry>
         <entry key="caPassword" class="class java.lang.String">public</entry>
-        <entry key="certificateLocation" class="class java.lang.String">cert/{{ v.client_cert_name }}.p12</entry>
+        <entry key="certificateLocation" class="class java.lang.String">cert/{{ v.client_cert_file_name }}.p12</entry>
         <entry key="clientPassword" class="class java.lang.String">{{ v.client_cert_password }}</entry>
         <entry key="locationCallsign" class="class java.lang.String">{{ v.client_cert_name }}</entry>
         <!-- Download server profiles on connect and disable tak.gov default maps -->
