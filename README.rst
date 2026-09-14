@@ -17,6 +17,16 @@ The HTTPS chain from ``/le_certs/rasenmaeher/fullchain.pem`` (override with
 the Let's Encrypt ``ISRG Root X1``, are added to the same bundle. Clients need
 these to reach the TAKServer HTTPS endpoints, so both files must be mounted.
 
+The CA bundle is written as a **Java compatible** PKCS12 truststore
+(``pkcs12.serialize_java_truststore``, see ``takutils/pkcs12_helpers.py``): only
+trusted certificate entries are visible to Java based clients, a plain
+certificate-only PKCS12 is parsed happily by OpenSSL but shows up as an empty
+keystore in ATAK. Entries get deterministic SHA-256 fingerprint aliases and are
+deduplicated, the HTTPS leaf certificate of the fullchain is left out. The
+encryption profile (3DES, SHA1 HMAC) is chosen for interoperability, the
+truststore holds no private keys. The users own certificate keeps the normal
+key + certificate serialization.
+
 The bundle is named ``<deployment>_rasenmaeher_ca-public.p12`` in the mission
 packages so that packages from different deployments do not overwrite each
 other's CA chains in the client. Override the basename (without the ``.p12``
