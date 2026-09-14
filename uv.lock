@@ -4,8 +4,8 @@ requires-python = ">=3.11, <4.0"
 resolution-markers = [
     "python_full_version >= '3.15'",
     "python_full_version == '3.14.*' and sys_platform == 'emscripten'",
-    "python_full_version >= '3.12' and python_full_version < '3.14' and sys_platform == 'emscripten'",
     "python_full_version == '3.14.*' and sys_platform != 'emscripten'",
+    "python_full_version >= '3.12' and python_full_version < '3.14' and sys_platform == 'emscripten'",
     "(python_full_version < '3.14' and sys_platform != 'emscripten') or (python_full_version < '3.12' and sys_platform == 'emscripten')",
 ]
 
@@ -2245,9 +2245,10 @@ wheels = [
 
 [[package]]
 name = "takrmapi"
-version = "1.16.0+260912"
+version = "1.16.1+260914"
 source = { editable = "." }
 dependencies = [
+    { name = "cryptography" },
     { name = "fastapi" },
     { name = "filelock" },
     { name = "gunicorn" },
@@ -2279,6 +2280,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "cryptography", specifier = ">=45.0.1" },
     { name = "fastapi", specifier = ">=0.89,!=0.99.0,<1.0" },
     { name = "filelock", specifier = ">=3.12,<4.0" },
     { name = "gunicorn", specifier = ">=23.0,<26.3" },
