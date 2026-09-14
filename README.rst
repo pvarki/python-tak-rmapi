@@ -31,6 +31,14 @@ ATAK installs the manifest contents in order and starts validating the TAK strea
 as soon as the preferences are loaded, so the certificates have to be in
 ``/atak/cert`` by then.
 
+The ATAK preferences bind the certificates to the connection with the indexed
+``caLocation0``, ``caPassword0``, ``certificateLocation0`` and ``clientPassword0``
+entries in ``cot_streams``; ATAK does a host specific CA lookup for the HTTPS
+endpoints and finds nothing when only the global defaults are set. The global
+``com.atakmap.app_preferences`` entries are kept as well for compatibility. The
+iTAK and WinTAK templates are deliberately left with the global entries only,
+the indexed form has not been verified with those clients.
+
 
 Docker
 ------
