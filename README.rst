@@ -26,6 +26,11 @@ The users own certificate is shipped as ``<deployment>_<callsign>.p12`` for the
 same reason. The callsign shown in the client and the password of the PKCS12
 file are still the plain callsign.
 
+Mission package manifests must list both PKCS12 files **before** ``server.pref``.
+ATAK installs the manifest contents in order and starts validating the TAK stream
+as soon as the preferences are loaded, so the certificates have to be in
+``/atak/cert`` by then.
+
 
 Docker
 ------
