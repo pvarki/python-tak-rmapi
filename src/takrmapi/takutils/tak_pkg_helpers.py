@@ -10,6 +10,7 @@ from pathlib import Path
 import tempfile
 import asyncio
 import os
+import re
 import shutil
 from jinja2 import Template
 
@@ -22,6 +23,8 @@ from takrmapi.takutils.tak_pkg_vars import TAKDataPackagePathVars, TAKViteAssetV
 
 LOGGER = logging.getLogger(__name__)
 KEYPAIR_TIMEOUT = env_float("TAK_RMAPI_KEYPAIR_TIMEOUT", 5.0, max_value=600.0)
+# Matches both the deployment prefixed and the legacy unprefixed CA bundle name
+CA_P12_RE = re.compile(r"[\w.\-/]*rasenmaeher_ca-public\.p12")
 
 
 @dataclass
@@ -403,7 +406,8 @@ class TAKPackageZip:
         tmp_folder = await self.chk_manifest_file_extra_folder(row=row, tmp_folder=tmp_folder)
         # FIXME: do the blocking IO in executor
         LOGGER.info("PKCS12 Got template %s, tmp folder %s...", row, tmp_folder)
-        if "rasenmaeher_ca-public.p12" in row:
+        ca_match = CA_P12_RE.search(row)
+        if ca_match:
             # CoT uses the internal CFSSL CA, including its intermediate and root.
             srcdata = config.TAK_CA_CHAIN_PATH.read_bytes()
             # HTTPS endpoints are served with Let's Encrypt certificates, clients must trust those too.
@@ -414,7 +418,8 @@ class TAKPackageZip:
                 LOGGER.info("Adding PEM %s to CA bundle", ca_f.name)
                 srcdata += ca_f.read_bytes()
 
-            tgtfile = Path(tmp_folder) / "rasenmaeher_ca-public.p12"
+            # Keep whatever name the manifest asked for, it is deployment prefixed by the templates
+            tgtfile = Path(tmp_folder) / Path(ca_match.group(0)).name
             LOGGER.info("Creating %s", tgtfile)
             p12bytes = convert_pem_to_pkcs12(srcdata, None, "public", None, "ca-chains")
             tgtfile.parent.mkdir(parents=True, exist_ok=True)
