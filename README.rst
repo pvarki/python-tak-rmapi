@@ -22,6 +22,10 @@ packages so that packages from different deployments do not overwrite each
 other's CA chains in the client. Override the basename (without the ``.p12``
 suffix) with ``TI_TAK_CA_CERT_NAME`` if needed.
 
+The users own certificate is shipped as ``<deployment>_<callsign>.p12`` for the
+same reason. The callsign shown in the client and the password of the PKCS12
+file are still the plain callsign.
+
 
 Docker
 ------
