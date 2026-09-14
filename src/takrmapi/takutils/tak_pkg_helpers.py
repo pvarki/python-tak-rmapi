@@ -25,6 +25,8 @@ LOGGER = logging.getLogger(__name__)
 KEYPAIR_TIMEOUT = env_float("TAK_RMAPI_KEYPAIR_TIMEOUT", 5.0, max_value=600.0)
 # Matches both the deployment prefixed and the legacy unprefixed CA bundle name
 CA_P12_RE = re.compile(r"[\w.\-/]*rasenmaeher_ca-public\.p12")
+# Same for the users own certificate, the callsign is the part we can count on
+CLIENT_P12_RE_TPL = r"[\w.\-/]*{}\.p12"
 
 
 @dataclass
@@ -426,8 +428,12 @@ class TAKPackageZip:
             LOGGER.debug("{} exists: {}".format(tgtfile.parent, tgtfile.parent.exists()))
             tgtfile.write_bytes(p12bytes)
             LOGGER.debug("{} exists: {}".format(tgtfile, tgtfile.exists()))
-        elif f"{self.user.callsign}.p12" in row:
-            tgtfile = Path(tmp_folder) / f"{self.user.callsign}.p12"
+            return
+
+        client_match = re.search(CLIENT_P12_RE_TPL.format(re.escape(self.user.callsign)), row)
+        if client_match:
+            # Keep whatever name the manifest asked for, it is deployment prefixed by the templates
+            tgtfile = Path(tmp_folder) / Path(client_match.group(0)).name
             await asyncio.wait_for(self.user.wait_for_keypair(), timeout=KEYPAIR_TIMEOUT)
             LOGGER.info("Creating {}".format(tgtfile))
             p12bytes = convert_pem_to_pkcs12(
@@ -436,8 +442,9 @@ class TAKPackageZip:
             tgtfile.parent.mkdir(parents=True, exist_ok=True)
             tgtfile.write_bytes(p12bytes)
             LOGGER.debug("{} exists: {}".format(tgtfile, tgtfile.exists()))
-        else:
-            raise RuntimeError("IDK what to do")
+            return
+
+        raise RuntimeError("IDK what to do")
 
     async def chk_manifest_file_extra_folder(self, row: str, tmp_folder: Path) -> Path:
         """Check folder path from manifest, return updated path if folder was located"""
