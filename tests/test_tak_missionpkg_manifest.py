@@ -3,6 +3,7 @@
 import re
 from dataclasses import dataclass
 from pathlib import Path
+from xml.etree import ElementTree
 
 from jinja2 import Template
 
@@ -12,6 +13,10 @@ CALLSIGN = "RAMBO01"
 # Paths the preference files point at, eg cert/enabling-gazelle_rasenmaeher_ca-public.p12
 PREF_CERT_RE = re.compile(r">(cert/[^<]+\.p12)<")
 ZIPENTRY_RE = re.compile(r'zipEntry="([^"]+)"')
+# Only these are known to be consumed by ATAK, see PR156 handoff
+ATAK_PACKAGES = ("atak", "atak-mini")
+# These clients are not verified for the connection specific soft certificate keys, tak-tracker always had them
+GLOBAL_ONLY_PACKAGES = ("itak", "wintak")
 
 
 @dataclass
@@ -121,3 +126,42 @@ def test_no_misspelled_plugin_scanning_preference() -> None:
             continue
         content = template.read_text(encoding="utf-8")
         assert "atakPluginScanninOnStartup" not in content, f"{template} misspells the plugin scanning key"
+
+
+def pref_entries(content: str, pref_name: str) -> dict[str, str]:
+    """Entries of a single named preference block, keyed by preference key"""
+    root = ElementTree.fromstring(content)
+    for pref in root.findall("preference"):
+        if pref.get("name") == pref_name:
+            return {entry.get("key", ""): (entry.text or "").strip() for entry in pref.findall("entry")}
+    raise AssertionError(f"no '{pref_name}' preference block")
+
+
+def test_atak_binds_the_certificates_to_the_connection() -> None:
+    """ATAK does a host specific CA lookup, the certificates must be bound to the cot_streams entry."""
+    packages = render_packages("enabling-gazelle")
+    for name in ATAK_PACKAGES:
+        streams = pref_entries(packages[name]["server.pref"], "cot_streams")
+        assert streams["caLocation0"] == "cert/enabling-gazelle_rasenmaeher_ca-public.p12"
+        assert streams["caPassword0"] == "public"  # pragma: allowlist secret
+        assert streams["certificateLocation0"] == f"cert/enabling-gazelle_{CALLSIGN}.p12"
+        assert streams["clientPassword0"] == CALLSIGN
+
+
+def test_atak_keeps_the_global_certificate_fields() -> None:
+    """The global defaults stay for compatibility until the indexed fields are verified on every ATAK version."""
+    packages = render_packages("enabling-gazelle")
+    for name in ATAK_PACKAGES:
+        prefs = pref_entries(packages[name]["server.pref"], "com.atakmap.app_preferences")
+        streams = pref_entries(packages[name]["server.pref"], "cot_streams")
+        for key in ("caLocation", "caPassword", "certificateLocation", "clientPassword"):
+            assert prefs[key] == streams[f"{key}0"], f"{name} global {key} differs from the connection specific one"
+
+
+def test_unverified_clients_keep_only_the_global_certificate_fields() -> None:
+    """The indexed keys are only verified for ATAK, do not push them to the other clients without testing."""
+    packages = render_packages("enabling-gazelle")
+    for name in GLOBAL_ONLY_PACKAGES:
+        streams = pref_entries(packages[name]["server.pref"], "cot_streams")
+        for key in ("caLocation0", "caPassword0", "certificateLocation0", "clientPassword0"):
+            assert key not in streams, f"{name} got the unverified connection specific {key}"
