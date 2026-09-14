@@ -53,9 +53,11 @@ async def test_client_trust_bundle_contains_all_anchors(tmp_path: Path, monkeypa
     monkeypatch.setattr(config, "TAK_CA_CHAIN_PATH", write_chain(tmp_path / "ca_chain.pem", internal))
     monkeypatch.setattr(config, "TAK_LE_CHAIN_PATH", write_chain(tmp_path / "fullchain.pem", https))
     package = TAKPackageZip(Mock(spec=UserCRUD))
-    await package.tak_missionpackage_add_p12("<Content>certs/rasenmaeher_ca-public.p12</Content>", tmp_path)
+    await package.tak_missionpackage_add_p12(
+        "<Content>certs/{}.p12</Content>".format(config.TAK_CA_CERT_NAME), tmp_path
+    )
     key, cert, extra = pkcs12.load_key_and_certificates(
-        (tmp_path / "certs/rasenmaeher_ca-public.p12").read_bytes(), b"public"
+        (tmp_path / "certs" / f"{config.TAK_CA_CERT_NAME}.p12").read_bytes(), b"public"
     )
     assert key is None
     actual = ([cert] if cert is not None else []) + extra
@@ -69,6 +71,22 @@ async def test_client_trust_bundle_contains_all_anchors(tmp_path: Path, monkeypa
     assert {item.fingerprint(hashes.SHA256()) for item in actual} == {
         item.fingerprint(hashes.SHA256()) for item in expected
     }
+
+
+def test_ca_cert_name_is_deployment_prefixed() -> None:
+    """Packages from different deployments must not fight over the same CA bundle file name."""
+    assert config.TAK_CA_CERT_NAME.startswith(f"{config.TAK_SERVER_NAME}_")
+    assert config.TAK_CA_CERT_NAME.endswith("rasenmaeher_ca-public")
+
+
+def test_missionpkg_templates_use_the_prefixed_ca_name() -> None:
+    """No mission package template may hardcode the unprefixed CA bundle name."""
+    templates = sorted(config.TAK_MISSIONPKG_TEMPLATES_FOLDER.rglob("*.tpl"))
+    assert templates, "no mission package templates found"
+    users = [tpl for tpl in templates if "v.ca_cert_name" in tpl.read_text(encoding="utf-8")]
+    assert users, "no template references the CA bundle name variable"
+    for tpl in templates:
+        assert "rasenmaeher_ca-public" not in tpl.read_text(encoding="utf-8"), f"{tpl} hardcodes the CA bundle name"
 
 
 @pytest.mark.asyncio
