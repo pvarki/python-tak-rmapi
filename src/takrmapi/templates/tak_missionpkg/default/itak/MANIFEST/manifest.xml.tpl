@@ -6,7 +6,7 @@
    </Configuration>
    <Contents>
       <Content ignore="false" zipEntry="server.pref"/>
-      <Content ignore="false" zipEntry="rasenmaeher_ca-public.p12"/>
+      <Content ignore="false" zipEntry="{{ v.ca_cert_name }}.p12"/>
       <Content ignore="false" zipEntry="{{ v.client_cert_name }}.p12"/>
       <Content ignore="false" zipEntry="MML_Peruskartta.xml"/>
       <Content ignore="false" zipEntry="MML_Ortoilmakuva.xml"/>
