@@ -406,6 +406,13 @@ class TAKPackageZip:
         if "rasenmaeher_ca-public.p12" in row:
             # CoT uses the internal CFSSL CA, including its intermediate and root.
             srcdata = config.TAK_CA_CHAIN_PATH.read_bytes()
+            # HTTPS endpoints are served with Let's Encrypt certificates, clients must trust those too.
+            srcdata += config.TAK_LE_CHAIN_PATH.read_bytes()
+            templates_folder = config.TEMPLATES_PATH
+            LOGGER.info("Searching extra trust anchors from %s...", templates_folder)
+            for ca_f in sorted(templates_folder.rglob("*.pem")):
+                LOGGER.info("Adding PEM %s to CA bundle", ca_f.name)
+                srcdata += ca_f.read_bytes()
 
             tgtfile = Path(tmp_folder) / "rasenmaeher_ca-public.p12"
             LOGGER.info("Creating %s", tgtfile)
