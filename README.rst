@@ -10,8 +10,12 @@ does not rotate existing user keys or change the TAK server's JWT signing identi
 
 TAK client packages trust the internal CFSSL intermediate and root from
 ``/ca_public/ca_chain.pem``. Override this path with ``TI_TAK_CA_CHAIN_PATH``
-when using a different mount. The chain must include the root CA. HTTPS certificates
-and Let's Encrypt roots are not included in the CoT trust bundle.
+when using a different mount. The chain must include the root CA.
+
+The HTTPS chain from ``/le_certs/rasenmaeher/fullchain.pem`` (override with
+``TI_TAK_LE_CHAIN_PATH``) and every ``*.pem`` under the templates folder, notably
+the Let's Encrypt ``ISRG Root X1``, are added to the same bundle. Clients need
+these to reach the TAKServer HTTPS endpoints, so both files must be mounted.
 
 
 Docker
