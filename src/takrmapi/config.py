@@ -117,6 +117,8 @@ MTX_SERVER_OBSERVER_PROTO: str = cfg("MTX_SERVER_OBSERVER_PROTO", cast=str, defa
 MTX_SERVER_OBSERVER_NET_PROTO: str = cfg("MTX_SERVER_OBSERVER_NET_PROTO", cast=str, default="tcp")
 TAK_SERVER_FQDN: str = cfg("TAK_SERVER_FQDN", cast=str, default=read_tak_fqdn())
 TAK_SERVER_NAME: str = cfg("TAK_SERVER_NAME", cast=str, default=read_deployment_name())
+# Prefixed with the deployment name so packages from different deployments do not clash in the client
+TAK_CA_CERT_NAME: str = cfg("TAK_CA_CERT_NAME", cast=str, default=f"{TAK_SERVER_NAME}_rasenmaeher_ca-public")
 TAK_SERVER_NETWORKMESH_KEY_FILE: Path = cfg(
     "TAK_SERVER_NETWORKMESH_KEY_FILE", cast=Path, default=Path("/opt/tak/data/tak_server_networkmesh")
 )

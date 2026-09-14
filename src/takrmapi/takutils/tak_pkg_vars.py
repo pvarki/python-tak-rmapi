@@ -23,6 +23,7 @@ class UserTAKTemplateVars:
     # Deployment specific "static" var mapping for template files
     tak_server_deployment_name: ClassVar[str] = config.TAK_SERVER_NAME
     tak_server_public_address: ClassVar[str] = config.TAK_SERVER_FQDN
+    ca_cert_name: ClassVar[str] = config.TAK_CA_CERT_NAME
     mtx_server_public_address: ClassVar[str] = config.MTX_SERVER_FQDN
     mtx_server_srt_port: ClassVar[int] = config.MTX_SERVER_SRT_PORT
     mtx_server_observer_port: ClassVar[int] = config.MTX_SERVER_OBSERVER_PORT
