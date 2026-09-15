@@ -49,6 +49,8 @@ jobs:
     needs: publish
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
     permissions:
       contents: write
       packages: read
@@ -66,3 +68,25 @@ jobs:
           release: ${{ steps.tag.outputs.version }}
           product: tak-integration
           attach-to-release: "true"
+
+  # OpenAPI spec to releases.
+  openapi:
+    name: Attach OpenAPI spec
+    needs: release
+    if: needs.release.outputs.tag != ''
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.release.outputs.tag }}
+      - uses: pvarki/config-ci-library/.github/actions/setup-python@main
+        with:
+          python-version: "3.11"
+      - name: Generate and attach OpenAPI spec
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          uv run takrmapi openapi > openapi.json
+          gh release upload "${{ needs.release.outputs.tag }}" openapi.json --clobber
