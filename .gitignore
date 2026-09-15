@@ -3,6 +3,7 @@
 
 # ci artefacts
 pytest*.xml
+release-notes/
 
 tests/data
 .cache
