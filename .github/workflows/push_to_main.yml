@@ -43,3 +43,26 @@ jobs:
           acr-repo: ${{ vars.ACR_REPO }}
           acr-username: ${{ vars.ACR_USERNAME }}
           acr-token: ${{ secrets.ACR_TOKEN }}
+
+  release:
+    name: Tag and release
+    needs: publish
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: pvarki/config-ci-library/.github/actions/tag-release@main
+        id: tag
+      - uses: pvarki/config-ci-library/.github/actions/release-notes@main
+        if: steps.tag.outputs.tag != ''
+        with:
+          ref: ${{ steps.tag.outputs.tag }}
+          release: ${{ steps.tag.outputs.version }}
+          product: tak-integration
+          attach-to-release: "true"
