@@ -8,14 +8,14 @@
     </preference>
     <preference version="1" name="com.atakmap.app_preferences">
         <entry key="displayServerConnectionWidget" class="class java.lang.Boolean">true</entry>
-        <entry key="caLocation" class="class java.lang.String">cert/rasenmaeher_ca-public.p12</entry>
+        <entry key="caLocation" class="class java.lang.String">cert/{{ v.ca_cert_name }}.p12</entry>
         <entry key="caPassword" class="class java.lang.String">public</entry>
-        <entry key="certificateLocation" class="class java.lang.String">cert/{{ v.client_cert_name }}.p12</entry>
+        <entry key="certificateLocation" class="class java.lang.String">cert/{{ v.client_cert_file_name }}.p12</entry>
         <entry key="clientPassword" class="class java.lang.String">{{ v.client_cert_password }}</entry>
         <entry key="locationCallsign" class="class java.lang.String">{{ v.client_cert_name }}</entry>
         <!-- Download server profiles on connect and disable tak.gov default maps -->
         <entry key="deviceProfileEnableOnConnect" class="class java.lang.Boolean">true</entry>
         <entry key="eud_api_sync_mapsources" class="class java.lang.Boolean">false</entry>
-        <entry key="atakPluginScanninOnStartup" class="class java.lang.Boolean">true</entry>
+        <entry key="atakPluginScanningOnStartup" class="class java.lang.Boolean">true</entry>
    </preference>
 </preferences>
