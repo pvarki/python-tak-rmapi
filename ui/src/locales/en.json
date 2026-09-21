@@ -139,7 +139,7 @@
           "title": "Team Members"
         },
         "welcome": {
-          "description": "This is your home base for managing everything. Launch apps, check system status, and keep your team organized\u2014all in one place.",
+          "description": "This is your home base for managing everything. Launch apps, check system status, and keep your team organized—all in one place.",
           "title": "Welcome!"
         }
       },
@@ -147,7 +147,8 @@
     },
     "wintak": {
       "description": "Choose the platform you are using (1), if it isn't detected correctly. Download your package (2). Read the instructions for importing your package (3)."
-    }
+    },
+    "disableAutoOpen": "Do not show me guides automatically"
   },
   "platform": {
     "android": "ATAK",

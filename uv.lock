@@ -2245,7 +2245,7 @@ wheels = [
 
 [[package]]
 name = "takrmapi"
-version = "1.17.0+260916"
+version = "1.17.0+260921"
 source = { editable = "." }
 dependencies = [
     { name = "cryptography" },

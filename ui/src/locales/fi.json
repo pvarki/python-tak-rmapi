@@ -147,7 +147,8 @@
     },
     "wintak": {
       "description": "Valitse käyttämäsi alusta (1), jos sitä ei tunnisteta oikein. Lataa pakettisi (2). Lue paketin tuomista koskevat ohjeet (3)."
-    }
+    },
+    "disableAutoOpen": "Älä näytä minulle ohjeita automaattisesti"
   },
   "platform": {
     "android": "ATAK",
