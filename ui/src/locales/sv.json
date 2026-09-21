@@ -147,7 +147,8 @@
     },
     "wintak": {
       "description": "Välj den plattform du använder (1) om den inte detekteras korrekt. Ladda ner ditt paket (2). Läs instruktionerna för hur du importerar ditt paket (3)."
-    }
+    },
+    "disableAutoOpen": "Visa inte guider automatiskt för mig"
   },
   "platform": {
     "android": "ATAK",
