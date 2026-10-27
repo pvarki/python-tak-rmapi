@@ -32,6 +32,35 @@ class RestHelpers:  # pylint: disable=too-few-public-methods
         """RestHelpers init"""
         self.helpers = Helpers(user)
 
+    async def federation_request(
+        self, method: str, path: str, *, body: Dict[str, Any] | None = None, pem: bytes | None = None
+    ) -> Any:
+        """Keep federation failures visible; GETs must have a TAK data envelope."""
+        options: Dict[str, Any] = {
+            "ssl": await self.helpers.tak_mtls_client_sslcontext(),
+            "timeout": aiohttp.ClientTimeout(total=5),
+            "allow_redirects": False,
+        }
+        if pem is not None:
+            form = aiohttp.FormData()
+            form.add_field("file", pem, filename="intermediate_ca.pem", content_type="application/x-pem-file")
+            options["data"] = form
+        elif body is not None:
+            options["json"] = body
+        async with await self.helpers.tak_mtls_client() as session:
+            async with session.request(
+                method, f"{self.helpers.tak_base_url()}/Marti/api/{path}", **options
+            ) as response:
+                if not 200 <= response.status < 300:
+                    response.raise_for_status()
+                    raise ValueError("Unexpected TAK redirect")
+                if method == "GET":
+                    payload = await response.json(content_type=None)
+                    if not isinstance(payload, dict) or "data" not in payload:
+                        raise ValueError("Missing TAK data envelope")
+                    return payload["data"]
+                return None
+
     async def output_response_to_output(self, resp: aiohttp.ClientResponse) -> None:
         """Output response to log"""
         resp_text = await resp.text()
