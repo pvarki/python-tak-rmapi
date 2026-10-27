@@ -5,5 +5,5 @@ minimumReleaseAgeExclude:
 overrides:
   # The federation DTS plugin pins 0.6.0; use the symlink-extraction security fix.
   adm-zip@>=0.5.9 <=0.6.0: ^0.6.1
-  # The federation DTS plugin pins 7.29.0; use the security fixes in 7.29.1.
-  undici@7.29.0: ^7.29.1
+  # Federation DTS plugins pin vulnerable 7.x releases; use the fix in 7.30.1.
+  undici@>=7.18.0 <7.30.1: ^7.30.1
