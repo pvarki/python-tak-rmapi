@@ -28,7 +28,8 @@ export const InstructionsWizard: React.FC<InstructionsWizardProps> = ({
   const { t } = useTranslation("tak");
   const navigate = useNavigate();
   const params: { phaseId?: string } = useParams({
-    // @ts-expect-error dynamic basePath isn't representable in the router's typed param map
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore dynamic basePath isn't representable in the router's typed param map
     from: `${basePath}/$phaseId`,
   });
   const phaseIdParam = params.phaseId;
