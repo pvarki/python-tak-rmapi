@@ -5,13 +5,13 @@ ARG TAKSERVER_IMAGE="${PVARKI_DOCKER_REPO:-ghcr.io/}pvarki/tak-server:5.8-RELEAS
 ARG PYPI_INDEX_URL=https://pypi.org/simple
 
 # The local reference tak_server is used in future stages
-FROM ${TAKSERVER_IMAGE} as tak_server
+FROM ${TAKSERVER_IMAGE} AS tak_server
 FROM ghcr.io/astral-sh/uv:0.13.6 AS uv_tool
 
 #############################################
 # Tox testsuite for multiple python version #
 #############################################
-FROM advian/tox-base:debian-bookworm as tox
+FROM advian/tox-base:debian-bookworm AS tox
 ARG PYTHON_VERSIONS="3.11 3.12 3.13 3.14"
 ARG UV_VERSION="0.13.6"
 RUN export RESOLVED_VERSIONS=`pyenv_resolve $PYTHON_VERSIONS` \
@@ -28,7 +28,7 @@ RUN export RESOLVED_VERSIONS=`pyenv_resolve $PYTHON_VERSIONS` \
 ######################
 # Base builder image #
 ######################
-FROM eclipse-temurin:${TEMURIN_VERSION}-jdk-noble as builder_base
+FROM eclipse-temurin:${TEMURIN_VERSION}-jdk-noble AS builder_base
 #FROM python:3.11-bookworm as builder_base
 COPY --from=uv_tool /uv /uvx /usr/local/bin/
 
@@ -86,7 +86,7 @@ RUN --mount=type=ssh uv venv /.venv \
 ####################################
 # Base stage for production builds #
 ####################################
-FROM builder_base as production_build
+FROM builder_base AS production_build
 # Copy entrypoint script
 COPY ./docker/entrypoint.sh /docker-entrypoint.sh
 COPY --from=builder_base /tmp/wheelhouse /tmp/wheelhouse
@@ -109,7 +109,7 @@ RUN --mount=type=ssh source /.venv/bin/activate \
 #########################
 # Main production build #
 #########################
-FROM ${JAVA_RUNTIME_IMAGE} as production
+FROM ${JAVA_RUNTIME_IMAGE} AS production
 ENV PATH="/opt/venv/bin:${PATH}" \
     PYTHONFAULTHANDLER=1 \
     PYTHONUNBUFFERED=1 \
@@ -152,7 +152,7 @@ ENTRYPOINT ["/usr/bin/tini", "--", "/docker-entrypoint.sh"]
 #####################################
 # Base stage for development builds #
 #####################################
-FROM builder_base as devel_build
+FROM builder_base AS devel_build
 COPY --from=tak_server /opt/tak/version.txt /opt/tak/version.txt
 # Install deps
 COPY . /app
@@ -167,7 +167,7 @@ RUN --mount=type=ssh source /.venv/bin/activate \
 #0############
 # Run tests #
 #############
-FROM devel_build as test
+FROM devel_build AS test
 WORKDIR /app/ui
 RUN mkdir -p /ui_build && cp -r dist/* /ui_build/
 WORKDIR /app
@@ -183,7 +183,7 @@ RUN --mount=type=ssh source /.venv/bin/activate \
 ###########
 # Hacking #
 ###########
-FROM devel_build as devel_shell
+FROM devel_build AS devel_shell
 # Copy everything to the image
 WORKDIR /app/ui
 RUN mkdir -p /ui_build && cp -r dist/* /ui_build/
@@ -202,7 +202,7 @@ ENTRYPOINT ["/bin/zsh", "-l"]
 ############################
 # Compose container target #
 ############################
-FROM devel_shell as integ_devel_shell
+FROM devel_shell AS integ_devel_shell
 COPY --from=tak_server /opt/tak /opt/tak
 COPY --from=tak_server /opt/scripts /opt/scripts
 COPY --from=tak_server /opt/templates /opt/templates
