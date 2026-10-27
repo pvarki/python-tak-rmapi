@@ -4,6 +4,7 @@ import asyncio
 from pathlib import Path
 from typing import Any
 from unittest.mock import AsyncMock
+from urllib.parse import unquote
 
 import aiohttp
 import filelock
@@ -34,6 +35,8 @@ class FakeTAK:
         self.fail_groups = False
         self.concurrent = 0
         self.max_concurrent = 0
+        self.definitions: list[dict[str, Any]] = []
+        self.status: Any = {"connectionStatusValue": "CONNECTING"}
 
     def group(self, direction: str, name: str = "default") -> dict[str, str]:
         return {"caId": self.fingerprint, "group": name, "direction": direction}
@@ -48,6 +51,13 @@ class FakeTAK:
                 return self.cas.copy()
             if path.startswith("federatecagroups/"):
                 return self.groups.copy()
+            if path == "outgoingconnections":
+                return self.definitions.copy()
+            if path.startswith("outgoingconnections/"):
+                name = unquote(path.split("/")[1])
+                return next((item for item in self.definitions if item["displayName"] == name), None)
+            if path.startswith("outgoingconnectionstatus/"):
+                return self.status
             raise AssertionError(path)
         self.writes.append((path, options))
         if self.ignore_writes:
@@ -64,6 +74,8 @@ class FakeTAK:
                 if direction == "OUTBOUND" and self.fail_groups:
                     raise TimeoutError()
                 self.groups.append(self.group(direction))
+        elif path == "outgoingconnections":
+            self.definitions.append(options["body"])
         else:
             raise AssertionError(path)
         return None
@@ -161,7 +173,6 @@ async def test_busy_lock(tak: FakeTAK, monkeypatch: pytest.MonkeyPatch) -> None:
 async def test_deadline_releases_lock(tak: FakeTAK, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(federation, "OPERATION_SECONDS", 0.01)
     with monkeypatch.context() as patch:
-        patch.setattr(RestHelpers, "federation_request", AsyncMock(side_effect=lambda *a, **k: None))
 
         async def stall(*args: Any, **kwargs: Any) -> None:
             await asyncio.sleep(1)
@@ -206,4 +217,167 @@ def test_self_federation(tak: FakeTAK, rmclient: TestClient) -> None:
     response = rmclient.post("/api/v1/federation/trust", json={"remote_base": "localmaeher.dev.pvarki.fi:4439"})
     assert response.status_code == 422
     assert tak.writes == []
+    federation.download_intermediate.assert_not_called()
+
+
+async def prepare_trust(tak: FakeTAK) -> None:
+    tak.cas.append({"fingerPrint": tak.fingerprint})
+    tak.groups.extend([tak.group("INBOUND"), tak.group("OUTBOUND")])
+
+
+@pytest.mark.asyncio
+async def test_outgoing_retry(tak: FakeTAK) -> None:
+    await prepare_trust(tak)
+    result = await operation().run(outgoing=True)
+    assert result["changed"] is True
+    assert result["display_name"] == "fast_flounder"
+    assert result["connection_status"] == "CONNECTING"
+    assert tak.writes == [
+        (
+            "outgoingconnections",
+            {
+                "body": {
+                    "displayName": "fast_flounder",
+                    "address": f"tak.{PEER}",
+                    "port": 9001,
+                    "enabled": True,
+                    "protocolVersion": 2,
+                    "reconnectInterval": 30,
+                    "unlimitedRetries": True,
+                    "tls": True,
+                    "useToken": False,
+                }
+            },
+        )
+    ]
+    assert (await operation().run(outgoing=True))["changed"] is False
+    assert len(tak.writes) == 1
+
+
+@pytest.mark.asyncio
+async def test_outgoing_other_name(tak: FakeTAK) -> None:
+    await prepare_trust(tak)
+    await operation().run(outgoing=True)
+    tak.definitions[0]["displayName"] = "fast flounder"
+    tak.definitions[0]["address"] = f"TAK.{PEER.upper()}"
+    tak.writes.clear()
+    result = await operation().run(outgoing=True)
+    assert result["display_name"] == "fast flounder"
+    assert result["changed"] is False
+    assert tak.writes == []
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "override",
+    [
+        {"enabled": False},
+        {"protocolVersion": 1},
+        {"tls": False},
+        {"useToken": True},
+        {"reconnectInterval": 1},
+        {"unlimitedRetries": False},
+        {"address": "tak.another.example"},
+        {"port": 9002},
+    ],
+)
+async def test_outgoing_conflict(tak: FakeTAK, override: dict[str, Any]) -> None:
+    await prepare_trust(tak)
+    await operation().run(outgoing=True)
+    tak.definitions[0].update(override)
+    before = tak.definitions[0].copy()
+    tak.writes.clear()
+    with pytest.raises(HTTPException) as exc:
+        await operation().run(outgoing=True)
+    assert exc.value.status_code == 409
+    assert exc.value.detail["may_have_changed"] is False
+    assert tak.definitions == [before]
+    assert tak.writes == []
+
+
+@pytest.mark.asyncio
+async def test_outgoing_duplicates(tak: FakeTAK) -> None:
+    await prepare_trust(tak)
+    await operation().run(outgoing=True)
+    tak.definitions.append({**tak.definitions[0], "displayName": "another"})
+    tak.writes.clear()
+    with pytest.raises(HTTPException) as exc:
+        await operation().run(outgoing=True)
+    assert exc.value.status_code == 409
+    assert tak.writes == []
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("ca,directions", [(False, []), (True, []), (True, ["INBOUND"]), (True, ["OUTBOUND"])])
+async def test_outgoing_requires_trust(tak: FakeTAK, ca: bool, directions: list[str]) -> None:
+    if ca:
+        tak.cas.append({"fingerPrint": tak.fingerprint})
+    tak.groups.extend(tak.group(direction) for direction in directions)
+    with pytest.raises(HTTPException) as exc:
+        await operation().run(outgoing=True)
+    assert exc.value.status_code == 409
+    assert exc.value.detail["code"] == "trust_required"
+    assert tak.writes == []
+
+
+@pytest.mark.asyncio
+async def test_outgoing_readback_failure(tak: FakeTAK) -> None:
+    await prepare_trust(tak)
+    tak.ignore_writes = True
+    with pytest.raises(HTTPException) as exc:
+        await operation().run(outgoing=True)
+    assert exc.value.status_code == 502
+    assert exc.value.detail["code"] == "outgoing_readback_failed"
+    assert exc.value.detail["may_have_changed"] is True
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("status", [None, {}, {"connectionStatusValue": "CONNECTED"}])
+async def test_outgoing_status(tak: FakeTAK, status: Any) -> None:
+    await prepare_trust(tak)
+    tak.status = status
+    result = await operation().run(outgoing=True)
+    assert result["connection_status"] == (status.get("connectionStatusValue") if status else None)
+
+
+@pytest.mark.asyncio
+async def test_concurrent_outgoing(tak: FakeTAK) -> None:
+    await prepare_trust(tak)
+    results = await asyncio.gather(operation().run(outgoing=True), operation().run(outgoing=True))
+    assert sorted(result["changed"] for result in results) == [False, True]
+    assert len(tak.writes) == 1
+
+
+def test_outgoing_route(tak: FakeTAK, rmclient: TestClient) -> None:
+    tak.cas.append({"fingerPrint": tak.fingerprint})
+    tak.groups.extend([tak.group("INBOUND"), tak.group("OUTBOUND")])
+    response = rmclient.post("/api/v1/federation/outgoing", json={"remote_base": PEER})
+    assert response.status_code == 200
+    result = response.json()
+    assert result["operation"] == "outgoing"
+    assert result["protocol_version"] == 2
+    assert result["port"] == 9001
+    assert result["enabled"] is True
+
+
+@pytest.mark.parametrize("endpoint", ["trust", "outgoing"])
+def test_no_certificate(tak: FakeTAK, rmclient: TestClient, endpoint: str) -> None:
+    rmclient.headers.pop("X-ClientCert-DN")
+    response = rmclient.post(f"/api/v1/federation/{endpoint}", json={"remote_base": PEER})
+    assert response.status_code == 403
+    federation.download_intermediate.assert_not_called()
+
+
+@pytest.mark.parametrize("endpoint", ["trust", "outgoing"])
+def test_proxy_cannot_override_policy(tak: FakeTAK, rmclient: TestClient, endpoint: str) -> None:
+    rmclient.headers["X-Rasenmaeher-Proxy"] = "productproxy"
+    response = rmclient.post(f"/api/v1/federation/{endpoint}?allow_proxy=true", json={"remote_base": PEER})
+    assert response.status_code == 403
+    federation.download_intermediate.assert_not_called()
+
+
+@pytest.mark.parametrize("endpoint", ["trust", "outgoing"])
+def test_invalid_body(tak: FakeTAK, rmclient: TestClient, endpoint: str) -> None:
+    response = rmclient.post(f"/api/v1/federation/{endpoint}", json={"remote_base": PEER, "port": 1234})
+    assert response.status_code == 422
     federation.download_intermediate.assert_not_called()
