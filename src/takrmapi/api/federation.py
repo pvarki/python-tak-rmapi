@@ -8,7 +8,7 @@ from libpvarki.middleware import MTLSHeader
 from takrmapi import config
 from takrmapi.takutils.federation import FederationOperation
 
-from .federation_schemas import FederationRequest, FederationTrustResponse
+from .federation_schemas import FederationOutgoingResponse, FederationRequest, FederationTrustResponse
 from .usercrud import comes_from_rm
 
 router = APIRouter(dependencies=[Depends(MTLSHeader(auto_error=True))])
@@ -45,3 +45,11 @@ async def trust(peer: FederationRequest, request: Request) -> FederationTrustRes
     comes_from_rm(request)
     check_local_peer(peer)
     return FederationTrustResponse(**await FederationOperation(peer).run())
+
+
+@router.post("/outgoing")
+async def outgoing(peer: FederationRequest, request: Request) -> FederationOutgoingResponse:
+    """Ensure one local outgoing connection; the caller selects the initiating server."""
+    comes_from_rm(request)
+    check_local_peer(peer)
+    return FederationOutgoingResponse(**await FederationOperation(peer).run(outgoing=True))

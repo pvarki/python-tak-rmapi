@@ -17,6 +17,7 @@ RM_ONLY_ENDPOINTS = (
     ("put", "/api/v1/users/updated"),
     ("get", "/api/v2/admin/description/en"),
     ("post", "/api/v1/federation/trust"),
+    ("post", "/api/v1/federation/outgoing"),
 )
 
 

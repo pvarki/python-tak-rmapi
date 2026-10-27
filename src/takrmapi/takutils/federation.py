@@ -7,6 +7,7 @@ import re
 import ssl
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any, cast
+from urllib.parse import quote
 
 import aiohttp
 import filelock
@@ -92,7 +93,7 @@ class FederationOperation:
             detail={"code": code, "stage": self.stage, "message": message, "may_have_changed": self.may_have_changed},
         )
 
-    async def run(self) -> dict[str, Any]:
+    async def run(self, *, outgoing: bool = False) -> dict[str, Any]:
         """Include download, lock wait and all TAK requests in one deadline."""
         try:
             async with asyncio.timeout(OPERATION_SECONDS):
@@ -113,6 +114,8 @@ class FederationOperation:
                             ) from None
                         await asyncio.sleep(0.05)
                 try:
+                    if outgoing:
+                        return await self.outgoing(fingerprint)
                     return await self.trust(pem, fingerprint)
                 finally:
                     lock.release()
@@ -182,3 +185,75 @@ class FederationOperation:
         if await self.directions(fingerprint) != {"INBOUND", "OUTBOUND"}:
             raise self.error(502, "groups_readback_failed", "CA groups were not visible after update")
         return {"remote_base": self.peer.remote_base, "changed": changed, "ca_fingerprint": fingerprint}
+
+    async def outgoing(self, fingerprint: str) -> dict[str, Any]:
+        """Require trust first; preserve equivalent or conflicting admin configuration."""
+        if not await self.has_ca(fingerprint) or await self.directions(fingerprint) != {"INBOUND", "OUTBOUND"}:
+            raise self.error(409, "trust_required", "Configure the remote CA and both default groups first")
+        self.stage = "outgoing"
+        expected = {
+            "address": f"tak.{self.peer.hostname}",
+            "port": 9001,
+            "enabled": True,
+            "protocolVersion": 2,
+            "reconnectInterval": 30,
+            "unlimitedRetries": True,
+            "tls": True,
+            "useToken": False,
+        }
+        definitions = await self.records("outgoingconnections")
+        if any(
+            not isinstance(item.get("displayName"), str)
+            or not isinstance(item.get("address"), str)
+            or type(item.get("port")) is not int
+            for item in definitions
+        ):
+            raise ValueError("Malformed outgoing definition")
+        matches = [
+            item
+            for item in definitions
+            if item["displayName"] == self.peer.display_name
+            or (item["address"].lower() == expected["address"] and item["port"] == 9001)
+        ]
+        if len(matches) > 1:
+            raise self.error(409, "outgoing_conflict", "Multiple outgoing definitions match the peer")
+        name = matches[0]["displayName"] if matches else self.peer.display_name
+        if not re.fullmatch(r"[A-Za-z0-9_\s]{1,30}", name):
+            raise ValueError("Invalid outgoing display name")
+        if matches and not self.equivalent(matches[0], expected):
+            raise self.error(
+                409, "outgoing_conflict", "Existing outgoing configuration conflicts with requested settings"
+            )
+        if not matches:
+            self.may_have_changed = True
+            await self.rest.federation_request("POST", "outgoingconnections", body={"displayName": name, **expected})
+        self.stage = "verify"
+        definition = await self.rest.federation_request("GET", f"outgoingconnections/{quote(name, safe='')}")
+        if (
+            not isinstance(definition, dict)
+            or definition.get("displayName") != name
+            or not self.equivalent(definition, expected)
+        ):
+            raise self.error(502, "outgoing_readback_failed", "Outgoing settings were not visible after configuration")
+        status = await self.rest.federation_request("GET", f"outgoingconnectionstatus/{quote(name, safe='')}")
+        if status is not None and not isinstance(status, dict):
+            raise ValueError("Malformed outgoing connection status")
+        value = status.get("connectionStatusValue") if status else None
+        if value is not None and not isinstance(value, str):
+            raise ValueError("Malformed connection status value")
+        return {
+            "remote_base": self.peer.remote_base,
+            "changed": not matches,
+            "display_name": name,
+            "address": expected["address"],
+            "connection_status": value,
+        }
+
+    @staticmethod
+    def equivalent(definition: dict[str, Any], expected: dict[str, Any]) -> bool:
+        """Use strict types so malformed settings cannot pass as verified configuration."""
+        return all(
+            type(definition.get(key)) is type(value)
+            and (definition[key].lower() == value if key == "address" else definition[key] == value)
+            for key, value in expected.items()
+        )
