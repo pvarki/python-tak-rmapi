@@ -14,7 +14,8 @@ const PHASE_MAP: Record<string, React.ComponentType> = {
 
 export const WindowsPhasePage = () => {
   const { phaseId }: { phaseId: string } = useParams({
-    // @ts-expect-error route is not in the standalone-mode router tree
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore route is not in the standalone-mode router tree
     from: "/windows/$phaseId",
   });
   const PhaseComponent = PHASE_MAP[phaseId];
