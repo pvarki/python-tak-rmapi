@@ -16,6 +16,7 @@ RM_ONLY_ENDPOINTS = (
     ("post", "/api/v1/users/demoted"),
     ("put", "/api/v1/users/updated"),
     ("get", "/api/v2/admin/description/en"),
+    ("post", "/api/v1/federation/trust"),
 )
 
 
@@ -23,6 +24,8 @@ def call(client: TestClient, method: str, path: str, payload: Dict[str, Any]) ->
     """Call the endpoint, GET does not take a body"""
     if method == "get":
         return client.get(path)
+    if "/federation/" in path:
+        payload = {"remote_base": "fast-flounder.other.example"}
     return getattr(client, method)(path, json=payload)
 
 
