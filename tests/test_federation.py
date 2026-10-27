@@ -206,16 +206,33 @@ async def test_invalid_certificate_no_write(tak: FakeTAK, monkeypatch: pytest.Mo
     assert tak.writes == []
 
 
-def test_trust_route(tak: FakeTAK, rmclient: TestClient) -> None:
-    result = rmclient.post("/api/v1/federation/trust", json={"remote_base": PEER})
+def test_trust_route(tak: FakeTAK, rmclient: TestClient, caplog: pytest.LogCaptureFixture) -> None:
+    with caplog.at_level("AUDIT", logger="takrmapi.api.federation"):
+        result = rmclient.post("/api/v1/federation/trust", json={"remote_base": PEER})
     assert result.status_code == 200
     assert result.json()["directions"] == ["INBOUND", "OUTBOUND"]
     assert result.json()["operation"] == "trust"
+    assert any(
+        record.levelname == "AUDIT" and f"action=trust peer={PEER} result=success changed=True" in record.message
+        for record in caplog.records
+    )
 
 
-def test_self_federation(tak: FakeTAK, rmclient: TestClient) -> None:
-    response = rmclient.post("/api/v1/federation/trust", json={"remote_base": "localmaeher.dev.pvarki.fi:4439"})
+def test_trust_failure_audit(tak: FakeTAK, rmclient: TestClient, caplog: pytest.LogCaptureFixture) -> None:
+    tak.fail_groups = True
+    with caplog.at_level("AUDIT", logger="takrmapi.api.federation"):
+        response = rmclient.post("/api/v1/federation/trust", json={"remote_base": PEER})
+    assert response.status_code == 504
+    assert any(
+        f"action=trust peer={PEER} result=failed status=504 stage=groups" in record.message for record in caplog.records
+    )
+
+
+def test_self_federation(tak: FakeTAK, rmclient: TestClient, caplog: pytest.LogCaptureFixture) -> None:
+    with caplog.at_level("AUDIT", logger="takrmapi.api.federation"):
+        response = rmclient.post("/api/v1/federation/trust", json={"remote_base": "localmaeher.dev.pvarki.fi:4439"})
     assert response.status_code == 422
+    assert any("result=failed status=422 stage=authorize" in record.message for record in caplog.records)
     assert tak.writes == []
     federation.download_intermediate.assert_not_called()
 
@@ -348,16 +365,20 @@ async def test_concurrent_outgoing(tak: FakeTAK) -> None:
     assert len(tak.writes) == 1
 
 
-def test_outgoing_route(tak: FakeTAK, rmclient: TestClient) -> None:
+def test_outgoing_route(tak: FakeTAK, rmclient: TestClient, caplog: pytest.LogCaptureFixture) -> None:
     tak.cas.append({"fingerPrint": tak.fingerprint})
     tak.groups.extend([tak.group("INBOUND"), tak.group("OUTBOUND")])
-    response = rmclient.post("/api/v1/federation/outgoing", json={"remote_base": PEER})
+    with caplog.at_level("AUDIT", logger="takrmapi.api.federation"):
+        response = rmclient.post("/api/v1/federation/outgoing", json={"remote_base": PEER})
     assert response.status_code == 200
     result = response.json()
     assert result["operation"] == "outgoing"
     assert result["protocol_version"] == 2
     assert result["port"] == 9001
     assert result["enabled"] is True
+    assert any(
+        f"action=outgoing peer={PEER} result=success changed=True" in record.message for record in caplog.records
+    )
 
 
 @pytest.mark.parametrize("endpoint", ["trust", "outgoing"])
@@ -369,10 +390,17 @@ def test_no_certificate(tak: FakeTAK, rmclient: TestClient, endpoint: str) -> No
 
 
 @pytest.mark.parametrize("endpoint", ["trust", "outgoing"])
-def test_proxy_cannot_override_policy(tak: FakeTAK, rmclient: TestClient, endpoint: str) -> None:
+def test_proxy_cannot_override_policy(
+    tak: FakeTAK, rmclient: TestClient, endpoint: str, caplog: pytest.LogCaptureFixture
+) -> None:
     rmclient.headers["X-Rasenmaeher-Proxy"] = "productproxy"
-    response = rmclient.post(f"/api/v1/federation/{endpoint}?allow_proxy=true", json={"remote_base": PEER})
+    with caplog.at_level("AUDIT", logger="takrmapi.api.federation"):
+        response = rmclient.post(f"/api/v1/federation/{endpoint}?allow_proxy=true", json={"remote_base": PEER})
     assert response.status_code == 403
+    assert any(
+        f"action={endpoint} peer={PEER} result=failed status=403 stage=authorize" in record.message
+        for record in caplog.records
+    )
     federation.download_intermediate.assert_not_called()
 
 

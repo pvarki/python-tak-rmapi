@@ -1,5 +1,7 @@
 """Internal federation requests: only RMAPI itself may call these routes."""
 
+import logging
+from typing import Any
 from urllib.parse import urlsplit
 
 from fastapi import APIRouter, Depends, HTTPException, Request
@@ -11,6 +13,7 @@ from takrmapi.takutils.federation import FederationOperation
 from .federation_schemas import FederationOutgoingResponse, FederationRequest, FederationTrustResponse
 from .usercrud import comes_from_rm
 
+LOGGER = logging.getLogger(__name__)
 router = APIRouter(dependencies=[Depends(MTLSHeader(auto_error=True))])
 
 
@@ -39,17 +42,52 @@ def check_local_peer(peer: FederationRequest) -> None:
         )
 
 
+async def run_federation(peer: FederationRequest, request: Request, *, outgoing: bool = False) -> dict[str, Any]:
+    """Audit the result of each authenticated federation operation."""
+    action = "outgoing" if outgoing else "trust"
+    stage = "authorize"
+    operation = None
+    try:
+        comes_from_rm(request)
+        check_local_peer(peer)
+        operation = FederationOperation(peer)
+        stage = "fetch_ca"
+        result = await operation.run(outgoing=outgoing)
+    except HTTPException as exc:
+        if isinstance(exc.detail, dict):
+            stage = exc.detail.get("stage", stage)
+        LOGGER.audit(  # type: ignore[attr-defined]
+            "Federation action=%s peer=%s result=failed status=%s stage=%s",
+            action,
+            peer.remote_base,
+            exc.status_code,
+            stage,
+        )
+        raise
+    except Exception:
+        LOGGER.audit(  # type: ignore[attr-defined]
+            "Federation action=%s peer=%s result=failed status=500 stage=%s",
+            action,
+            peer.remote_base,
+            operation.stage if operation else stage,
+        )
+        raise
+    LOGGER.audit(  # type: ignore[attr-defined]
+        "Federation action=%s peer=%s result=success changed=%s",
+        action,
+        peer.remote_base,
+        result["changed"],
+    )
+    return result
+
+
 @router.post("/trust")
 async def trust(peer: FederationRequest, request: Request) -> FederationTrustResponse:
     """Ensure the remote intermediate CA and default groups exist locally."""
-    comes_from_rm(request)
-    check_local_peer(peer)
-    return FederationTrustResponse(**await FederationOperation(peer).run())
+    return FederationTrustResponse(**await run_federation(peer, request))
 
 
 @router.post("/outgoing")
 async def outgoing(peer: FederationRequest, request: Request) -> FederationOutgoingResponse:
     """Ensure one local outgoing connection; the caller selects the initiating server."""
-    comes_from_rm(request)
-    check_local_peer(peer)
-    return FederationOutgoingResponse(**await FederationOperation(peer).run(outgoing=True))
+    return FederationOutgoingResponse(**await run_federation(peer, request, outgoing=True))
