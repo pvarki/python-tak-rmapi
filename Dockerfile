@@ -6,14 +6,14 @@ ARG PYPI_INDEX_URL=https://pypi.org/simple
 
 # The local reference tak_server is used in future stages
 FROM ${TAKSERVER_IMAGE} as tak_server
-FROM ghcr.io/astral-sh/uv:0.11.6 AS uv_tool
+FROM ghcr.io/astral-sh/uv:0.13.6 AS uv_tool
 
 #############################################
 # Tox testsuite for multiple python version #
 #############################################
 FROM advian/tox-base:debian-bookworm as tox
 ARG PYTHON_VERSIONS="3.11 3.12 3.13 3.14"
-ARG UV_VERSION="0.11.6"
+ARG UV_VERSION="0.13.6"
 RUN export RESOLVED_VERSIONS=`pyenv_resolve $PYTHON_VERSIONS` \
     && echo RESOLVED_VERSIONS=$RESOLVED_VERSIONS \
     && for pyver in $RESOLVED_VERSIONS; do pyenv install -s $pyver; done \
