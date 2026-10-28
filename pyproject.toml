@@ -1,6 +1,6 @@
 [project]
 name = "takrmapi"
-version = "1.17.1+261027"
+version = "1.17.2+261028"
 description = "RASENMAEHER integration API for TAK server"
 authors = [
     { name = "Eero af Heurlin", email = "rambo@iki.fi" },
