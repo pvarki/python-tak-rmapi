@@ -79,9 +79,10 @@ export function AndroidTab({ variant }: Props) {
             </DialogDescription>
           </DialogHeader>
           <Button asChild>
-            <Link to={takUrl} onClick={() => setIsDialogOpen(false)}>
+            {/* Native navigation hands the tak: URL to Android; the router blocks it. */}
+            <a href={takUrl} onClick={() => setIsDialogOpen(false)}>
               {t("tabs.android.open_atak_dialog.open")}
-            </Link>
+            </a>
           </Button>
           <div className="mt-4">{t("tabs.android.open_atak_dialog.note")}</div>
         </DialogContent>
