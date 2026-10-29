@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<customMapSource>
-    <name>1 MML Peruskartta</name>
-    <tileType>jpg</tileType>
-    <url>https://tiles.kartat.kapsi.fi/peruskartta/{$z}/{$x}/{$y}.jpg</url>
-    <minZoom>2</minZoom>
-    <maxZoom>19</maxZoom>
-    <tileUpdate>None</tileUpdate>
+<customWmsMapSource>
+    <name>1 MML Maastokartta</name>
+    <version>1.1.1</version>
+    <minZoom>0</minZoom>
+    <maxZoom>23</maxZoom>
+    <tileType>png</tileType>
+    <url>https://tiles.kartat.kapsi.fi/peruskartta?</url>
+    <coordinatesystem>EPSG:3857</coordinatesystem>
+    <layers>peruskartta</layers>
+    <styles></styles>
+    <north>70.4674</north>
+    <east>34.6744</east>
+    <south>58.9984</south>
+    <west>14.3349</west>
     <backgroundColor>#000000</backgroundColor>
-    <ignoreErrors>false</ignoreErrors>
-    <serverParts></serverParts>
-</customMapSource>
+    <aditionalparameters>&amp;transparent=true</aditionalparameters>
+</customWmsMapSource>

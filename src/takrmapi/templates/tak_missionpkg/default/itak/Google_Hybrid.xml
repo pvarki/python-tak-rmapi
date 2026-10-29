@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <customMapSource>
-    <name>4 Google Hybrid</name>
+    <name>4 Google Hybridi</name>
     <minZoom>0</minZoom>
     <maxZoom>21</maxZoom>
     <tileType>png</tileType>

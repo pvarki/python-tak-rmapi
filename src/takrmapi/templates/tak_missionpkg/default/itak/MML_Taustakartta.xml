@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<customWmsMapSource>
+    <name>3 MML Taustakartta</name>
+    <version>1.1.1</version>
+    <minZoom>0</minZoom>
+    <maxZoom>23</maxZoom>
+    <tileType>png</tileType>
+    <url>https://tiles.kartat.kapsi.fi/taustakartta?</url>
+    <coordinatesystem>EPSG:3857</coordinatesystem>
+    <layers>taustakartta</layers>
+    <styles></styles>
+    <north>70.4674</north>
+    <east>34.6744</east>
+    <south>58.9984</south>
+    <west>14.3349</west>
+    <backgroundColor>#000000</backgroundColor>
+    <aditionalparameters>&amp;transparent=true</aditionalparameters>
+</customWmsMapSource>

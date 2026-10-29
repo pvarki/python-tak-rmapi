@@ -1,0 +1,32 @@
+{
+  "schema": "2.1.0",
+  "title": "PVARKI Terrain HighRes",
+  "content": "terrain",
+  "mimeType": "application/vnd.mapbox-terrain-rgb",
+  "downloadable": true,
+  "refreshInterval": 0,
+  "isQuadtree": true,
+  "url": "http://maps.solution.dev.pvarki.fi:9091/terrain/{$z}/{$x}/{$y}.png",
+  "srs": "EPSG:4326",
+  "numLevels": 16,
+  "tileMatrix": [
+    {
+      "level": 0,
+      "pixelSizeX": 0.703125,
+      "pixelSizeY": 0.703125,
+      "tileWidth": 256,
+      "tileHeight": 256,
+      "resolution": 156543.034
+    }
+  ],
+  "metadata": {
+    "heights": "hae",
+    "dataSource": "MML 2m"
+  },
+  "bounds": {
+    "minX": 15.132916406867048,
+    "minY": 59.23800887124947,
+    "maxX": 33.307217488700815,
+    "maxY": 70.14458988674285
+  }
+}
