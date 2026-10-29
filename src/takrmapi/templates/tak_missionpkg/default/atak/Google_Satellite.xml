@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <customMapSource>
-    <name>5 Google Satellite</name>
+    <name>5 Google Ilmakuva</name>
     <minZoom>0</minZoom>
     <maxZoom>20</maxZoom>
     <tileType>jpg</tileType>

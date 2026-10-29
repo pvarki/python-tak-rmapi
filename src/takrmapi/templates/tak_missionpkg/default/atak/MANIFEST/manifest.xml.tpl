@@ -14,6 +14,9 @@
       <Content ignore="false" zipEntry="TeamMember_Toolbar.pref"/>
       <Content ignore="false" zipEntry="MML_Peruskartta.xml"/>
       <Content ignore="false" zipEntry="MML_Ortoilmakuva.xml"/>
+      <Content ignore="false" zipEntry="MML_Taustakartta.xml"/>
+      <Content ignore="false" zipEntry="pvarki-terrain-high.json"/>
+      <Content ignore="false" zipEntry="pvarki-terrain-mid.json"/>
       <Content ignore="false" zipEntry="Google_Roadmap.xml"/>
       <Content ignore="false" zipEntry="Google_Hybrid.xml"/>
       <Content ignore="false" zipEntry="Google_Satellite.xml"/>

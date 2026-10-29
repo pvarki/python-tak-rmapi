@@ -45,7 +45,7 @@
   <entry key="atakDoubleTapToZoom" class="class java.lang.Boolean">true</entry>
   <entry key="self_coord_action" class="class java.lang.String">nothing</entry>
   <!-- Selected Map  -->
-  <entry key="MobileLayerSelectionAdapter.selected" class="class java.lang.String">4 Google Hybrid</entry>
+  <entry key="MobileLayerSelectionAdapter.selected" class="class java.lang.String">4 Google Hybridi</entry>
   <entry key="rng_meters_display_pref" class="class java.lang.String">2000</entry>
   <!-- Enable smart cache for maps 2Gbts -->
   <entry key="prefs_enable_smart_cache" class="class java.lang.Boolean">true</entry>
