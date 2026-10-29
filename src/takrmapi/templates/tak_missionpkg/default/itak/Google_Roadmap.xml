@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <customMapSource>
-    <name>3 Google Roadmap</name>
+    <name>6 Google Roadmap</name>
     <minZoom>0</minZoom>
     <maxZoom>20</maxZoom>
     <tileType>jpg</tileType>

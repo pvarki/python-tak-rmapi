@@ -1,0 +1,25 @@
+{
+  "schema": "2.1.0",
+  "title": "PVARKI Terrain MidRes",
+  "content": "terrain",
+  "downloadable": true,
+  "refreshInterval": 0,
+  "isQuadtree": true,
+  "url": "http://maps.solution.dev.pvarki.fi:9090/map/terrain/{$z}/{$x}/{$y}.png",
+  "srs": "EPSG:4326",
+  "numLevels": 10,
+  "tileMatrix": [
+    {
+      "level": 0,
+      "pixelSizeX": 0.703125,
+      "pixelSizeY": 0.703125,
+      "tileWidth": 256,
+      "resolution": 156543.034,
+      "tileHeight": 256
+    }
+  ],
+  "metadata": {
+    "heights": "hae",
+    "dataSource": "TAK Bathy"
+  }
+}
