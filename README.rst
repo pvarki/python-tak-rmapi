@@ -164,3 +164,56 @@ Versioning is handled with bump-my-version_. To increment, use ``bump-my-version
 You can use ``bump-my-version show-bump`` to see how each option would affect the version.
 
 .. _bump-my-version: https://github.com/callowayproject/bump-my-version
+
+TAK federation
+--------------
+
+RMAPI itself can call these internal routes with its product mTLS identity.
+End-user certificates and requests marked ``X-Rasenmaeher-Proxy: productproxy``
+are rejected. These routes do not accept or interpret external JWTs.
+
+* ``POST /api/v1/federation/trust`` installs the peer's intermediate CA and
+  ensures the ``default`` group exists in both directions.
+* ``POST /api/v1/federation/outgoing`` requires that trust first, then ensures
+  an enabled v2/TLS connection to ``tak.<peer>`` on port 9001.
+
+Both accept only ``{"remote_base": "peer.example.org"}``. The authority may
+include an HTTPS port, such as ``peer.example.org:4439``. Schemes, paths,
+credentials, IP literals, ``tak.`` prefixes and self-federation are rejected.
+Hostnames are lowercased and explicit port 443 is removed. The first DNS label
+becomes the display name, with hyphens replaced by underscores; it must fit
+TAK's 30-character limit. Cross-domain peers are supported.
+
+The caller must run trust on both deployments before calling outgoing on
+**exactly one**. This service does not select the initiating server or create a
+reverse connection. Existing equivalent connections, including those with a
+different display name, are reused. Conflicting or disabled definitions are
+preserved and return 409.
+
+Responses return ``success``, ``operation``, canonical ``remote_base`` and
+``changed``. Trust also returns ``ca_fingerprint``, ``group`` and ``directions``.
+Outgoing returns ``display_name``, ``address``, ``port``, ``protocol_version``,
+``enabled`` and ``connection_status`` (a string or null). HTTP 200 means the
+configuration was read back successfully, including a no-op. It does not prove
+traffic delivery or persistence across a TAK restart.
+
+Application errors use ``detail`` with ``code``, ``stage``, ``message`` and
+``may_have_changed``. Status codes are 403 for authorization, 422 for invalid
+input, 409 for missing trust or conflicts, 502 for upstream/readback failures,
+503 for local resources or lock contention, and 504 for timeouts. A timeout or
+partial failure can follow a successful write: retry the same desired state.
+The service never removes existing trust or rolls back other admin changes.
+
+Operations have a 20-second total budget, 5-second HTTP timeouts, and up to
+3 seconds to acquire ``TI_TAK_CERTS_FOLDER/federation.lock`` on the shared TAK
+volume. All bridge workers serialize federation changes with this file lock;
+manual TAK UI changes must be coordinated separately.
+
+The public CA downloader uses verified HTTPS, no redirects and no client
+credentials. It accepts exactly one current PEM intermediate CA smaller than
+1 MiB, with CA basic constraints and signing key usage when present. For a
+development peer, provide an HTTPS CA bundle through ``SSL_CERT_FILE`` containing
+both system roots and the development HTTPS CA. Do not disable verification or
+use the local TAK admin TLS helper for this download. CA group updates do not
+repair an already-created federate's own groups; that requires a separate admin
+operation.

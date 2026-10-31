@@ -20,7 +20,7 @@ from takrmapi.takutils.tak_pkg_helpers import TAKDataPackage
 
 def test_version() -> None:
     """Make sure version matches expected"""
-    assert __version__ == "1.17.3+261029"
+    assert __version__ == "1.18.0+261027"
 
 
 @pytest.fixture(autouse=True)
